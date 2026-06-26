@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+/* ================= ۱. تعریف فونت فارسی ================= */
+@font-face {
+    font-family: "IRANSans";
+    src: url('/fonts/fa-regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "IRANSans";
+    src: url('/fonts/fa-bold.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ================= ۲. تعریف فونت انگلیسی ================= */
+@font-face {
+    font-family: "EnglishFont";
+    src: url('/fonts/en-regular.woff2') format('woff2'); /* نام دقیق فایل خودت را بگذار */
+    font-weight: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "EnglishFont";
+    src: url('/fonts/en-bold.woff2') format('woff2'); /* نام دقیق فایل خودت را بگذار */
+    font-weight: bold;
+    font-display: swap;
+}
+
+/* ================= ۳. تعریف فونت عربی ================= */
+@font-face {
+    font-family: "ArabicFont";
+    src: url('/fonts/ar-regular.woff2') format('woff2'); /* نام دقیق فایل خودت را بگذار */
+    font-weight: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "ArabicFont";
+    src: url('/fonts/ar-bold.woff2') format('woff2'); /* نام دقیق فایل خودت را بگذار */
+    font-weight: bold;
+    font-display: swap;
+}
+
+/* ================= ۴. اعمال هوشمند بر اساس ویژگی lang تگ html ================= */
+@layer base {
+    /* وضعیت پیش‌فرض برای کل پلتفرم */
+    html, body {
+        @apply antialiased text-slate-800 bg-slate-50;
+    }
+
+    /* اگر زبان فارسی بود */
+    html[lang="fa"] *, html[lang="fa"] body {
+        font-family: "IRANSans", sans-serif !important;
+    }
+
+    /* اگر زبان انگلیسی بود */
+    html[lang="en"] *, html[lang="en"] body {
+        font-family: "EnglishFont", system-ui, sans-serif !important;
+    }
+
+    /* اگر زبان عربی بود */
+    html[lang="ar"] *, html[lang="ar"] body {
+        font-family: "ArabicFont", Arial, sans-serif !important;
+    }
+}
