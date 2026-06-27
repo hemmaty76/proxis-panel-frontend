@@ -160,3 +160,23 @@ export const purchasePackage = async (packageId: string): Promise<PurchaseResult
   const response = await apiClient.post<PurchaseResult>(`/shop/purchase/${packageId}`);
   return response.data;
 };
+
+export interface ConfigUsageResponse {
+  username: string;
+  status: string;
+  used_traffic: number;
+  lifetime_used_traffic: number;
+  data_limit: number;
+  expire: number | null;
+  on_hold_expire_duration: number;
+  on_hold_timeout: string | null;
+  online_at: string | null;
+  sub_updated_at: string | null;
+  created_at: string;
+  links: string[];
+}
+
+export const getConfigUsage = async (username: string): Promise<ConfigUsageResponse> => {
+  const response = await apiClient.get<ConfigUsageResponse>(`/shop/configs/${username}/usage`);
+  return response.data;
+};

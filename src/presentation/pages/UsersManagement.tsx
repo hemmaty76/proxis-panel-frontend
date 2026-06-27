@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Copy, Check, ChevronRight, ChevronLeft, QrCode, X } from 'lucide-react';
+import { Copy, Check, ChevronRight, ChevronLeft, QrCode, X, BarChart3, RefreshCw } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { getShopConfigs, type PaginatedConfigs } from '../../data/services/shopService';
+import { getShopConfigs, getConfigUsage, type PaginatedConfigs, type ConfigUsageResponse } from '../../data/services/shopService';
 import { useTranslation } from 'react-i18next';
 
 
@@ -37,6 +37,9 @@ export default function UsersManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [qrModal, setQrModal] = useState<{ isOpen: boolean; link: string; username: string } | null>(null);
+  const [selectedUsage, setSelectedUsage] = useState<ConfigUsageResponse | null>(null);
+  const [isUsageLoading, setIsUsageLoading] = useState(false);
+  const [isUsageOpen, setIsUsageOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -66,6 +69,30 @@ export default function UsersManagement() {
     } catch (err) {
       toast.error(t('usersManagement.messages.copyError'));
     }
+  };
+
+  const handleShowUsage = async (username: string) => {
+    setIsUsageOpen(true);
+    setIsUsageLoading(true);
+    setSelectedUsage(null);
+    try {
+      const result = await getConfigUsage(username);
+      setSelectedUsage(result);
+    } catch (error) {
+      toast.error('خطا در دریافت اطلاعات مصرف کاربر از سرور اصلی');
+      setIsUsageOpen(false);
+    } finally {
+      setIsUsageLoading(false);
+    }
+  };
+
+  const formatBytes = (bytes: number) => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    const val = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
+    return `${val.toLocaleString(getLocale())} ${sizes[i]}`;
   };
 
   return (
@@ -116,6 +143,13 @@ export default function UsersManagement() {
                     <td className="px-6 py-4">
                       <div className="flex justify-center items-center gap-2">
                         <button
+                          onClick={() => handleShowUsage(item.marzban_username)}
+                          className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-600 transition-all duration-200"
+                          title="مشاهده مصرف و جزئیات"
+                        >
+                          <BarChart3 size={18} strokeWidth={2.5} />
+                        </button>
+                        <button
                           onClick={() => setQrModal({ isOpen: true, link: item.sub_link, username: item.marzban_username })}
                           className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 transition-all duration-200"
                           title={t('usersManagement.tooltips.showQr')}
@@ -154,6 +188,13 @@ export default function UsersManagement() {
                   <span className="font-bold text-slate-800 text-lg dir-ltr text-left">{item.marzban_username}</span>
 
                   <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleShowUsage(item.marzban_username)}
+                      className="p-2.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                      title="مشاهده مصرف"
+                    >
+                      <BarChart3 size={18} strokeWidth={2.5} />
+                    </button>
                     <button
                       onClick={() => setQrModal({ isOpen: true, link: item.sub_link, username: item.marzban_username })}
                       className="p-2.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all"
@@ -231,6 +272,168 @@ export default function UsersManagement() {
               <p className="text-sm font-medium text-slate-600">
                 {t('usersManagement.qrModal.guide')}
               </p>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* === مودال جزئیات مصرف (Real-time Config Details) === */}
+      {isUsageOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
+            
+            {/* Header */}
+            <div className="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50/50">
+              <div>
+                <h3 className="font-extrabold text-slate-800">جزئیات مصرف کانفیگ</h3>
+                <p className="text-xs font-semibold text-slate-500 mt-1 dir-ltr text-right">
+                  {selectedUsage?.username || "در حال بارگذاری..."}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                {selectedUsage && (
+                  <button
+                    onClick={() => handleShowUsage(selectedUsage.username)}
+                    disabled={isUsageLoading}
+                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors disabled:opacity-50"
+                    title="بروزرسانی"
+                  >
+                    <RefreshCw size={18} strokeWidth={2.5} className={isUsageLoading ? 'animate-spin' : ''} />
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsUsageOpen(false)}
+                  className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                >
+                  <X size={20} strokeWidth={2.5} />
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6 overflow-y-auto max-h-[60vh]">
+              {isUsageLoading ? (
+                <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                  <RefreshCw className="animate-spin text-indigo-600" size={32} />
+                  <p className="text-sm font-semibold text-slate-500">دریافت اطلاعات مصرف از سرور اصلی...</p>
+                </div>
+              ) : selectedUsage ? (
+                <div className="space-y-6 font-sans">
+                  {/* Status */}
+                  <div className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <span className="text-sm font-bold text-slate-500 font-medium">وضعیت سرویس</span>
+                    <div>
+                      {selectedUsage.status === 'active' && (
+                        <span className="px-3 py-1.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                          فعال (Active)
+                        </span>
+                      )}
+                      {selectedUsage.status === 'on_hold' && (
+                        <span className="px-3 py-1.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-700 border border-amber-200">
+                          در انتظار اولین اتصال (On Hold)
+                        </span>
+                      )}
+                      {selectedUsage.status === 'expired' && (
+                        <span className="px-3 py-1.5 rounded-full text-xs font-extrabold bg-rose-100 text-rose-700 border border-rose-200">
+                          منقضی شده (Expired)
+                        </span>
+                      )}
+                      {selectedUsage.status === 'disabled' && (
+                        <span className="px-3 py-1.5 rounded-full text-xs font-extrabold bg-slate-200 text-slate-700 border border-slate-300">
+                          غیرفعال (Disabled)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Volume Usage */}
+                  <div className="space-y-3 bg-gradient-to-br from-indigo-50/50 to-slate-50 p-5 rounded-2xl border border-slate-100/80">
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-sm font-bold text-indigo-950">ترافیک مصرفی</span>
+                      <span className="text-xs font-bold text-indigo-950/80">
+                        {formatBytes(selectedUsage.used_traffic)} از {selectedUsage.data_limit > 0 ? formatBytes(selectedUsage.data_limit) : 'نامحدود'}
+                      </span>
+                    </div>
+                    
+                    {selectedUsage.data_limit > 0 ? (
+                      <div className="space-y-1.5">
+                        <div className="w-full bg-slate-200/80 rounded-full h-3 overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              ((selectedUsage.used_traffic / selectedUsage.data_limit) * 100) > 85 ? 'bg-gradient-to-r from-rose-500 to-red-600' : 
+                              ((selectedUsage.used_traffic / selectedUsage.data_limit) * 100) > 60 ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 
+                              'bg-gradient-to-r from-indigo-500 to-emerald-500'
+                            }`}
+                            style={{ width: `${Math.min(100, (selectedUsage.used_traffic / selectedUsage.data_limit) * 100)}%` }}
+                          ></div>
+                        </div>
+                        <div className="flex justify-between text-[11px] text-slate-500 font-bold">
+                          <span>{Math.min(100, (selectedUsage.used_traffic / selectedUsage.data_limit) * 100).toFixed(1)}% مصرف شده</span>
+                          <span>{formatBytes(Math.max(0, selectedUsage.data_limit - selectedUsage.used_traffic))} باقی‌مانده</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                        <div className="h-full bg-indigo-500 rounded-full w-full"></div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Other Info */}
+                  <div className="bg-white rounded-2xl border border-slate-100 divide-y divide-slate-50 overflow-hidden shadow-sm">
+                    <div className="flex justify-between items-center p-4">
+                      <span className="text-xs font-bold text-slate-500">کل ترافیک مصرفی (Lifetime)</span>
+                      <span className="text-sm font-bold text-slate-800 dir-ltr">{formatBytes(selectedUsage.lifetime_used_traffic)}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center p-4">
+                      <span className="text-xs font-bold text-slate-500">تاریخ ایجاد کانفیگ</span>
+                      <span className="text-sm font-bold text-slate-700">{formatDate(selectedUsage.created_at)}</span>
+                    </div>
+
+                    {selectedUsage.status === 'on_hold' ? (
+                      <div className="flex justify-between items-center p-4">
+                        <span className="text-xs font-bold text-slate-500">مدت دوره (پس از اتصال)</span>
+                        <span className="text-sm font-bold text-slate-700">
+                          {Math.round(selectedUsage.on_hold_expire_duration / (24 * 3600))} روز
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center p-4">
+                        <span className="text-xs font-bold text-slate-500">تاریخ انقضا</span>
+                        <span className="text-sm font-bold text-slate-700">
+                          {selectedUsage.expire ? formatDate(new Date(selectedUsage.expire * 1000).toISOString()) : 'نامحدود'}
+                        </span>
+                      </div>
+                    )}
+
+                    {selectedUsage.online_at && (
+                      <div className="flex justify-between items-center p-4">
+                        <span className="text-xs font-bold text-slate-500">آخرین اتصال به سرور</span>
+                        <span className="text-sm font-bold text-slate-700">{formatDate(selectedUsage.online_at)}</span>
+                      </div>
+                    )}
+
+                    {selectedUsage.sub_updated_at && (
+                      <div className="flex justify-between items-center p-4">
+                        <span className="text-xs font-bold text-slate-500">آخرین بروزرسانی ساب</span>
+                        <span className="text-sm font-bold text-slate-700">{formatDate(selectedUsage.sub_updated_at)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 bg-slate-50/50 text-center border-t border-slate-100 flex justify-end">
+              <button
+                onClick={() => setIsUsageOpen(false)}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm"
+              >
+                بستن
+              </button>
             </div>
 
           </div>
