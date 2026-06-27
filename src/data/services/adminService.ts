@@ -190,3 +190,35 @@ export const adminUpdatePackage = async (id: string, data: Partial<AdminPackageI
   const response = await apiClient.patch<AdminPackageItem>(`/admin/packages/${id}`, data);
   return response.data;
 };
+
+export const getSettlementDashboard = async (): Promise<SettlementDashboardResponse> => {
+  const response = await apiClient.get('/admin/settlements/');
+  return response.data;
+};
+
+export const createSettlement = async (amount: number, trackingCode: string): Promise<SettlementResponse> => {
+  const response = await apiClient.post('/admin/settlements/', {
+    amount,
+    tracking_code: trackingCode,
+  });
+  return response.data;
+};
+
+
+// مسیر احتمالی: src/data/services/adminService.ts
+
+export interface SettlementResponse {
+  id: string;
+  amount: number;
+  tracking_code: string | null;
+  created_at: string;
+}
+
+export interface SettlementDashboardResponse {
+  total_debt: number;
+  total_paid: number;
+  remaining_debt: number;
+  history: SettlementResponse[];
+}
+
+

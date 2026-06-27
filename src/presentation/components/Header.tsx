@@ -7,7 +7,7 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user_role'); 
-    toast.success(t('header.logoutSuccess'));
+    toast.success(t('forceChangePassword.messages.logoutSuccess'));
     setTimeout(() => {
       window.location.href = '/login';
     }, 500);

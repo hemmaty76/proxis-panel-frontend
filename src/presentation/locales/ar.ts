@@ -1,142 +1,142 @@
-export const ar = {  
+export const ar = {
     header: {
-        logoutSucces: 'تم تسجيل الخروج بنجاح',  
-        connectedToServer: 'تم الاتصال بالخادم',  
-        welcome: 'مرحباً بك',  
-        logOut: 'تسجيل الخروج'  
+        logoutSucces: 'تم تسجيل الخروج بنجاح',
+        connectedToServer: 'تم الاتصال بالخادم',
+        welcome: 'مرحباً بك',
+        logOut: 'تسجيل الخروج'
     },
     passwordChangeForm: {
         errors: {
-            fillAllFields: 'يرجى ملء جميع الحقول',  
-            minLength: 'يجب أن تتكون كلمة المرور الجديدة من 8 أحرف على الأقل',  
-            passwordMismatch: 'كلمة المرور الجديدة وتأكيدها غير متطابقين',  
-            generalError: 'كلمة المرور الحالية غير صحيحة أو حدث خطأ'  
+            fillAllFields: 'يرجى ملء جميع الحقول',
+            minLength: 'يجب أن تتكون كلمة المرور الجديدة من 8 أحرف على الأقل',
+            passwordMismatch: 'كلمة المرور الجديدة وتأكيدها غير متطابقين',
+            generalError: 'كلمة المرور الحالية غير صحيحة أو حدث خطأ'
         },
-        success: 'تم تغيير كلمة المرور بنجاح',  
+        success: 'تم تغيير كلمة المرور بنجاح',
         labels: {
-            currentPassword: 'كلمة المرور الحالية',  
-            newPassword: 'كلمة المرور الجديدة',  
-            confirmPassword: 'تأكيد كلمة المرور الجديدة'  
+            currentPassword: 'كلمة المرور الحالية',
+            newPassword: 'كلمة المرور الجديدة',
+            confirmPassword: 'تأكيد كلمة المرور الجديدة'
         },
         placeholders: {
-            minLength: '8 أحرف كحد أدنى',  
+            minLength: '8 أحرف كحد أدنى',
         },
         buttons: {
-            changing: 'جاري التغيير...',  
-            changePassword: 'تغيير كلمة المرور'  
+            changing: 'جاري التغيير...',
+            changePassword: 'تغيير كلمة المرور'
         }
     },
     sidebar: {
-        title: 'إدارة الوكيل (البروكسي)',  
+        title: 'إدارة الوكيل (البروكسي)',
         menu: {
-            dashboard: 'لوحة التحكم والإحصائيات',  
-            createConfig: 'إنشاء تكوین (كونفيج)',  
-            manageUsers: 'إدارة المستخدمين',  
-            manageShop: 'إدارة المتجر',  
+            dashboard: 'لوحة التحكم والإحصائيات',
+            createConfig: 'إنشاء تكوین (كونفيج)',
+            manageUsers: 'إدارة المستخدمين',
+            manageShop: 'إدارة المتجر',
             manageServices: 'إدارة الخدمات والحزم',
             customPrices: 'إعدادات سعر البيع',
-            panelSettings: 'إعدادات اللوحة'  
+            panelSettings: 'إعدادات اللوحة'
         }
     },
     usersManagement: {
-        currency: 'تومان',  
-        unlimited: 'غير محدود',  
-        gigabyte: 'جيجابايت',  
-        emptyDate: '—',  
+        currency: 'تومان',
+        unlimited: 'غير محدود',
+        gigabyte: 'جيجابايت',
+        emptyDate: '—',
         messages: {
-            fetchError: 'خطأ في جلب قائمة التكوينات',  
-            copySuccess: 'تم نسخ رابط الاشتراك بنجاح',  
-            copyError: 'المتصفح لا يدعم النسخ التلقائي',  
+            fetchError: 'خطأ في جلب قائمة التكوينات',
+            copySuccess: 'تم نسخ رابط الاشتراك بنجاح',
+            copyError: 'المتصفح لا يدعم النسخ التلقائي',
         },
         header: {
-            title: 'إدارة المستخدمين',  
-            subtitle: 'قائمة التكوينات المباعة، حالة الحجم، وروابط الاشتراك'  
+            title: 'إدارة المستخدمين',
+            subtitle: 'قائمة التكوينات المباعة، حالة الحجم، وروابط الاشتراك'
         },
         table: {
-            username: 'اسم المستخدم',  
-            serviceVolume: 'حجم الخدمة',  
-            createdAt: 'تاريخ الإنشاء',  
-            expireDate: 'تاريخ الانتهاء',  
-            sellPrice: 'سعر البيع',  
-            actions: 'عمليات الاشتراك',  
-            noConfigs: 'لا توجد تكوينات لعرضها.',  
-            volumeShort: 'الحجم',  
-            createdShort: 'إنشاء',  
-            expireShort: 'انتهاء',  
+            username: 'اسم المستخدم',
+            serviceVolume: 'حجم الخدمة',
+            createdAt: 'تاريخ الإنشاء',
+            expireDate: 'تاريخ الانتهاء',
+            sellPrice: 'سعر البيع',
+            actions: 'عمليات الاشتراك',
+            noConfigs: 'لا توجد تكوينات لعرضها.',
+            volumeShort: 'الحجم',
+            createdShort: 'إنشاء',
+            expireShort: 'انتهاء',
         },
         tooltips: {
-            showQr: 'عرض رمز الاستجابة السريعة (QR Code)',  
-            copyLink: 'نسخ رابط الاشتراك'  
+            showQr: 'عرض رمز الاستجابة السريعة (QR Code)',
+            copyLink: 'نسخ رابط الاشتراك'
         },
         pagination: {
-            page: 'صفحة',  
-            of: 'من'  
+            page: 'صفحة',
+            of: 'من'
         },
         qrModal: {
-            title: 'رمز الاستجابة للاتصال',  
-            guide: 'للاتصال، قم بمسح هذا الرمز في التطبيق.'  
+            title: 'رمز الاستجابة للاتصال',
+            guide: 'للاتصال، قم بمسح هذا الرمز في التطبيق.'
         }
     },
     login: {
         messages: {
-            emptyFields: 'يرجى إدخال اسم المستخدم وكلمة المرور',  
-            success: 'تم تسجيل الدخول بنجاح',  
-            invalidCredentials: 'اسم المستخدم أو كلمة المرور غير صحيحة.',  
+            emptyFields: 'يرجى إدخال اسم المستخدم وكلمة المرور',
+            success: 'تم تسجيل الدخول بنجاح',
+            invalidCredentials: 'اسم المستخدم أو كلمة المرور غير صحيحة.',
         },
         header: {
-            title: 'تسجيل الدخول إلى اللوحة',  
-            subtitle: 'للوصول إلى لوحة التحكم، أدخل بياناتك'  
+            title: 'تسجيل الدخول إلى اللوحة',
+            subtitle: 'للوصول إلى لوحة التحكم، أدخل بياناتك'
         },
         labels: {
-            username: 'اسم المستخدم',  
-            password: 'كلمة المرور'  
+            username: 'اسم المستخدم',
+            password: 'كلمة المرور'
         },
         placeholders: {
-            username: 'admin',  
-            password: '••••••••'  
+            username: 'admin',
+            password: '••••••••'
         },
         buttons: {
-            authenticating: 'جاري المصادقة...',  
-            login: 'تسجيل الدخول'  
+            authenticating: 'جاري المصادقة...',
+            login: 'تسجيل الدخول'
         }
     },
     forceChangePassword: {
         messages: {
-            logoutSuccess: 'تم تسجيل الخروج بنجاح'  
+            logoutSuccess: 'تم تسجيل الخروج بنجاح'
         },
         header: {
-            title: 'تغيير إلزامي لكلمة المرور',  
-            description: 'لأسباب أمنية، لن تتمكن من الوصول إلى النظام حتى تقوم بتغيير كلمة المرور الخاصة بك.'  
+            title: 'تغيير إلزامي لكلمة المرور',
+            description: 'لأسباب أمنية، لن تتمكن من الوصول إلى النظام حتى تقوم بتغيير كلمة المرور الخاصة بك.'
         },
         buttons: {
-            logout: 'تسجيل الخروج من الحساب'  
+            logout: 'تسجيل الخروج من الحساب'
         }
     },
     dashboardHome: {
-        currency: 'تومان',  
+        currency: 'تومان',
         messages: {
-            fetchError: 'فشل الاتصال بالخادم. يرجى إعادة تحميل الصفحة.',  
-            invalidPrice: 'يرجى إدخال سعر صالح',  
-            priceUpdateSuccess: 'تم تحديث سعر البيع بنجاح في النظام',  
-            priceUpdateError: 'خطأ في تحديث السعر. يرجى المحاولة مرة أخرى'  
+            fetchError: 'فشل الاتصال بالخادم. يرجى إعادة تحميل الصفحة.',
+            invalidPrice: 'يرجى إدخال سعر صالح',
+            priceUpdateSuccess: 'تم تحديث سعر البيع بنجاح في النظام',
+            priceUpdateError: 'خطأ في تحديث السعر. يرجى المحاولة مرة أخرى'
         },
         stats: {
-            totalSales: 'إجمالي المبيعات',  
-            activeServices: 'الخدمات النشطة',  
-            totalCost: 'إجمالي التكلفة',  
-            totalRevenue: 'إجمالي الإيرادات',  
-            netProfit: 'صافي الأرباح',  
+            totalSales: 'إجمالي المبيعات',
+            activeServices: 'الخدمات النشطة',
+            totalCost: 'إجمالي التكلفة',
+            totalRevenue: 'إجمالي الإيرادات',
+            netProfit: 'صافي الأرباح',
             upstreamDebt: 'الديون للمزود (مرزبان)',
             adminGrossRevenue: 'إجمالي إيرادات المسؤول',
             adminNetProfit: 'صافي أرباح المسؤول'
         },
         header: {
-            title: 'لوحة التحكم',  
-            subtitle: 'نظرة عامة على الأداء وحالة الحساب وإعدادات المبيعات'  
+            title: 'لوحة التحكم',
+            subtitle: 'نظرة عامة على الأداء وحالة الحساب وإعدادات المبيعات'
         },
         sections: {
-            generalStats: 'الإحصائيات العامة',  
-            profileAndOps: 'الملف الشخصي والعمليات'  
+            generalStats: 'الإحصائيات العامة',
+            profileAndOps: 'الملف الشخصي والعمليات'
         },
         adminActions: {
             servicesTitle: 'إدارة الباقات والخدمات',
@@ -145,15 +145,15 @@ export const ar = {
             servicesBtn: 'الذهاب إلى الخدمات والباقات'
         },
         profile: {
-            title: 'الملف الشخصي والمالي',  
-            subtitle: 'معلومات حسابك الخاص',  
-            active: 'نشط',  
-            username: 'اسم المستخدم',  
-            phone: 'رقم الهاتف',  
-            createdAt: 'تاريخ إنشاء الحساب',  
-            balance: 'الرصيد',  
-            creditLimit: 'حد الائتممان',  
-            discountPercent: 'نسبة الخصم الافتراضية',  
+            title: 'الملف الشخصي والمالي',
+            subtitle: 'معلومات حسابك الخاص',
+            active: 'نشط',
+            username: 'اسم المستخدم',
+            phone: 'رقم الهاتف',
+            createdAt: 'تاريخ إنشاء الحساب',
+            balance: 'الرصيد',
+            creditLimit: 'حد الائتممان',
+            discountPercent: 'نسبة الخصم الافتراضية',
             notAvailable: 'معلومات الملف الشخصي غير متوفرة.',
             roles: {
                 admin: 'مدير النظام',
@@ -161,67 +161,67 @@ export const ar = {
             }
         },
         sellPrice: {
-            title: 'إعدادات سعر البيع للزبائن',  
+            title: 'إعدادات سعر البيع للزبائن',
             subtitle: 'تخصيص أسعار البيع للزبائن',
             desc: 'تم تغيير نظام تسعير الباقات ليكون على أساس الوحدة والتصنيف. لتعديل وتخصيص أسعار البيع للزبائن النهائيين بناءً على فئات الخدمات، انتقل إلى قسم إعدادات سعر البيع.',
             btn: 'إعدادات سعر البيع',
-            currentPrice: 'السعر الحالي:',  
-            emptyPrice: '—',  
-            newPriceLabel: 'سعر البيع الجديد (تومان / جيجابايت)',  
-            placeholder: 'مثلاً ۳,۵۰۰',  
-            submitting: 'جاري الإرسال...',  
-            submitBtn: 'حفظ السعر الجديد'  
+            currentPrice: 'السعر الحالي:',
+            emptyPrice: '—',
+            newPriceLabel: 'سعر البيع الجديد (تومان / جيجابايت)',
+            placeholder: 'مثلاً ۳,۵۰۰',
+            submitting: 'جاري الإرسال...',
+            submitBtn: 'حفظ السعر الجديد'
         },
         password: {
-            title: 'تغيير كلمة المرور',  
-            subtitle: 'اختر كلمة مرور قوية لمزيد من الأمان'  
+            title: 'تغيير كلمة المرور',
+            subtitle: 'اختر كلمة مرور قوية لمزيد من الأمان'
         }
     },
     createConfig: {
-        currency: 'تومان',  
-        unlimited: 'غير محدود',  
-        gigabyte: 'جيجابايت',  
-        days: 'أيام',  
+        currency: 'تومان',
+        unlimited: 'غير محدود',
+        gigabyte: 'جيجابايت',
+        days: 'أيام',
         messages: {
-            fetchError: 'خطأ في جلب البيانات. يرجى تحديث الصفحة.',  
-            purchaseSuccess: 'تم إنشاء التكوين بنجاح',  
-            purchaseErrorFallback: 'خطأ في عملية الشراء. يرجى المحاولة مرة أخرى.',  
-            copySuccess: 'تم نسخ رابط الاشتراك',  
-            copyError: 'المتصفح لا يدعم النسخ التلقائي',  
+            fetchError: 'خطأ في جلب البيانات. يرجى تحديث الصفحة.',
+            purchaseSuccess: 'تم إنشاء التكوين بنجاح',
+            purchaseErrorFallback: 'خطأ في عملية الشراء. يرجى المحاولة مرة أخرى.',
+            copySuccess: 'تم نسخ رابط الاشتراك',
+            copyError: 'المتصفح لا يدعم النسخ التلقائي',
         },
         header: {
-            title: 'إنشاء تكوين جديد',  
-            subtitle: 'اختر الباقة المطلوبة واستلم التكوين',  
-            currentBalance: 'رصيدك الحالي'  
+            title: 'إنشاء تكوين جديد',
+            subtitle: 'اختر الباقة المطلوبة واستلم التكوين',
+            currentBalance: 'رصيدك الحالي'
         },
         package: {
-            notFound: 'لم يتم العثور على أي باقة',  
-            volume: 'الحجم:',  
-            validity: 'الصلاحية:',  
-            costPrice: 'سعر التكلفة (الشراء):',  
+            notFound: 'لم يتم العثور على أي باقة',
+            volume: 'الحجم:',
+            validity: 'الصلاحية:',
+            costPrice: 'سعر التكلفة (الشراء):',
             sellPrice: 'سعر البيع للعميل:',
             noExpiration: 'بدون تاريخ انتهاء'
         },
         recentPurchases: {
-            title: 'مشترياتك الأخيرة في هذا النظام',  
-            deductedAmount: 'المبلغ المخصوم:',  
-            copied: 'تم النسخ',  
-            copyLink: 'نسخ الرابط'  
+            title: 'مشترياتك الأخيرة في هذا النظام',
+            deductedAmount: 'المبلغ المخصوم:',
+            copied: 'تم النسخ',
+            copyLink: 'نسخ الرابط'
         },
         modal: {
-            title: 'تأكيد شراء الباقة',  
-            confirmPromptStart: 'هل أنت متأكد من شراء الباقة «',  
-            confirmPromptEnd: '»؟',  
-            amountToDeduct: 'المبلغ المخصوم من المحفظة:',  
-            balanceAfter: 'الرصيد بعد الشراء:',  
-            guideStart: 'وفقاً لإعداداتك، السعر المقترح لبيع هذا التكوين للعميل',  
-            guideMiddle: 'هو. ربحك من هذا البيع',  
-            guideEnd: 'سيكون.',  
-            cancel: 'إلغاء',  
-            payAndReceive: 'الدفع والاستلام'  
+            title: 'تأكيد شراء الباقة',
+            confirmPromptStart: 'هل أنت متأكد من شراء الباقة «',
+            confirmPromptEnd: '»؟',
+            amountToDeduct: 'المبلغ المخصوم من المحفظة:',
+            balanceAfter: 'الرصيد بعد الشراء:',
+            guideStart: 'وفقاً لإعداداتك، السعر المقترح لبيع هذا التكوين للعميل',
+            guideMiddle: 'هو. ربحك من هذا البيع',
+            guideEnd: 'سيكون.',
+            cancel: 'إلغاء',
+            payAndReceive: 'الدفع والاستلام'
         },
         qrModal: {
-            title: 'رمز الاستجابة للاتصال'  
+            title: 'رمز الاستجابة للاتصال'
         },
         labels: {
             allPackages: 'جميع الحزم',
@@ -229,81 +229,81 @@ export const ar = {
         }
     },
     shopsManagement: {
-        currency: 'تومان',  
+        currency: 'تومان',
         messages: {
-            fetchError: 'خطأ في جلب قائمة أصحاب المتاجر',  
-            invalidAmount: 'يرجى إدخال مبلغ صحيح',  
-            chargeSuccess: 'تم شحن المحفظة بنجاح',  
-            chargeError: 'خطأ في شحن المحفظة',  
-            descUpdateSuccess: 'تم تحديث الوصف بنجاح',  
-            descUpdateError: 'خطأ في تسجيل الوصف',  
-            resetPasswordConfirmStart: 'هل أنت متأكد من إعادة تعيين كلمة مرور المتجر «',  
-            resetPasswordConfirmEnd: '»؟',  
-            resetPasswordSuccess: 'تم إعادة تعيين كلمة المرور بنجاح.',  
-            resetPasswordError: 'خطأ في إعادة تعيين كلمة المرور',  
-            statsError: 'خطأ في جلب الإحصائيات',  
-            createShopSuccess: 'تم إنشاء متجر جديد بنجاح',  
+            fetchError: 'خطأ في جلب قائمة أصحاب المتاجر',
+            invalidAmount: 'يرجى إدخال مبلغ صحيح',
+            chargeSuccess: 'تم شحن المحفظة بنجاح',
+            chargeError: 'خطأ في شحن المحفظة',
+            descUpdateSuccess: 'تم تحديث الوصف بنجاح',
+            descUpdateError: 'خطأ في تسجيل الوصف',
+            resetPasswordConfirmStart: 'هل أنت متأكد من إعادة تعيين كلمة مرور المتجر «',
+            resetPasswordConfirmEnd: '»؟',
+            resetPasswordSuccess: 'تم إعادة تعيين كلمة المرور بنجاح.',
+            resetPasswordError: 'خطأ في إعادة تعيين كلمة المرور',
+            statsError: 'خطأ في جلب الإحصائيات',
+            createShopSuccess: 'تم إنشاء متجر جديد بنجاح',
             createShopError: 'خطأ في إنشاء المتجر',
             updateSuccess: 'تم تعديل بيانات المتجر بنجاح.',
             updateError: 'خطأ في تعديل بيانات المتجر.'
         },
         header: {
-            title: 'إدارة أصحاب المتاجر',  
-            subtitle: 'تحكم كامل بالبائعين، شحن الحساب، وإحصائيات البيع',  
-            searchPlaceholder: 'البحث عن رقم هاتف محمول...',  
-            createShopBtn: 'إنشاء متجر جديد'  
+            title: 'إدارة أصحاب المتاجر',
+            subtitle: 'تحكم كامل بالبائعين، شحن الحساب، وإحصائيات البيع',
+            searchPlaceholder: 'البحث عن رقم هاتف محمول...',
+            createShopBtn: 'إنشاء متجر جديد'
         },
         table: {
-            userAndPhone: 'اسم المستخدم / الرقم',  
-            adminDesc: 'وصف المسؤول',  
-            balanceAndCredit: 'الرصيد (الائتمان)',  
-            prices: 'السعر (شراء / بيع)',  
-            actions: 'العمليات',  
-            loading: 'جاري جلب البيانات...',  
-            empty: 'لم يتم العثور على أي متجر.',  
-            emptyDash: '—',  
-            limit: 'الحد:',  
-            sell: 'البيع:',  
+            userAndPhone: 'اسم المستخدم / الرقم',
+            adminDesc: 'وصف المسؤول',
+            balanceAndCredit: 'الرصيد (الائتمان)',
+            prices: 'السعر (شراء / بيع)',
+            actions: 'العمليات',
+            loading: 'جاري جلب البيانات...',
+            empty: 'لم يتم العثور على أي متجر.',
+            emptyDash: '—',
+            limit: 'الحد:',
+            sell: 'البيع:',
             active: 'نشط',
             discountPercent: 'الخصم'
         },
         mobileCard: {
-            currentBalance: 'الرصيد الحالي',  
-            creditLimit: 'الحد الائتماني',  
-            buyPerGb: 'شراء لكل جيجابايت',  
+            currentBalance: 'الرصيد الحالي',
+            creditLimit: 'الحد الائتماني',
+            buyPerGb: 'شراء لكل جيجابايت',
             defaultSell: 'البيع الافتراضي',
             discountPercent: 'نسبة الخصم'
         },
         tooltips: {
-            chargeWallet: 'شحن المحفظة',  
-            salesStats: 'إحصائيات البيع',  
-            editDesc: 'تعديل الوصف',  
+            chargeWallet: 'شحن المحفظة',
+            salesStats: 'إحصائيات البيع',
+            editDesc: 'تعديل الوصف',
             resetPassword: 'إعادة تعيين كلمة المرور',
             editShop: 'تعديل بيانات المتجر'
         },
         actionsShort: {
-            charge: 'شحن',  
-            stats: 'إحصائيات',  
-            edit: 'تعديل',  
-            reset: 'إعادة تعيين'  
+            charge: 'شحن',
+            stats: 'إحصائيات',
+            edit: 'تعديل',
+            reset: 'إعادة تعيين'
         },
         pagination: {
-            page: 'صفحة',  
-            of: 'من'  
+            page: 'صفحة',
+            of: 'من'
         },
         modals: {
             charge: {
-                title: 'شحن المحفظة',  
-                amountLabel: 'مبلغ الشحن (تومان)',  
-                amountPlaceholder: 'مثال: 500,000',  
-                descLabel: 'الوصف',  
-                descDefault: 'شحن يدوي للمحفظة بواسطة المسؤول',  
-                submit: 'تأكيد وشحن'  
+                title: 'شحن المحفظة',
+                amountLabel: 'مبلغ الشحن (تومان)',
+                amountPlaceholder: 'مثال: 500,000',
+                descLabel: 'الوصف',
+                descDefault: 'شحن يدوي للمحفظة بواسطة المسؤول',
+                submit: 'تأكيد وشحن'
             },
             editDesc: {
-                title: 'وصف المسؤول',  
-                placeholder: 'العنوان أو ملاحظة...',  
-                submit: 'حفظ التغييرات'  
+                title: 'وصف المسؤول',
+                placeholder: 'العنوان أو ملاحظة...',
+                submit: 'حفظ التغييرات'
             },
             edit: {
                 title: 'تعديل الإعدادات',
@@ -315,21 +315,21 @@ export const ar = {
                 submit: 'حفظ التغييرات'
             },
             stats: {
-                title: 'إحصائيات المتجر',  
-                salesCount: 'عدد المبيعات',  
-                activeServices: 'الخدمات النشطة',  
-                netProfit: 'صافي الربح (البائع):',  
-                totalIncome: 'إجمالي الدخل (الشراء منك):'  
+                title: 'إحصائيات المتجر',
+                salesCount: 'عدد المبيعات',
+                activeServices: 'الخدمات النشطة',
+                netProfit: 'صافي الربح (البائع):',
+                totalIncome: 'إجمالي الدخل (الشراء منك):'
             },
             create: {
-                title: 'إنشاء متجر جديد',  
-                username: 'اسم المستخدم (باللغة الإنجليزية)',  
-                phone: 'رقم الهاتف',  
-                password: 'كلمة المرور',  
-                creditLimit: 'الحد الائتماني (تومان)',  
-                buyPrice: 'سعر الشراء (لكل جيجا / تومان)',  
-                sellPrice: 'سعر البيع الافتراضي (تومان)',  
-                adminDesc: 'وصف المسؤول (عنوان/ملاحظة)',  
+                title: 'إنشاء متجر جديد',
+                username: 'اسم المستخدم (باللغة الإنجليزية)',
+                phone: 'رقم الهاتف',
+                password: 'كلمة المرور',
+                creditLimit: 'الحد الائتماني (تومان)',
+                buyPrice: 'سعر الشراء (لكل جيجا / تومان)',
+                sellPrice: 'سعر البيع الافتراضي (تومان)',
+                adminDesc: 'وصف المسؤول (عنوان/ملاحظة)',
                 submit: 'تسجيل متجر البائع',
                 discountPercent: 'نسبة خصم صاحب المتجر (٪)'
             }
@@ -337,36 +337,36 @@ export const ar = {
     },
     systemSettings: {
         messages: {
-            fetchError: 'خطأ في جلب إعدادات النظام',  
-            saveSuccess: 'تم تحديث إعدادات النظام بنجاح',  
-            saveError: 'خطأ في حفظ الإعدادات'  
+            fetchError: 'خطأ في جلب إعدادات النظام',
+            saveSuccess: 'تم تحديث إعدادات النظام بنجاح',
+            saveError: 'خطأ في حفظ الإعدادات'
         },
         header: {
-            title: 'إعدادات النظام',  
-            subtitle: 'إدارة رسائل لوحة التحكم وإصدار النظام'  
+            title: 'إعدادات النظام',
+            subtitle: 'إدارة رسائل لوحة التحكم وإصدار النظام'
         },
         general: {
-            title: 'الإعدادات العامة',  
-            versionLabel: 'إصدار لوحة التحكم (Version)'  
+            title: 'الإعدادات العامة',
+            versionLabel: 'إصدار لوحة التحكم (Version)'
         },
         notice: {
-            title: 'إشعار عام للمستخدمين',  
-            messageLabel: 'نص الرسالة (اتركه فارغاً لإخفائه)',  
-            messagePlaceholder: 'مثال: سينقطع الاتصال بالخادم في التاريخ المحدد لمدة ساعة...',  
-            typeLabel: 'نوع الرسالة (اللون والأيقونة)',  
+            title: 'إشعار عام للمستخدمين',
+            messageLabel: 'نص الرسالة (اتركه فارغاً لإخفائه)',
+            messagePlaceholder: 'مثال: سينقطع الاتصال بالخادم في التاريخ المحدد لمدة ساعة...',
+            typeLabel: 'نوع الرسالة (اللون والأيقونة)',
             types: {
-                info: 'إشعار عادي (أزرق)',  
-                success: 'نجاح / خبر سار (أخضر)',  
-                warning: 'تحذير (أصفر)',  
-                error: 'تنبيه هام / انقطاع (أحمر)'  
+                info: 'إشعار عادي (أزرق)',
+                success: 'نجاح / خبر سار (أخضر)',
+                warning: 'تحذير (أصفر)',
+                error: 'تنبيه هام / انقطاع (أحمر)'
             }
         },
         preview: {
-            title: 'معاينة لوحة تحكم المستخدم',  
-            empty: 'لا توجد رسالة لعرضها'  
+            title: 'معاينة لوحة تحكم المستخدم',
+            empty: 'لا توجد رسالة لعرضها'
         },
         buttons: {
-            save: 'حفظ الإعدادات'  
+            save: 'حفظ الإعدادات'
         }
     },
     servicesManagement: {
@@ -465,6 +465,47 @@ export const ar = {
             cancelBtn: 'إلغاء',
             saveTitle: 'حفظ السعر',
             defaultServiceType: 'خدمة'
+        }
+    },
+    common: {
+        "currency": "تومان",
+        "submitting": "جاري الإرسال...",
+        "cancel": "إلغاء"
+    },
+    settlements: {
+
+        "messages": {
+            "fetchError": "حدث خطأ أثناء جلب البيانات.",
+            "invalidAmount": "المبلغ غير صالح.",
+            "success": "تم تسجيل الدفع بنجاح.",
+            "submitError": "فشل في تسجيل الدفع."
+        },
+        "header": {
+            "title": "تسويات الخادم (Upstream)",
+            "subtitle": "إدارة الديون والمدفوعات لمزود الخادم"
+        },
+        "buttons": {
+            "newSettlement": "تسجيل دفعة جديدة"
+        },
+        "stats": {
+            "totalDebt": "إجمالي الدين المتراكم",
+            "totalPaid": "إجمالي المبلغ المدفوع",
+            "remainingDebt": "الدين المتبقي الحالي"
+        },
+        "history": {
+            "title": "تاريخ المدفوعات",
+            "empty": "لم يتم تسجيل أي مدفوعات حتى الآن."
+        },
+        "table": {
+            "date": "التاريخ والوقت",
+            "amount": "المبلغ المدفوع",
+            "trackingCode": "رمز التتبع / ملاحظة"
+        },
+        "modal": {
+            "title": "تسجيل دفعة جديدة",
+            "amountLabel": "مبلغ الدفع (تومان)",
+            "trackingCodeLabel": "رمز التتبع أو الملاحظة",
+            "submitBtn": "تأكيد المبلغ"
         }
     }
 };

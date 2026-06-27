@@ -21,7 +21,8 @@ export default function Sidebar({ isOpen, onClose, appVersion }: SidebarProps) {
     ...(userRole === 'ADMIN' ? [
       { text: t('sidebar.menu.manageShop'), path: '/admin/shops', icon: <Settings size={20} strokeWidth={2.5} /> },
       { text: t('sidebar.menu.manageServices'), path: '/admin/services', icon: <Package size={20} strokeWidth={2.5} /> },
-      { text: t('sidebar.menu.panelSettings'), path: '/admin/settings', icon: <Settings size={20} strokeWidth={2.5} /> }
+      { text: t('sidebar.menu.panelSettings'), path: '/admin/settings', icon: <Settings size={20} strokeWidth={2.5} /> },
+      { text: t('sidebar.menu.panelSettings'), path: '/admin/settlements', icon: <Settings size={20} strokeWidth={2.5} /> }
     ] : [
       { text: t('sidebar.menu.customPrices'), path: '/settings/prices', icon: <Coins size={20} strokeWidth={2.5} /> }
     ]),

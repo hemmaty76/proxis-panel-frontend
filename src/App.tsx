@@ -8,6 +8,7 @@ import UsersManagement from './presentation/pages/UsersManagement';
 import CreateConfig from './presentation/pages/CreateConfig';
 import ShopsManagement from './presentation/pages/admin/ShopsManagement';
 import ServicesManagement from './presentation/pages/admin/ServicesManagement';
+import AdminSettlements from './presentation/pages/admin/AdminSettlements';
 import ShopCustomPrices from './presentation/pages/ShopCustomPrices';
 import type { JSX } from 'react/jsx-runtime';
 import SystemSettingsPage from './presentation/pages/admin/SystemSetting';
@@ -136,6 +137,16 @@ function App() {
                   <ShopCustomPrices />
                 </DashboardLayout>
               </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/settlements"
+            element={
+              <AdminRoute>
+                <DashboardLayout>
+                  <AdminSettlements />
+                </DashboardLayout>
+              </AdminRoute>
             }
           />
         </Routes>

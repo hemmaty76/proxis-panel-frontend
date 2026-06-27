@@ -369,118 +369,159 @@ export const fa = {
             save: 'ذخیره تنظیمات'
         }
     },
-        servicesManagement: {
-            messages: {
-                fetchError: 'خطا در بارگذاری داده‌های خدمات.',
-                createTypeSuccess: 'نوع کانفیگ با موفقیت ساخته شد.',
-                createTypeError: 'خطا در ثبت نوع کانفیگ.',
-                deleteTypeConfirm: 'آیا از حذف این نوع سرویس مطمئن هستید؟ با این کار تمام دسته‌بندی‌های متصل نیز حذف می‌شوند.',
-                deleteTypeSuccess: 'نوع سرویس با موفقیت حذف شد.',
-                deleteTypeError: 'خطا در حذف نوع سرویس. احتمالاً به علت وجود وابستگی‌های فعال است.',
-                createCategorySuccess: 'دسته کانفیگ جدید با موفقیت ایجاد شد.',
-                createCategoryError: 'خطا در ثبت دسته کانفیگ.',
-                updateCategorySuccess: 'دسته کانفیگ با موفقیت ویرایش شد.',
-                updateCategoryError: 'خطا در ویرایش دسته کانفیگ.',
-                deleteCategoryConfirm: 'آیا از حذف این دسته کانفیگ مطمئن هستید؟ تمام پکیج‌ها و تنظیمات قیمت سفارشی متصل حذف می‌شوند.',
-                deleteCategorySuccess: 'دسته سرویس با موفقیت حذف شد.',
-                deleteCategoryError: 'خطا در حذف دسته سرویس.',
-                createPackageSuccess: 'پکیج جدید با موفقیت ایجاد شد.',
-                createPackageError: 'خطا در ثبت پکیج جدید.',
-                deletePackageConfirm: 'آیا از حذف این پکیج قالب مطمئن هستید؟',
-                deletePackageSuccess: 'پکیج با موفقیت حذف شد.',
-                deletePackageError: 'خطا در حذف پکیج.',
-                updatePackageSuccess: 'وضعیت پکیج با موفقیت بروزرسانی شد.',
-                updatePackageError: 'خطا در تغییر وضعیت پکیج.'
-            },
-            labels: {
-                sellTypes: {
-                    volumeTime: 'حجمی زمانی (محدود)',
-                    unlimitedVolume: 'حجم نامحدود (زمانی)',
-                    unlimitedTime: 'زمان نامحدود (حجمی)'
-                },
-                title: 'مدیریت سرویس‌ها و پکیج‌ها',
-                subtitle: 'مدیریت انواع کانفیگ (VIP / معمولی)، دسته‌بندی‌های فروش و قالب‌های پکیج آماده',
-                tabs: {
-                    packages: 'پکیج‌های خرید',
-                    categories: 'دسته‌بندی و تعیین فروش',
-                    types: 'نوع سرویس‌ها'
-                },
-                forms: {
-                    createTypeTitle: 'ساخت نوع سرویس جدید',
-                    typeName: 'نام نوع سرویس',
-                    typeDesc: 'توضیحات',
-                    typeDescPlaceholder: 'توضیحات اختیاری...',
-                    submitType: 'ثبت نوع سرویس',
-                    createCategoryTitle: 'ایجاد دسته فروش جدید',
-                    selectType: 'انتخاب نوع سرویس',
-                    sellType: 'مدل فروش و حسابداری',
-                    categoryName: 'نام نمایشی دسته',
-                    adminCost: 'هزینه ادمین به سرور اصلی (هر واحد - تومان)',
-                    shopPrice: 'قیمت فروش پایه به مغازه‌دار (هر واحد - تومان)',
-                    submitCategory: 'ثبت دسته فروش',
-                    createPackageTitle: 'ساخت پکیج جدید',
-                    selectCategory: 'انتخاب دسته سرویس',
-                    packageName: 'نام پکیج قالب',
-                    volumeGb: 'حجم (گیگابایت)',
-                    durationDays: 'مدت اعتبار (روز)',
-                    submitPackage: 'ثبت پکیج قالب',
-                    editPackageTitle: 'ویرایش پکیج قالب',
-                    savePackage: 'ذخیره تغییرات'
-                },
-                tables: {
-                    typeName: 'نام نوع سرویس',
-                    description: 'توضیحات',
-                    actions: 'عملیات',
-                    noTypes: 'هیچ نوع سرویسی ثبت نشده است.',
-                    sellType: 'مدل فروش',
-                    categoryName: 'نام نمایشی',
-                    adminCost: 'هزینه ادمین',
-                    shopPrice: 'قیمت پایه مغازه',
-                    noCategories: 'هیچ دسته‌بندی فروشی ثبت نشده است.',
-                    noPackages: 'هیچ قالب پکیجی طراحی نشده است.',
-                    volume: 'حجم',
-                    duration: 'اعتبار',
-                    unlimited: 'نامحدود',
-                    noExpiration: 'بدون تاریخ انقضا',
-                    days: 'روز',
-                    gigabytes: 'گیگ',
-                    deactivate: 'غیرفعال‌سازی فروش',
-                    activate: 'فعال‌سازی فروش',
-                    activeStatus: 'فعال',
-                    inactiveStatus: 'غیرفعال',
-                    edit: 'ویرایش'
-                }
-            }
+    servicesManagement: {
+        messages: {
+            fetchError: 'خطا در بارگذاری داده‌های خدمات.',
+            createTypeSuccess: 'نوع کانفیگ با موفقیت ساخته شد.',
+            createTypeError: 'خطا در ثبت نوع کانفیگ.',
+            deleteTypeConfirm: 'آیا از حذف این نوع سرویس مطمئن هستید؟ با این کار تمام دسته‌بندی‌های متصل نیز حذف می‌شوند.',
+            deleteTypeSuccess: 'نوع سرویس با موفقیت حذف شد.',
+            deleteTypeError: 'خطا در حذف نوع سرویس. احتمالاً به علت وجود وابستگی‌های فعال است.',
+            createCategorySuccess: 'دسته کانفیگ جدید با موفقیت ایجاد شد.',
+            createCategoryError: 'خطا در ثبت دسته کانفیگ.',
+            updateCategorySuccess: 'دسته کانفیگ با موفقیت ویرایش شد.',
+            updateCategoryError: 'خطا در ویرایش دسته کانفیگ.',
+            deleteCategoryConfirm: 'آیا از حذف این دسته کانفیگ مطمئن هستید؟ تمام پکیج‌ها و تنظیمات قیمت سفارشی متصل حذف می‌شوند.',
+            deleteCategorySuccess: 'دسته سرویس با موفقیت حذف شد.',
+            deleteCategoryError: 'خطا در حذف دسته سرویس.',
+            createPackageSuccess: 'پکیج جدید با موفقیت ایجاد شد.',
+            createPackageError: 'خطا در ثبت پکیج جدید.',
+            deletePackageConfirm: 'آیا از حذف این پکیج قالب مطمئن هستید؟',
+            deletePackageSuccess: 'پکیج با موفقیت حذف شد.',
+            deletePackageError: 'خطا در حذف پکیج.',
+            updatePackageSuccess: 'وضعیت پکیج با موفقیت بروزرسانی شد.',
+            updatePackageError: 'خطا در تغییر وضعیت پکیج.'
         },
-        shopCustomPrices: {
-            messages: {
-                fetchError: 'خطا در بارگذاری قیمت‌های سفارشی شما.',
-                invalidPrice: 'لطفاً قیمت معتبری وارد کنید.',
-                saveSuccess: 'قیمت فروش دسته با موفقیت به‌روزرسانی شد.',
-                saveError: 'خطا در ثبت قیمت جدید.'
+        labels: {
+            sellTypes: {
+                volumeTime: 'حجمی زمانی (محدود)',
+                unlimitedVolume: 'حجم نامحدود (زمانی)',
+                unlimitedTime: 'زمان نامحدود (حجمی)'
             },
-            labels: {
-                title: 'تنظیمات قیمت فروش به مشتری نهایی',
-                subtitle: 'در این بخش می‌توانید قیمت نهایی فروش هر واحد سرویس (به ازای هر گیگابایت یا روز) را برای مشتریان خود مشخص کنید.',
-                guideTitle: 'راهنمای محاسبه قیمت فروش نهایی:',
-                guide1: 'در مدل‌های حجمی زمانی و زمان نامحدود، قیمت نهایی فاکتور فروش مشتری شما برابر با (قیمت فروش هر واحد × حجم گیگابایت پکیج) خواهد بود.',
-                guide2: 'در مدل‌های حجم نامحدود، ملاک قیمت‌گذاری معمولاً بر اساس روز است اما فرمول فروش نهایی از مقداردهی فاکتور پیروی می‌کند.',
-                noPrices: 'هیچ تنظیمات قیمتی برای شما ثبت نشده است. ادمین باید دسته‌بندی‌های فروش فعال بسازد.',
-                cardTitle: 'تعرفه فروش به مشتری نهایی',
-                unitPrice: 'قیمت هر واحد (گیگابایت/روز)',
-                changeBtn: 'تغییر تعرفه',
-                cancelBtn: 'لغو',
-                saveTitle: 'ذخیره قیمت',
-                defaultServiceType: 'سرویس'
-            }
-        },
-        adminFinancialReports: {
-            title: 'گزارش‌های مالی ادمین',
-            subtitle: 'مشاهده سود خالص، درآمد کل و تراکنش‌های سیستم',
-            stats: {
-                totalSales: 'مجموع فروش کل',
-                netProfit: 'سود خالص ادمین',
-                pendingCredit: 'اعتبار در انتظار تسویه'
+            title: 'مدیریت سرویس‌ها و پکیج‌ها',
+            subtitle: 'مدیریت انواع کانفیگ (VIP / معمولی)، دسته‌بندی‌های فروش و قالب‌های پکیج آماده',
+            tabs: {
+                packages: 'پکیج‌های خرید',
+                categories: 'دسته‌بندی و تعیین فروش',
+                types: 'نوع سرویس‌ها'
+            },
+            forms: {
+                createTypeTitle: 'ساخت نوع سرویس جدید',
+                typeName: 'نام نوع سرویس',
+                typeDesc: 'توضیحات',
+                typeDescPlaceholder: 'توضیحات اختیاری...',
+                submitType: 'ثبت نوع سرویس',
+                createCategoryTitle: 'ایجاد دسته فروش جدید',
+                selectType: 'انتخاب نوع سرویس',
+                sellType: 'مدل فروش و حسابداری',
+                categoryName: 'نام نمایشی دسته',
+                adminCost: 'هزینه ادمین به سرور اصلی (هر واحد - تومان)',
+                shopPrice: 'قیمت فروش پایه به مغازه‌دار (هر واحد - تومان)',
+                submitCategory: 'ثبت دسته فروش',
+                createPackageTitle: 'ساخت پکیج جدید',
+                selectCategory: 'انتخاب دسته سرویس',
+                packageName: 'نام پکیج قالب',
+                volumeGb: 'حجم (گیگابایت)',
+                durationDays: 'مدت اعتبار (روز)',
+                submitPackage: 'ثبت پکیج قالب',
+                editPackageTitle: 'ویرایش پکیج قالب',
+                savePackage: 'ذخیره تغییرات'
+            },
+            tables: {
+                typeName: 'نام نوع سرویس',
+                description: 'توضیحات',
+                actions: 'عملیات',
+                noTypes: 'هیچ نوع سرویسی ثبت نشده است.',
+                sellType: 'مدل فروش',
+                categoryName: 'نام نمایشی',
+                adminCost: 'هزینه ادمین',
+                shopPrice: 'قیمت پایه مغازه',
+                noCategories: 'هیچ دسته‌بندی فروشی ثبت نشده است.',
+                noPackages: 'هیچ قالب پکیجی طراحی نشده است.',
+                volume: 'حجم',
+                duration: 'اعتبار',
+                unlimited: 'نامحدود',
+                noExpiration: 'بدون تاریخ انقضا',
+                days: 'روز',
+                gigabytes: 'گیگ',
+                deactivate: 'غیرفعال‌سازی فروش',
+                activate: 'فعال‌سازی فروش',
+                activeStatus: 'فعال',
+                inactiveStatus: 'غیرفعال',
+                edit: 'ویرایش'
             }
         }
+    },
+    shopCustomPrices: {
+        messages: {
+            fetchError: 'خطا در بارگذاری قیمت‌های سفارشی شما.',
+            invalidPrice: 'لطفاً قیمت معتبری وارد کنید.',
+            saveSuccess: 'قیمت فروش دسته با موفقیت به‌روزرسانی شد.',
+            saveError: 'خطا در ثبت قیمت جدید.'
+        },
+        labels: {
+            title: 'تنظیمات قیمت فروش به مشتری نهایی',
+            subtitle: 'در این بخش می‌توانید قیمت نهایی فروش هر واحد سرویس (به ازای هر گیگابایت یا روز) را برای مشتریان خود مشخص کنید.',
+            guideTitle: 'راهنمای محاسبه قیمت فروش نهایی:',
+            guide1: 'در مدل‌های حجمی زمانی و زمان نامحدود، قیمت نهایی فاکتور فروش مشتری شما برابر با (قیمت فروش هر واحد × حجم گیگابایت پکیج) خواهد بود.',
+            guide2: 'در مدل‌های حجم نامحدود، ملاک قیمت‌گذاری معمولاً بر اساس روز است اما فرمول فروش نهایی از مقداردهی فاکتور پیروی می‌کند.',
+            noPrices: 'هیچ تنظیمات قیمتی برای شما ثبت نشده است. ادمین باید دسته‌بندی‌های فروش فعال بسازد.',
+            cardTitle: 'تعرفه فروش به مشتری نهایی',
+            unitPrice: 'قیمت هر واحد (گیگابایت/روز)',
+            changeBtn: 'تغییر تعرفه',
+            cancelBtn: 'لغو',
+            saveTitle: 'ذخیره قیمت',
+            defaultServiceType: 'سرویس'
+        }
+    },
+    adminFinancialReports: {
+        title: 'گزارش‌های مالی ادمین',
+        subtitle: 'مشاهده سود خالص، درآمد کل و تراکنش‌های سیستم',
+        stats: {
+            totalSales: 'مجموع فروش کل',
+            netProfit: 'سود خالص ادمین',
+            pendingCredit: 'اعتبار در انتظار تسویه'
+        }
+    },
+    common: {
+        "currency": "تومان",
+        "submitting": "در حال ثبت...",
+        "cancel": "انصراف"
+    },
+    settlements: {
+
+        "messages": {
+            "fetchError": "دریافت اطلاعات با خطا مواجه شد.",
+            "invalidAmount": "مبلغ معتبر نیست.",
+            "success": "پرداختی با موفقیت ثبت شد.",
+            "submitError": "خطا در ثبت پرداختی."
+        },
+        "header": {
+            "title": "تسویه‌حساب آپ‌استریم",
+            "subtitle": "مدیریت بدهی‌ها و پرداختی‌ها به ارائه‌دهنده سرور"
+        },
+        "buttons": {
+            "newSettlement": "ثبت پرداختی جدید"
+        },
+        "stats": {
+            "totalDebt": "کل بدهی تولید شده",
+            "totalPaid": "کل مبلغ تسویه شده",
+            "remainingDebt": "مانده بدهی فعلی"
+        },
+        "history": {
+            "title": "تاریخچه پرداختی‌ها",
+            "empty": "هیچ پرداختی تا کنون ثبت نشده است."
+        },
+        "table": {
+            "date": "تاریخ و ساعت",
+            "amount": "مبلغ پرداختی",
+            "trackingCode": "کد پیگیری / یادداشت"
+        },
+        "modal": {
+            "title": "ثبت پرداختی جدید",
+            "amountLabel": "مبلغ پرداختی (تومان)",
+            "trackingCodeLabel": "کد پیگیری یا یادداشت",
+            "submitBtn": "ثبت مبلغ"
+        }
     }
+}

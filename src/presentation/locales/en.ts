@@ -473,5 +473,46 @@ export const en = {
             saveTitle: 'Save Price',
             defaultServiceType: 'Service'
         }
+    },
+    common: {
+            "currency": "Toman",
+            "submitting": "Submitting...",
+            "cancel": "Cancel"
+        },
+    settlements: {
+        
+        "messages": {
+            "fetchError": "Failed to fetch data.",
+            "invalidAmount": "Invalid amount.",
+            "success": "Settlement recorded successfully.",
+            "submitError": "Failed to record settlement."
+        },
+        "header": {
+            "title": "Upstream Settlements",
+            "subtitle": "Manage debts and payments to the server provider"
+        },
+        "buttons": {
+            "newSettlement": "New Settlement"
+        },
+        "stats": {
+            "totalDebt": "Total Debt Generated",
+            "totalPaid": "Total Amount Paid",
+            "remainingDebt": "Current Remaining Debt"
+        },
+        "history": {
+            "title": "Payment History",
+            "empty": "No payments have been recorded yet."
+        },
+        "table": {
+            "date": "Date & Time",
+            "amount": "Amount Paid",
+            "trackingCode": "Tracking Code / Note"
+        },
+        "modal": {
+            "title": "Record New Settlement",
+            "amountLabel": "Payment Amount (Toman)",
+            "trackingCodeLabel": "Tracking Code or Note",
+            "submitBtn": "Submit Amount"
+        }
     }
 };
