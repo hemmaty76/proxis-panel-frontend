@@ -7,8 +7,10 @@ import {
   getShopPackages,
   purchasePackage,
   getProfile,
+  getShopCategories,
   type PackageItem,
-  type PurchaseResult
+  type PurchaseResult,
+  type ConfigCategoryItem
 } from '../../data/services/shopService';
 
 
@@ -29,9 +31,20 @@ export default function CreateConfig() {
     if (limit === 0) return t('createConfig.unlimited');
     return `${limit.toLocaleString(getLocale())} ${t('createConfig.gigabyte')}`;
   };
+
+  const getSellTypeLabel = (sellType: string) => {
+    switch (sellType) {
+      case 'VOLUME_TIME': return t('servicesManagement.labels.sellTypes.volumeTime', 'حجمی زمانی');
+      case 'UNLIMITED_VOLUME': return t('servicesManagement.labels.sellTypes.unlimitedVolume', 'حجم نامحدود');
+      case 'UNLIMITED_TIME': return t('servicesManagement.labels.sellTypes.unlimitedTime', 'زمان نامحدود');
+      default: return sellType;
+    }
+  };
   const [packages, setPackages] = useState<PackageItem[]>([]);
+  const [categories, setCategories] = useState<ConfigCategoryItem[]>([]);
   const [balance, setBalance] = useState<number | null>(null);
   const [creditLimit, setCreditLimit] = useState<number>(0);
+  const [activeFilter, setActiveFilter] = useState<string>('ALL');
 
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState<PackageItem | null>(null);
@@ -45,14 +58,16 @@ export default function CreateConfig() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [packagesData, profileData] = await Promise.all([
+        const [packagesData, profileData, categoriesData] = await Promise.all([
           getShopPackages(),
-          getProfile()
+          getProfile(),
+          getShopCategories()
         ]);
         if (isMounted) {
           setPackages(packagesData);
           setBalance(profileData.balance);
-          setCreditLimit(profileData.credit_limit)
+          setCreditLimit(profileData.credit_limit);
+          setCategories(categoriesData);
         }
       } catch (error) {
         if (isMounted) toast.error(t('createConfig.messages.fetchError'));
@@ -145,42 +160,87 @@ export default function CreateConfig() {
             <h3 className="text-lg font-bold text-slate-700">{t('createConfig.package.notFound')}</h3>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {packages.map((pkg) => (
-              <div
-                key={pkg.id}
-                onClick={() => setSelectedPackage(pkg)}
-                className="bg-white border-2 border-slate-100 rounded-2xl p-5 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[220px]"
+          <div className="space-y-6">
+            {/* تب فیلتر دسته‌بندی‌ها */}
+            <div className="flex gap-2 border-b border-slate-200 pb-3 overflow-x-auto shrink-0">
+              <button
+                onClick={() => setActiveFilter('ALL')}
+                className={`px-4.5 py-2 text-xs font-bold rounded-xl border transition-all ${
+                  activeFilter === 'ALL'
+                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-600/10'
+                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                }`}
               >
-                <div>
-                  <h3 className="text-lg font-extrabold text-slate-800 mb-4 group-hover:text-blue-600 transition-colors">
-                    {pkg.name}
-                  </h3>
-                  <div className="space-y-2.5">
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                      <HardDrive size={16} className="text-slate-400" />
-                      {t('createConfig.package.volume')} <span className="font-bold text-slate-800">{formatDataLimit(pkg.data_limit_gb)}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                      <Clock size={16} className="text-slate-400" />
-                      {t('createConfig.package.validity')} <span className="font-bold text-slate-800 tabular-nums">{pkg.duration_days} {t('createConfig.days')}</span>
-                    </div>
-                  </div>
-                </div>
+                {t('createConfig.labels.allPackages', 'همه پکیج‌ها')}
+              </button>
+              {categories.map(cat => {
+                const typeName = cat.config_type?.name || '';
+                const displayLabel = cat.name || `${typeName} - ${getSellTypeLabel(cat.sell_type)}`;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveFilter(cat.id)}
+                    className={`px-4.5 py-2 text-xs font-bold rounded-xl border transition-all ${
+                      activeFilter === cat.id
+                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-600/10'
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    {displayLabel}
+                  </button>
+                );
+              })}
+            </div>
 
-                {/* بخش نمایش دوگانه قیمت‌ها در کارت */}
-                <div className="mt-5 pt-4 border-t border-slate-100 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-500">{t('createConfig.package.costPrice')}</span>
-                    <span className="text-sm font-bold text-slate-700 tabular-nums">{formatCurrency(getCostPrice(pkg))}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {(activeFilter === 'ALL' ? packages : packages.filter(p => p.config_category_id === activeFilter)).map((pkg) => {
+                const c = categories.find(cat => cat.id === pkg.config_category_id);
+                const displayLabel = c?.name || pkg.category_name || '';
+                return (
+                  <div
+                    key={pkg.id}
+                    onClick={() => setSelectedPackage(pkg)}
+                    className="bg-white border-2 border-slate-100 rounded-2xl p-5 hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[240px]"
+                  >
+                    <div>
+                      {displayLabel && (
+                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded border border-indigo-100 mb-3 inline-block">
+                          {displayLabel}
+                        </span>
+                      )}
+                    <h3 className="text-lg font-extrabold text-slate-800 mb-4 group-hover:text-blue-600 transition-colors">
+                      {pkg.name}
+                    </h3>
+                    <div className="space-y-2.5">
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <HardDrive size={16} className="text-slate-400" />
+                        {t('createConfig.package.volume')} <span className="font-bold text-slate-800">{formatDataLimit(pkg.data_limit_gb)}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <Clock size={16} className="text-slate-400" />
+                        {t('createConfig.package.validity')}{' '}
+                        <span className="font-bold text-slate-800 tabular-nums">
+                          {pkg.duration_days === 0
+                            ? t('createConfig.package.noExpiration', 'بدون تاریخ انقضا')
+                            : `${pkg.duration_days.toLocaleString(getLocale())} ${t('createConfig.days')}`}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between bg-blue-50/50 p-2 -mx-2 rounded-lg">
-                    <span className="text-xs font-bold text-blue-600/80">{t('createConfig.package.sellPrice')}</span>
-                    <span className="text-sm font-black text-blue-700 tabular-nums">{formatCurrency(getSellPrice(pkg))}</span>
+
+                  <div className="mt-5 pt-4 border-t border-slate-100 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-500">{t('createConfig.package.costPrice')}</span>
+                      <span className="text-sm font-bold text-slate-700 tabular-nums">{formatCurrency(getCostPrice(pkg))}</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-blue-50/50 p-2 -mx-2 rounded-lg">
+                      <span className="text-xs font-bold text-blue-600/80">{t('createConfig.package.sellPrice')}</span>
+                      <span className="text-sm font-black text-blue-700 tabular-nums">{formatCurrency(getSellPrice(pkg))}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ); })}
+            </div>
           </div>
         )}
       </section>

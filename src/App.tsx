@@ -7,10 +7,10 @@ import ForceChangePassword from './presentation/pages/ForceChangePassword';
 import UsersManagement from './presentation/pages/UsersManagement';
 import CreateConfig from './presentation/pages/CreateConfig';
 import ShopsManagement from './presentation/pages/admin/ShopsManagement';
+import ServicesManagement from './presentation/pages/admin/ServicesManagement';
+import ShopCustomPrices from './presentation/pages/ShopCustomPrices';
 import type { JSX } from 'react/jsx-runtime';
 import SystemSettingsPage from './presentation/pages/admin/SystemSetting';
-
-
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const isAuthenticated = !!localStorage.getItem('access_token');
@@ -22,7 +22,6 @@ const PrivateRoute = ({ children }: { children: JSX.Element }) => {
 
   return children;
 };
-
 
 const AdminRoute = ({ children }: { children: JSX.Element }) => {
   const isAuthenticated = !!localStorage.getItem('access_token');
@@ -110,6 +109,16 @@ function App() {
             }
           />
           <Route
+            path="/admin/services"
+            element={
+              <AdminRoute>
+                <DashboardLayout>
+                  <ServicesManagement />
+                </DashboardLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
             path="/admin/settings"
             element={
               <AdminRoute>
@@ -117,6 +126,16 @@ function App() {
                   <SystemSettingsPage />
                 </DashboardLayout>
               </AdminRoute>
+            }
+          />
+          <Route
+            path="/settings/prices"
+            element={
+              <PrivateRoute>
+                <DashboardLayout>
+                  <ShopCustomPrices />
+                </DashboardLayout>
+              </PrivateRoute>
             }
           />
         </Routes>

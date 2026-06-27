@@ -4,7 +4,7 @@ import { Users, Search, Plus, Wallet, KeyRound, Edit3, BarChart3, X, Loader2, Ch
 import { useTranslation } from 'react-i18next';
 import {
   getAllShops, createShop, chargeShopWallet, resetShopPassword,
-  updateShopDescription, getShopDashboardStats, type AdminUserItem, type AdminUserStats
+  getShopDashboardStats, updateShop, type AdminUserItem, type AdminUserStats
 } from '../../../data/services/adminService';
 
 
@@ -27,15 +27,20 @@ export default function ShopsManagement() {
   const [isLoading, setIsLoading] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [chargeModal, setChargeModal] = useState<{ user: AdminUserItem } | null>(null);
-  const [descModal, setDescModal] = useState<{ user: AdminUserItem } | null>(null);
+  const [editModal, setEditModal] = useState<{
+    user: AdminUserItem;
+    discountPercent: string;
+    creditLimit: string;
+    isActive: boolean;
+    description: string;
+  } | null>(null);
   const [statsModal, setStatsModal] = useState<{ user: AdminUserItem, stats: AdminUserStats | null, loading: boolean } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // === استیت‌های جدید برای مدیریت کاما در اینپوت‌ها ===
   const [chargeAmount, setChargeAmount] = useState('');
   const [createCreditLimit, setCreateCreditLimit] = useState('0');
-  const [createPricePerGb, setCreatePricePerGb] = useState('4000');
-  const [createSellPricePerGb, setCreateSellPricePerGb] = useState('10000');
+  const [createDiscountPercent, setCreateDiscountPercent] = useState('0');
 
   const fetchUsers = async (page = currentPage, phone = searchPhone) => {
     setIsLoading(true);
@@ -89,20 +94,23 @@ export default function ShopsManagement() {
     }
   };
 
-  const handleEditDescription = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleEditShop = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!descModal) return;
-    const formData = new FormData(e.currentTarget);
-    const desc = String(formData.get('description_admin'));
+    if (!editModal) return;
 
     setIsSubmitting(true);
     try {
-      await updateShopDescription(descModal.user.id, desc);
-      toast.success(t('shopsManagement.messages.descUpdateSuccess'));
-      setDescModal(null);
+      await updateShop(editModal.user.id, {
+        credit_limit: Number(editModal.creditLimit.replace(/\D/g, '')),
+        discount_percent: Number(editModal.discountPercent),
+        is_active: editModal.isActive,
+        description_admin: editModal.description
+      });
+      toast.success(t('shopsManagement.messages.updateSuccess'));
+      setEditModal(null);
       fetchUsers();
     } catch {
-      toast.error(t('shopsManagement.messages.descUpdateError'));
+      toast.error(t('shopsManagement.messages.updateError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -133,15 +141,13 @@ export default function ShopsManagement() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    // ساختن آبجکت نهایی با مقادیر عددی پاکسازی‌شده
     const data = {
       username: String(formData.get('username')),
       phone_number: String(formData.get('phone_number')),
       password: String(formData.get('password')),
       description_admin: String(formData.get('description_admin')),
       credit_limit: Number(createCreditLimit.replace(/\D/g, '')),
-      price_per_gb: Number(createPricePerGb.replace(/\D/g, '')),
-      sell_price_per_gb: Number(createSellPricePerGb.replace(/\D/g, '')),
+      discount_percent: Number(createDiscountPercent),
     };
 
     setIsSubmitting(true);
@@ -149,10 +155,8 @@ export default function ShopsManagement() {
       await createShop(data);
       toast.success(t('shopsManagement.messages.createShopSuccess'));
       setCreateModalOpen(false);
-      // ریست استیت‌ها به پیش‌فرض
       setCreateCreditLimit('0');
-      setCreatePricePerGb('4000');
-      setCreateSellPricePerGb('10000');
+      setCreateDiscountPercent('0');
       fetchUsers();
     } catch {
       toast.error(t('shopsManagement.messages.createShopError'));
@@ -206,7 +210,7 @@ export default function ShopsManagement() {
                 <th className="px-6 py-4">{t('shopsManagement.table.userAndPhone')}</th>
                 <th className="px-6 py-4">{t('shopsManagement.table.adminDesc')}</th>
                 <th className="px-6 py-4">{t('shopsManagement.table.balanceAndCredit')}</th>
-                <th className="px-6 py-4">{t('shopsManagement.table.prices')}</th>
+                <th className="px-6 py-4">{t('shopsManagement.table.discountPercent')}</th>
                 <th className="px-6 py-4 text-center">{t('shopsManagement.table.actions')}</th>
               </tr>
             </thead>
@@ -230,14 +234,13 @@ export default function ShopsManagement() {
                       <p className="text-xs text-indigo-600 font-semibold mt-0.5">{t('shopsManagement.table.limit')} {formatCurrency(user.credit_limit)}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="font-semibold text-emerald-600 tabular-nums">{formatCurrency(user.price_per_gb)}</p>
-                      <p className="text-xs text-slate-500 mt-0.5 tabular-nums">{t('shopsManagement.table.sell')} {formatCurrency(user.sell_price_per_gb)}</p>
+                      <p className="font-bold text-slate-800 tabular-nums">{user.discount_percent} %</p>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex justify-center items-center gap-1.5">
                         <button onClick={() => { setChargeAmount(''); setChargeModal({ user }); }} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title={t('shopsManagement.tooltips.chargeWallet')}><Wallet size={18} /></button>
                         <button onClick={() => openStatsModal(user)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title={t('shopsManagement.tooltips.salesStats')}><BarChart3 size={18} /></button>
-                        <button onClick={() => setDescModal({ user })} className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" title={t('shopsManagement.tooltips.editDesc')}><Edit3 size={18} /></button>
+                        <button onClick={() => setEditModal({ user, discountPercent: String(user.discount_percent), creditLimit: String(user.credit_limit), isActive: user.is_active, description: user.description_admin || '' })} className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" title={t('shopsManagement.tooltips.editShop')}><Edit3 size={18} /></button>
                         <button onClick={() => handleResetPassword(user)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title={t('shopsManagement.tooltips.resetPassword')}><KeyRound size={18} /></button>
                       </div>
                     </td>
@@ -278,13 +281,9 @@ export default function ShopsManagement() {
                     <span className="text-slate-400 text-[11px] font-bold block mb-1">{t('shopsManagement.mobileCard.creditLimit')}</span>
                     <span className="font-black text-indigo-600 text-sm tabular-nums">{formatCurrency(user.credit_limit)}</span>
                   </div>
-                  <div>
-                    <span className="text-slate-400 text-[11px] font-bold block mb-1">{t('shopsManagement.mobileCard.buyPerGb')}</span>
-                    <span className="font-bold text-emerald-600 text-sm tabular-nums">{formatCurrency(user.price_per_gb)}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 text-[11px] font-bold block mb-1">{t('shopsManagement.mobileCard.defaultSell')}</span>
-                    <span className="font-bold text-slate-600 text-sm tabular-nums">{formatCurrency(user.sell_price_per_gb)}</span>
+                  <div className="col-span-2">
+                    <span className="text-slate-400 text-[11px] font-bold block mb-1">{t('shopsManagement.mobileCard.discountPercent')}</span>
+                    <span className="font-bold text-emerald-600 text-sm tabular-nums">{user.discount_percent} %</span>
                   </div>
                 </div>
 
@@ -295,7 +294,7 @@ export default function ShopsManagement() {
                   <button onClick={() => openStatsModal(user)} className="flex-1 flex flex-col items-center justify-center gap-1.5 p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors">
                     <BarChart3 size={20} strokeWidth={2.5} /><span className="text-[10px] font-bold">{t('shopsManagement.actionsShort.stats')}</span>
                   </button>
-                  <button onClick={() => setDescModal({ user })} className="flex-1 flex flex-col items-center justify-center gap-1.5 p-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                  <button onClick={() => setEditModal({ user, discountPercent: String(user.discount_percent), creditLimit: String(user.credit_limit), isActive: user.is_active, description: user.description_admin || '' })} className="flex-1 flex flex-col items-center justify-center gap-1.5 p-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
                     <Edit3 size={20} strokeWidth={2.5} /><span className="text-[10px] font-bold">{t('shopsManagement.actionsShort.edit')}</span>
                   </button>
                   <button onClick={() => handleResetPassword(user)} className="flex-1 flex flex-col items-center justify-center gap-1.5 p-2 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-colors">
@@ -353,19 +352,60 @@ export default function ShopsManagement() {
         </div>
       )}
 
-      {/* ۲. مودال ویرایش توضیحات */}
-      {descModal && (
+      {/* ۲. مودال ویرایش مشخصات و تنظیمات مغازه */}
+      {editModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95">
             <div className="flex justify-between items-center p-5 border-b border-slate-100 shrink-0">
-              <h3 className="font-bold text-slate-800">{t('shopsManagement.modals.editDesc.title')}</h3>
-              <button onClick={() => setDescModal(null)} className="text-slate-400 hover:text-red-500 transition-colors"><X size={20} /></button>
+              <h3 className="font-bold text-slate-800">{t('shopsManagement.modals.edit.title')} ({editModal.user.username})</h3>
+              <button onClick={() => setEditModal(null)} className="text-slate-400 hover:text-red-500 transition-colors"><X size={20} /></button>
             </div>
-            <form onSubmit={handleEditDescription} className="p-5 space-y-4 overflow-y-auto flex-1">
+            <form onSubmit={handleEditShop} className="p-5 space-y-4 overflow-y-auto flex-1">
               <div>
-                <textarea name="description_admin" rows={4} defaultValue={descModal.user.description_admin} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 resize-none font-medium text-slate-700" placeholder={t('shopsManagement.modals.editDesc.placeholder')} />
+                <label className="block text-sm font-semibold text-slate-700 mb-1">{t('shopsManagement.modals.edit.creditLimit')}</label>
+                <input
+                  type="text"
+                  required
+                  dir="ltr"
+                  value={editModal.creditLimit ? Number(editModal.creditLimit).toLocaleString('en-US') : ''}
+                  onChange={(e) => setEditModal(prev => prev ? { ...prev, creditLimit: e.target.value.replace(/\D/g, '') } : null)}
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-left font-bold font-[inherit]"
+                />
               </div>
-              <button type="submit" disabled={isSubmitting} className="w-full py-3 mt-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 flex justify-center shadow-sm">{isSubmitting ? <Loader2 className="animate-spin" size={20} /> : t('shopsManagement.modals.editDesc.submit')}</button>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">{t('shopsManagement.modals.edit.discountPercent')}</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  required
+                  dir="ltr"
+                  value={editModal.discountPercent}
+                  onChange={(e) => setEditModal(prev => prev ? { ...prev, discountPercent: e.target.value } : null)}
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-left font-bold font-[inherit]"
+                />
+              </div>
+              <div className="flex items-center gap-2 py-2">
+                <input
+                  type="checkbox"
+                  id="edit_is_active"
+                  checked={editModal.isActive}
+                  onChange={(e) => setEditModal(prev => prev ? { ...prev, isActive: e.target.checked } : null)}
+                  className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded"
+                />
+                <label htmlFor="edit_is_active" className="text-sm font-bold text-slate-700 select-none">{t('shopsManagement.modals.edit.isActive')}</label>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">{t('shopsManagement.modals.edit.adminDesc')}</label>
+                <textarea
+                  value={editModal.description}
+                  onChange={(e) => setEditModal(prev => prev ? { ...prev, description: e.target.value } : null)}
+                  rows={3}
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 resize-none font-medium text-slate-700"
+                  placeholder={t('shopsManagement.modals.edit.adminDescPlaceholder')}
+                />
+              </div>
+              <button type="submit" disabled={isSubmitting} className="w-full py-3 mt-2 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 flex justify-center shadow-sm transition-all">{isSubmitting ? <Loader2 className="animate-spin" size={20} /> : t('shopsManagement.modals.edit.submit')}</button>
             </form>
           </div>
         </div>
@@ -444,28 +484,17 @@ export default function ShopsManagement() {
                   />
                 </div>
 
-                {/* فیلد قیمت خرید همراه با کاما */}
+                {/* فیلد درصد تخفیف مغازه‌دار */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">{t('shopsManagement.modals.create.buyPrice')}</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">{t('shopsManagement.modals.create.discountPercent')}</label>
                   <input
-                    type="text"
+                    type="number"
+                    min="0"
+                    max="100"
                     required
                     dir="ltr"
-                    value={createPricePerGb ? Number(createPricePerGb).toLocaleString('en-US') : ''}
-                    onChange={(e) => setCreatePricePerGb(e.target.value.replace(/\D/g, ''))}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-left font-bold font-[inherit]"
-                  />
-                </div>
-
-                {/* فیلد قیمت فروش همراه با کاما */}
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">{t('shopsManagement.modals.create.sellPrice')}</label>
-                  <input
-                    type="text"
-                    required
-                    dir="ltr"
-                    value={createSellPricePerGb ? Number(createSellPricePerGb).toLocaleString('en-US') : ''}
-                    onChange={(e) => setCreateSellPricePerGb(e.target.value.replace(/\D/g, ''))}
+                    value={createDiscountPercent}
+                    onChange={(e) => setCreateDiscountPercent(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-left font-bold font-[inherit]"
                   />
                 </div>

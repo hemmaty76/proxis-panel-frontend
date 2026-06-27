@@ -1,5 +1,6 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import PasswordChangeForm from '../components/PasswordChangeForm';
 import { useTranslation } from 'react-i18next';
 import {
@@ -7,39 +8,9 @@ import {
   type DashboardStats,
   getProfile,
   getDashboardStats,
-  updateSellPricePerGb,
 } from '../../data/services/shopService';
+import { getFinancialReport, type FinancialReport } from '../../data/services/adminService';
 
-
-
-
-
-
-function Spinner({ className = 'h-5 w-5' }: { className?: string }) {
-  return (
-    <svg
-      className={`animate-spin text-current ${className}`}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      />
-    </svg>
-  );
-}
 
 interface StatCardProps {
   title: string;
@@ -97,6 +68,7 @@ function StatCard({ title, value, icon, accent }: StatCardProps) {
 
 export default function DashboardHome() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
 
   const getLocale = () => {
     switch (i18n.language) {
@@ -105,7 +77,6 @@ export default function DashboardHome() {
       case 'fa': default: return 'fa-IR';
     }
   };
-
 
   const formatNumber = (value: number) =>
     value.toLocaleString(getLocale());
@@ -121,11 +92,11 @@ export default function DashboardHome() {
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [adminReport, setAdminReport] = useState<FinancialReport | null>(null);
   const [isLoadingData, setIsLoadingData] = useState(true);
-  const [sellPrice, setSellPrice] = useState('');
-  const [isUpdatingPrice, setIsUpdatingPrice] = useState(false);
+
   const formatCurrency = (value: number) =>
-  `${value.toLocaleString(getLocale())} ${t('dashboardHome.currency')}`;
+    `${value.toLocaleString(getLocale())} ${t('dashboardHome.currency', 'تومان')}`;
 
   useEffect(() => {
     let cancelled = false;
@@ -133,19 +104,22 @@ export default function DashboardHome() {
     const fetchDashboardData = async () => {
       setIsLoadingData(true);
       try {
-        const [profileData, statsData] = await Promise.all([
-          getProfile(),
-          getDashboardStats(),
-        ]);
-
+        const profileData = await getProfile();
         if (cancelled) return;
-
         setProfile(profileData);
-        setStats(statsData);
-        setSellPrice(String(profileData.sell_price_per_gb));
+
+        if (profileData.role === 'ADMIN') {
+          const reportData = await getFinancialReport();
+          if (cancelled) return;
+          setAdminReport(reportData);
+        } else {
+          const statsData = await getDashboardStats();
+          if (cancelled) return;
+          setStats(statsData);
+        }
       } catch {
         if (!cancelled) {
-          toast.error(t('dashboardHome.messages.fetchError'));
+          toast.error(t('dashboardHome.messages.fetchError', 'ارتباط با سرور برقرار نشد. لطفاً صفحه را رفرش کنید.'));
         }
       } finally {
         if (!cancelled) setIsLoadingData(false);
@@ -158,34 +132,45 @@ export default function DashboardHome() {
     };
   }, []);
 
-  const handleSellPriceSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const statCards: StatCardProps[] = [];
 
-    const parsed = Number(sellPrice);
-    if (!sellPrice.trim() || Number.isNaN(parsed) || parsed < 0) {
-      toast.error(t('dashboardHome.messages.invalidPrice'));
-      return;
-    }
-
-    setIsUpdatingPrice(true);
-    try {
-      await updateSellPricePerGb(parsed);
-
-      setProfile((prev) =>
-        prev ? { ...prev, sell_price_per_gb: parsed } : prev
-      );
-      toast.success(t('dashboardHome.messages.priceUpdateSuccess'));
-    } catch {
-      toast.error(t('dashboardHome.messages.priceUpdateError'));
-    } finally {
-      setIsUpdatingPrice(false);
-    }
-  };
-
-  const statCards: StatCardProps[] = stats
-    ? [
+  if (profile?.role === 'ADMIN' && adminReport) {
+    statCards.push(
       {
-        title: t('dashboardHome.stats.totalSales'),
+        title: t('dashboardHome.stats.upstreamDebt', 'بدهی به آپ‌استریم (مرزبان)'),
+        value: formatCurrency(adminReport.total_debt_to_upstream),
+        accent: 'slate',
+        icon: (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        ),
+      },
+      {
+        title: t('dashboardHome.stats.adminGrossRevenue', 'کل درآمد ناخالص ادمین'),
+        value: formatCurrency(adminReport.admin_gross_revenue),
+        accent: 'indigo',
+        icon: (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+        ),
+      },
+      {
+        title: t('dashboardHome.stats.adminNetProfit', 'سود خالص ادمین'),
+        value: formatCurrency(adminReport.admin_net_profit),
+        accent: 'green',
+        icon: (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        ),
+      }
+    );
+  } else if (stats) {
+    statCards.push(
+      {
+        title: t('dashboardHome.stats.totalSales', 'تعداد کل فروش'),
         value: formatNumber(stats.total_sales_count),
         accent: 'default',
         icon: (
@@ -195,7 +180,7 @@ export default function DashboardHome() {
         ),
       },
       {
-        title: t('dashboardHome.stats.activeServices'),
+        title: t('dashboardHome.stats.activeServices', 'سرویس‌های فعال'),
         value: formatNumber(stats.active_services_count),
         accent: 'default',
         icon: (
@@ -205,7 +190,7 @@ export default function DashboardHome() {
         ),
       },
       {
-        title: t('dashboardHome.stats.totalCost'),
+        title: t('dashboardHome.stats.totalCost', 'کل هزینه'),
         value: formatCurrency(stats.total_cost),
         accent: 'slate',
         icon: (
@@ -215,7 +200,7 @@ export default function DashboardHome() {
         ),
       },
       {
-        title: t('dashboardHome.stats.totalRevenue'),
+        title: t('dashboardHome.stats.totalRevenue', 'کل درآمد'),
         value: formatCurrency(stats.total_revenue),
         accent: 'indigo',
         icon: (
@@ -225,7 +210,7 @@ export default function DashboardHome() {
         ),
       },
       {
-        title: t('dashboardHome.stats.netProfit'),
+        title: t('dashboardHome.stats.netProfit', 'سود خالص'),
         value: formatCurrency(stats.net_profit),
         accent: 'green',
         icon: (
@@ -234,24 +219,26 @@ export default function DashboardHome() {
           </svg>
         ),
       },
-    ]
-    : [];
+    );
+  }
+
+  const skeletonCount = profile?.role === 'ADMIN' ? 3 : 5;
 
   return (
     <div className="space-y-6 md:space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
-          {t('dashboardHome.header.title')}
+          {t('dashboardHome.header.title', 'داشبورد')}
         </h1>
         <p className="text-sm text-slate-500 font-medium">
-          {t('dashboardHome.header.subtitle')}
+          {t('dashboardHome.header.subtitle', 'نمای کلی عملکرد، وضعیت حساب و تنظیمات فروش')}
         </p>
       </header>
 
-      <section aria-label={t('dashboardHome.sections.generalStats')}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      <section aria-label={t('dashboardHome.sections.generalStats', 'آمار کلی')}>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${profile?.role === 'ADMIN' ? 'xl:grid-cols-3' : 'xl:grid-cols-5'} gap-4`}>
           {isLoadingData
-            ? Array.from({ length: 5 }).map((_, i) => (
+            ? Array.from({ length: skeletonCount }).map((_, i) => (
               <div
                 key={i}
                 className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm min-h-[132px] animate-pulse"
@@ -270,13 +257,13 @@ export default function DashboardHome() {
       </section>
 
       <section
-        aria-label={t('dashboardHome.sections.profileAndOps')}
+        aria-label={t('dashboardHome.sections.profileAndOps', 'پروفایل و عملیات')}
         className="grid grid-cols-1 lg:grid-cols-2 gap-6"
       >
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-l from-slate-50/80 to-white">
-            <h2 className="text-lg font-bold text-slate-800">{t('dashboardHome.profile.title')}</h2>
-            <p className="text-sm text-slate-500 mt-0.5">{t('dashboardHome.profile.subtitle')}</p>
+            <h2 className="text-lg font-bold text-slate-800">{t('dashboardHome.profile.title', 'پروفایل و مالی')}</h2>
+            <p className="text-sm text-slate-500 mt-0.5">{t('dashboardHome.profile.subtitle', 'اطلاعات حساب کاربری شما')}</p>
           </div>
 
           <div className="p-6 space-y-6 min-h-[420px]">
@@ -295,61 +282,65 @@ export default function DashboardHome() {
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide bg-indigo-600 text-white shadow-sm shadow-indigo-600/20">
                     <span className="h-1.5 w-1.5 rounded-full bg-white/90 animate-pulse" />
-                    {profile.role}
+                    {profile.role === 'ADMIN' ? t('dashboardHome.profile.roles.admin', 'مدیر سیستم') : t('dashboardHome.profile.roles.shopkeeper', 'نماینده فروش (مغازه‌دار)')}
                   </span>
                   {profile.is_active && (
                     <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
-                      {t('dashboardHome.profile.active')}
+                      {t('dashboardHome.profile.active', 'فعال')}
                     </span>
                   )}
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <p className="text-xs font-semibold text-slate-400 mb-1">{t('dashboardHome.profile.username')}</p>
+                    <p className="text-xs font-semibold text-slate-400 mb-1">{t('dashboardHome.profile.username', 'نام کاربری')}</p>
                     <p className="text-lg font-bold text-slate-800 dir-ltr text-right">
                       {profile.username}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-slate-400 mb-1">{t('dashboardHome.profile.phone')}</p>
+                    <p className="text-xs font-semibold text-slate-400 mb-1">{t('dashboardHome.profile.phone', 'شماره تماس')}</p>
                     <p className="text-base font-semibold text-slate-700 dir-ltr text-right tabular-nums">
                       {profile.phone_number}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-slate-400 mb-1">{t('dashboardHome.profile.createdAt')}</p>
+                    <p className="text-xs font-semibold text-slate-400 mb-1">{t('dashboardHome.profile.createdAt', 'تاریخ ایجاد حساب')}</p>
                     <p className="text-sm font-medium text-slate-600">
                       {formatDate(profile.created_at)}
                     </p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                  <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4 min-h-[88px] flex flex-col justify-center transition-colors duration-200 hover:bg-slate-50">
-                    <p className="text-xs font-semibold text-slate-500 mb-1">{t('dashboardHome.profile.balance')}</p>
-                    <p className="text-xl font-extrabold text-slate-900 tabular-nums">
-                      {formatCurrency(profile.balance)}
-                    </p>
+                {profile.role !== 'ADMIN' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4 min-h-[88px] flex flex-col justify-center transition-colors duration-200 hover:bg-slate-50">
+                      <p className="text-xs font-semibold text-slate-500 mb-1">{t('dashboardHome.profile.balance', 'موجودی')}</p>
+                      <p className="text-xl font-extrabold text-slate-900 tabular-nums">
+                        {formatCurrency(profile.balance)}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-indigo-100 bg-indigo-50/40 p-4 min-h-[88px] flex flex-col justify-center transition-colors duration-200 hover:bg-indigo-50/60">
+                      <p className="text-xs font-semibold text-indigo-600/80 mb-1">{t('dashboardHome.profile.creditLimit', 'سقف اعتبار')}</p>
+                      <p className="text-xl font-extrabold text-indigo-700 tabular-nums">
+                        {formatCurrency(profile.credit_limit)}
+                      </p>
+                    </div>
                   </div>
-                  <div className="rounded-xl border border-indigo-100 bg-indigo-50/40 p-4 min-h-[88px] flex flex-col justify-center transition-colors duration-200 hover:bg-indigo-50/60">
-                    <p className="text-xs font-semibold text-indigo-600/80 mb-1">{t('dashboardHome.profile.creditLimit')}</p>
-                    <p className="text-xl font-extrabold text-indigo-700 tabular-nums">
-                      {formatCurrency(profile.credit_limit)}
-                    </p>
-                  </div>
-                </div>
+                )}
 
-                <div className="flex items-center justify-between text-sm pt-1 border-t border-slate-100">
-                  <span className="text-slate-500">{t('dashboardHome.profile.buyPricePerGb')}</span>
-                  <span className="font-bold text-slate-700 tabular-nums">
-                    {formatCurrency(profile.price_per_gb)}
-                  </span>
-                </div>
+                {profile.role !== 'ADMIN' && (
+                  <div className="flex items-center justify-between text-sm pt-1 border-t border-slate-100">
+                    <span className="text-slate-500">{t('dashboardHome.profile.discountPercent', 'درصد تخفیف پیش‌فرض')}</span>
+                    <span className="font-bold text-slate-700 tabular-nums">
+                      {profile.discount_percent} %
+                    </span>
+                  </div>
+                )}
               </>
             ) : (
               <p className="text-sm text-slate-500 text-center py-8">
-                {t('dashboardHome.profile.notAvailable')}
+                {t('dashboardHome.profile.notAvailable', 'اطلاعات پروفایل در دسترس نیست.')}
               </p>
             )}
           </div>
@@ -357,74 +348,55 @@ export default function DashboardHome() {
 
         {/* Right: Operational Actions */}
         <div className="space-y-6">
-          {/* Form A: Change Selling Price */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100">
-              <h2 className="text-lg font-bold text-slate-800">{t('dashboardHome.sellPrice.title')}</h2>
-              <p className="text-sm text-slate-500 mt-0.5">
-                {t('dashboardHome.sellPrice.currentPrice')}{' '}
-                <span className="font-bold text-slate-700 tabular-nums">
-                  {profile
-                    ? formatCurrency(profile.sell_price_per_gb)
-                    : t('dashboardHome.sellPrice.emptyPrice')}
-                </span>
-              </p>
-            </div>
-
-            <form
-              onSubmit={handleSellPriceSubmit}
-              className="p-6 space-y-4 min-h-[180px]"
-            >
-              <div>
-                <label
-                  htmlFor="sell-price"
-                  className="block text-sm font-semibold text-slate-700 mb-1.5"
-                >
-                  {t('dashboardHome.sellPrice.newPriceLabel')}
-                </label>
-                <input
-                  dir="ltr"
-                  id="sell-price"
-                  type="text"
-                  inputMode="numeric"
-                  value={sellPrice ? Number(sellPrice).toLocaleString('en-US') : ''}
-                  onChange={(e) => {
-                    const rawValue = e.target.value.replace(/\D/g, '');
-                    setSellPrice(rawValue);
-                  }}
-                  disabled={isUpdatingPrice}
-                  className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-left text-slate-700 font-medium font-sans placeholder:text-slate-400 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 outline-none transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
-                  placeholder={t('dashboardHome.sellPrice.placeholder')}
-                />
+          {/* Form A: Custom Prices Settings / Admin Settings Shortcut */}
+          {profile?.role === 'ADMIN' ? (
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-l from-indigo-50/30 to-white">
+                <h2 className="text-lg font-bold text-indigo-900">{t('dashboardHome.adminActions.servicesTitle', 'مدیریت پکیج‌ها و خدمات')}</h2>
+                <p className="text-sm text-slate-500 mt-0.5">
+                  {t('dashboardHome.adminActions.servicesSubtitle', 'پیکربندی نوع سرویس‌ها، مدل‌های فروش و تعریف بسته‌های حجمی/زمانی جدید')}
+                </p>
               </div>
-
-              <button
-                type="submit"
-                disabled={isUpdatingPrice}
-                className={`w-full py-3 px-4 rounded-xl text-white font-semibold shadow-sm transition-all duration-200 flex justify-center items-center gap-2 min-h-[48px]
-                  ${isUpdatingPrice
-                    ? 'bg-slate-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0'
-                  }`}
-              >
-                {isUpdatingPrice ? (
-                  <>
-                    <Spinner />
-                    {t('dashboardHome.sellPrice.submitting')}
-                  </>
-                ) : (
-                  t('dashboardHome.sellPrice.submitBtn')
-                )}
-              </button>
-            </form>
-          </div>
+              <div className="p-6 space-y-4">
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  {t('dashboardHome.adminActions.servicesDesc', 'از این بخش می‌توانید انواع سرویس‌ها (VIP، نرمال)، دسته‌بندی‌های فروش و قیمت پایه خرید هر دسته را برای مغازه‌داران تعریف کنید.')}
+                </p>
+                <button
+                  onClick={() => navigate('/admin/services')}
+                  className="w-full py-3 px-4 rounded-xl text-white font-semibold shadow-sm bg-indigo-600 hover:bg-indigo-700 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex justify-center items-center gap-2"
+                >
+                  {t('dashboardHome.adminActions.servicesBtn', 'برو به مدیریت خدمات و پکیج‌ها')}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-l from-blue-50/30 to-white">
+                <h2 className="text-lg font-bold text-blue-900">{t('dashboardHome.sellPrice.title', 'قیمت‌گذاری فروش به مشتری')}</h2>
+                <p className="text-sm text-slate-500 mt-0.5">
+                  {t('dashboardHome.sellPrice.subtitle', 'تنظیم قیمت‌های اختصاصی فروش به مشتری')}
+                </p>
+              </div>
+              <div className="p-6 space-y-4">
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  {t('dashboardHome.sellPrice.desc', 'سیستم قیمت‌گذاری پکیج‌ها به صورت واحدی و طبقه‌بندی شده تغییر یافته است. برای تغییر و شخصی‌سازی قیمت‌های فروش خود به مشتری بر اساس دسته‌بندی سرویس‌ها، از بخش تنظیمات قیمت فروش اقدام کنید.')}
+                </p>
+                <button
+                  onClick={() => navigate('/settings/prices')}
+                  className="w-full py-3 px-4 rounded-xl text-white font-semibold shadow-sm bg-blue-600 hover:bg-blue-700 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex justify-center items-center gap-2"
+                >
+                  {t('dashboardHome.sellPrice.btn', 'تنظیمات قیمت فروش')}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Form B: Change Password */}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="px-6 py-5 border-b border-slate-100">
-              <h2 className="text-lg font-bold text-slate-800">{t('dashboardHome.password.title')}</h2>
+              <h2 className="text-lg font-bold text-slate-800">{t('dashboardHome.password.title', 'تغییر رمز عبور')}</h2>
               <p className="text-sm text-slate-500 mt-0.5">
-                {t('dashboardHome.password.subtitle')}
+                {t('dashboardHome.password.subtitle', 'برای امنیت بیشتر، رمز عبور قوی انتخاب کنید')}
               </p>
             </div>
             <div className="p-6 min-h-[280px]">
@@ -435,4 +407,4 @@ export default function DashboardHome() {
       </section>
     </div>
   );
-}
+}

@@ -30,9 +30,11 @@ export const ar = {
         title: 'إدارة الوكيل (البروكسي)',  
         menu: {
             dashboard: 'لوحة التحكم والإحصائيات',  
-            createConfig: 'إنشاء تكوين (كونفيج)',  
+            createConfig: 'إنشاء تكوین (كونفيج)',  
             manageUsers: 'إدارة المستخدمين',  
             manageShop: 'إدارة المتجر',  
+            manageServices: 'إدارة الخدمات والحزم',
+            customPrices: 'إعدادات سعر البيع',
             panelSettings: 'إعدادات اللوحة'  
         }
     },
@@ -113,9 +115,9 @@ export const ar = {
     dashboardHome: {
         currency: 'تومان',  
         messages: {
-            fetchError: 'تعذر الاتصال بالخادم. يرجى تحديث الصفحة.',  
-            invalidPrice: 'يرجى إدخال سعر صحيح',  
-            priceUpdateSuccess: 'تم تسجيل سعر البيع في النظام بنجاح',  
+            fetchError: 'فشل الاتصال بالخادم. يرجى إعادة تحميل الصفحة.',  
+            invalidPrice: 'يرجى إدخال سعر صالح',  
+            priceUpdateSuccess: 'تم تحديث سعر البيع بنجاح في النظام',  
             priceUpdateError: 'خطأ في تحديث السعر. يرجى المحاولة مرة أخرى'  
         },
         stats: {
@@ -123,40 +125,56 @@ export const ar = {
             activeServices: 'الخدمات النشطة',  
             totalCost: 'إجمالي التكلفة',  
             totalRevenue: 'إجمالي الإيرادات',  
-            netProfit: 'صافي الربح'  
+            netProfit: 'صافي الأرباح',  
+            upstreamDebt: 'الديون للمزود (مرزبان)',
+            adminGrossRevenue: 'إجمالي إيرادات المسؤول',
+            adminNetProfit: 'صافي أرباح المسؤول'
         },
         header: {
             title: 'لوحة التحكم',  
-            subtitle: 'نظرة عامة على الأداء، حالة الحساب وإعدادات البيع'  
+            subtitle: 'نظرة عامة على الأداء وحالة الحساب وإعدادات المبيعات'  
         },
         sections: {
             generalStats: 'الإحصائيات العامة',  
             profileAndOps: 'الملف الشخصي والعمليات'  
         },
+        adminActions: {
+            servicesTitle: 'إدارة الباقات والخدمات',
+            servicesSubtitle: 'تكوين أنواع الخدمات ونماذج المبيعات وتحديد قوالب الحزم الجديدة',
+            servicesDesc: 'من هذا القسم يمكنك تحديد أنواع الخدمات (VIP، عادي) وفئات المبيعات وأسعار الشراء الأساسية للتاجر.',
+            servicesBtn: 'الذهاب إلى الخدمات والباقات'
+        },
         profile: {
-            title: 'الملف الشخصي والمالية',  
-            subtitle: 'معلومات حسابك',  
+            title: 'الملف الشخصي والمالي',  
+            subtitle: 'معلومات حسابك الخاص',  
             active: 'نشط',  
             username: 'اسم المستخدم',  
             phone: 'رقم الهاتف',  
             createdAt: 'تاريخ إنشاء الحساب',  
             balance: 'الرصيد',  
-            creditLimit: 'الحد الائتماني',  
-            buyPricePerGb: 'سعر الشراء لكل جيجابايت',  
-            notAvailable: 'معلومات الملف الشخصي غير متاحة.'  
+            creditLimit: 'حد الائتممان',  
+            discountPercent: 'نسبة الخصم الافتراضية',  
+            notAvailable: 'معلومات الملف الشخصي غير متوفرة.',
+            roles: {
+                admin: 'مدير النظام',
+                shopkeeper: 'صاحب المتجر (موجه مبيعات)'
+            }
         },
         sellPrice: {
-            title: 'تغيير سعر البيع',  
+            title: 'إعدادات سعر البيع للزبائن',  
+            subtitle: 'تخصيص أسعار البيع للزبائن',
+            desc: 'تم تغيير نظام تسعير الباقات ليكون على أساس الوحدة والتصنيف. لتعديل وتخصيص أسعار البيع للزبائن النهائيين بناءً على فئات الخدمات، انتقل إلى قسم إعدادات سعر البيع.',
+            btn: 'إعدادات سعر البيع',
             currentPrice: 'السعر الحالي:',  
             emptyPrice: '—',  
             newPriceLabel: 'سعر البيع الجديد (تومان / جيجابايت)',  
-            placeholder: 'مثال: 3,500',  
-            submitting: 'جاري التسجيل...',  
-            submitBtn: 'تسجيل السعر الجديد'  
+            placeholder: 'مثلاً ۳,۵۰۰',  
+            submitting: 'جاري الإرسال...',  
+            submitBtn: 'حفظ السعر الجديد'  
         },
         password: {
             title: 'تغيير كلمة المرور',  
-            subtitle: 'لمزيد من الأمان، اختر كلمة مرور قوية'  
+            subtitle: 'اختر كلمة مرور قوية لمزيد من الأمان'  
         }
     },
     createConfig: {
@@ -181,7 +199,8 @@ export const ar = {
             volume: 'الحجم:',  
             validity: 'الصلاحية:',  
             costPrice: 'سعر التكلفة (الشراء):',  
-            sellPrice: 'سعر البيع للعميل:'  
+            sellPrice: 'سعر البيع للعميل:',
+            noExpiration: 'بدون تاريخ انتهاء'
         },
         recentPurchases: {
             title: 'مشترياتك الأخيرة في هذا النظام',  
@@ -203,6 +222,10 @@ export const ar = {
         },
         qrModal: {
             title: 'رمز الاستجابة للاتصال'  
+        },
+        labels: {
+            allPackages: 'جميع الحزم',
+            serviceWithTypeName: 'خدمة {{typeName}}'
         }
     },
     shopsManagement: {
@@ -220,7 +243,9 @@ export const ar = {
             resetPasswordError: 'خطأ في إعادة تعيين كلمة المرور',  
             statsError: 'خطأ في جلب الإحصائيات',  
             createShopSuccess: 'تم إنشاء متجر جديد بنجاح',  
-            createShopError: 'خطأ في إنشاء المتجر'  
+            createShopError: 'خطأ في إنشاء المتجر',
+            updateSuccess: 'تم تعديل بيانات المتجر بنجاح.',
+            updateError: 'خطأ في تعديل بيانات المتجر.'
         },
         header: {
             title: 'إدارة أصحاب المتاجر',  
@@ -239,19 +264,22 @@ export const ar = {
             emptyDash: '—',  
             limit: 'الحد:',  
             sell: 'البيع:',  
-            active: 'نشط'  
+            active: 'نشط',
+            discountPercent: 'الخصم'
         },
         mobileCard: {
             currentBalance: 'الرصيد الحالي',  
             creditLimit: 'الحد الائتماني',  
             buyPerGb: 'شراء لكل جيجابايت',  
-            defaultSell: 'البيع الافتراضي'  
+            defaultSell: 'البيع الافتراضي',
+            discountPercent: 'نسبة الخصم'
         },
         tooltips: {
             chargeWallet: 'شحن المحفظة',  
             salesStats: 'إحصائيات البيع',  
             editDesc: 'تعديل الوصف',  
-            resetPassword: 'إعادة تعيين كلمة المرور'  
+            resetPassword: 'إعادة تعيين كلمة المرور',
+            editShop: 'تعديل بيانات المتجر'
         },
         actionsShort: {
             charge: 'شحن',  
@@ -277,6 +305,15 @@ export const ar = {
                 placeholder: 'العنوان أو ملاحظة...',  
                 submit: 'حفظ التغييرات'  
             },
+            edit: {
+                title: 'تعديل الإعدادات',
+                creditLimit: 'حد الائتمان (تومان)',
+                discountPercent: 'نسبة خصم المتجر (٪)',
+                isActive: 'الحساب نشط',
+                adminDesc: 'توضيحات المسؤول',
+                adminDescPlaceholder: 'ملاحظات حول صاحب المتجر...',
+                submit: 'حفظ التغييرات'
+            },
             stats: {
                 title: 'إحصائيات المتجر',  
                 salesCount: 'عدد المبيعات',  
@@ -293,7 +330,8 @@ export const ar = {
                 buyPrice: 'سعر الشراء (لكل جيجا / تومان)',  
                 sellPrice: 'سعر البيع الافتراضي (تومان)',  
                 adminDesc: 'وصف المسؤول (عنوان/ملاحظة)',  
-                submit: 'تسجيل متجر البائع'  
+                submit: 'تسجيل متجر البائع',
+                discountPercent: 'نسبة خصم صاحب المتجر (٪)'
             }
         }
     },
@@ -324,11 +362,109 @@ export const ar = {
             }
         },
         preview: {
-            title: 'معاينة في لوحة تحكم المستخدمين',  
+            title: 'معاينة لوحة تحكم المستخدم',  
             empty: 'لا توجد رسالة لعرضها'  
         },
         buttons: {
             save: 'حفظ الإعدادات'  
         }
+    },
+    servicesManagement: {
+        messages: {
+            fetchError: 'خطأ في تحميل بيانات الخدمة.',
+            createTypeSuccess: 'تم إنشاء نوع التكوين بنجاح.',
+            createTypeError: 'خطأ في تسجيل نوع التكوين.',
+            deleteTypeConfirm: 'هل أنت متأكد من حذف نوع الخدمة هذا؟ سيؤدي هذا أيضًا إلى حذف جميع الفئات المرتبطة.',
+            deleteTypeSuccess: 'تم حذف نوع الخدمة بنجاح.',
+            deleteTypeError: 'خطأ في حذف نوع الخدمة. ربما بسبب وجود تبعيات نشطة.',
+            createCategorySuccess: 'تم إنشاء فئة تكوين جديدة بنجاح.',
+            createCategoryError: 'خطأ في تسجيل فئة التكوين.',
+            deleteCategoryConfirm: 'هل أنت متأكد من حذف فئة التكوين هذه؟ سيتم حذف جميع الحزم وإعدادات الأسعار المخصصة المرتبطة بها.',
+            deleteCategorySuccess: 'تم حذف فئة الخدمة بنجاح.',
+            deleteCategoryError: 'خطأ في حذف فئة الخدمة.',
+            createPackageSuccess: 'تم إنشاء الحزمة الجديدة بنجاح.',
+            createPackageError: 'خطا في تسجيل الحزمة الجديدة.',
+            deletePackageConfirm: 'هل أنت متأكد من حذف قالب الحزمة هذا؟',
+            deletePackageSuccess: 'تم حذف الحزمة بنجاح.',
+            deletePackageError: 'خطأ في حذف الحزمة.',
+            updatePackageSuccess: 'تم تحديث حالة الحزمة بنجاح.',
+            updatePackageError: 'خطأ في تغيير حالة الحزمة.'
+        },
+        labels: {
+            sellTypes: {
+                volumeTime: 'حجم ووقت (محدود)',
+                unlimitedVolume: 'حجم غير محدود (محدد بالوقت)',
+                unlimitedTime: 'وقت غير محدود (محدد بالحجم)'
+            },
+            title: 'إدارة الخدمات والحزم',
+            subtitle: 'إدارة أنواع التكوين (VIP / عادي) وفئات المبيعات وقوالب الحزم',
+            tabs: {
+                packages: 'حزم الشراء',
+                categories: 'الفئات والمبيعات',
+                types: 'أنواع الخدمات'
+            },
+            forms: {
+                createTypeTitle: 'إنشاء نوع خدمة جديد',
+                typeName: 'اسم نوع الخدمة',
+                typeDesc: 'الوصف',
+                typeDescPlaceholder: 'وصف اختياري...',
+                submitType: 'تسجيل نوع الخدمة',
+                createCategoryTitle: 'إنشاء فئة مبيعات جديدة',
+                selectType: 'اختر نوع الخدمة',
+                sellType: 'نموذج المبيعات والمحاسبة',
+                adminCost: 'تكلفة المسؤول للمزود (لكل وحدة - تومان)',
+                shopPrice: 'سعر البيع الأساسي للتاجر (لكل وحدة - تومان)',
+                submitCategory: 'تسجيل فئة المبيعات',
+                createPackageTitle: 'إنشاء حزمة جديدة',
+                selectCategory: 'اختر فئة الخدمة',
+                packageName: 'اسم قالب الحزمة',
+                volumeGb: 'الحجم (جيجابايت)',
+                durationDays: 'المدة (أيام)',
+                submitPackage: 'تسجيل قالب الحزمة'
+            },
+            tables: {
+                typeName: 'اسم نوع الخدمة',
+                description: 'الوصف',
+                actions: 'العمليات',
+                noTypes: 'لم يتم تسجيل أي نوع خدمة.',
+                sellType: 'نموذج المبيعات',
+                adminCost: 'تكلفة المسؤول',
+                shopPrice: 'سعر التاجر الأساسي',
+                noCategories: 'لم يتم تسجيل أي فئة مبيعات.',
+                noPackages: 'لم يتم إعداد قوالب حزم بعد.',
+                volume: 'الحجم',
+                duration: 'المدة',
+                unlimited: 'غير محدود',
+                noExpiration: 'بدون تاريخ انتهاء',
+                days: 'يوم',
+                gigabytes: 'جيجا',
+                deactivate: 'إيقاف المبيعات',
+                activate: 'تفعيل المبيعات',
+                activeStatus: 'نشط',
+                inactiveStatus: 'غير نشط'
+            }
+        }
+    },
+    shopCustomPrices: {
+        messages: {
+            fetchError: 'خطأ في تحميل أسعارك المخصصة.',
+            invalidPrice: 'يرجى إدخال سعر صالح.',
+            saveSuccess: 'تم تحديث سعر البيع بنجاح.',
+            saveError: 'خطأ في تسجيل السعر الجديد.'
+        },
+        labels: {
+            title: 'إعدادات سعر البيع للزبائن',
+            subtitle: 'هنا يمكنك تحديد سعر البيع النهائي لكل وحدة خدمة (لكل جيجابايت أو يوم) لزبائنك.',
+            guideTitle: 'كيفية حساب أسعار البيع:',
+            guide1: 'في نماذج الحجم والوقت والوقت غير المحدود، تكون الفاتورة النهائية للزبون (السعر لكل وحدة × حجم الحزمة بالجيجابايت).',
+            guide2: 'في نماذج الحجم غير المحدود، يكون التسعير عادةً على أساس اليوم ولكنه يتبع حساب تنسيق الفاتورة.',
+            noPrices: 'لم يتم العثور على إعدادات أسعار لحسابك. يجب على المسؤول إنشاء فئات مبيعات نشطة أولاً.',
+            cardTitle: 'تعرفة البيع النهائي للزبائن',
+            unitPrice: 'السعر لكل وحدة (جيجابايت/يوم)',
+            changeBtn: 'تغيير التعرفة',
+            cancelBtn: 'إلغاء',
+            saveTitle: 'حفظ السعر',
+            defaultServiceType: 'خدمة'
+        }
     }
-};  
+};

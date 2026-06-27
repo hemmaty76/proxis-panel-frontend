@@ -40,8 +40,7 @@ export interface UserProfile {
   id: string;
   balance: number;
   credit_limit: number;
-  price_per_gb: number;
-  sell_price_per_gb: number;
+  discount_percent: number;
   role: string;
   is_active: boolean;
   created_at: string;
@@ -78,10 +77,22 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
 
 
 
-export const updateSellPricePerGb = async (sell_price_per_gb: number) => {
-  const response = await apiClient.patch('/shop/settings/sell-price', {
-    sell_price_per_gb,
-  });
+export interface ShopCustomPriceItem {
+  id: string;
+  config_category_id: string;
+  config_type_name?: string;
+  sell_type?: string;
+  category_name?: string;
+  sell_price_per_unit: number;
+}
+
+export const getShopCustomPrices = async (): Promise<ShopCustomPriceItem[]> => {
+  const response = await apiClient.get<ShopCustomPriceItem[]>('/shop/custom-prices');
+  return response.data;
+};
+
+export const updateShopCustomPrice = async (id: string, sell_price_per_unit: number): Promise<any> => {
+  const response = await apiClient.put(`/shop/custom-prices/${id}`, { sell_price_per_unit });
   return response.data;
 };
 
@@ -100,14 +111,30 @@ export const changePassword = async (payload: ChangePasswordPayload) => {
 
 
 
+export interface ConfigCategoryItem {
+  id: string;
+  config_type_id: string;
+  sell_type: string;
+  name?: string;
+  admin_cost_per_unit: number;
+  shop_price_per_unit: number;
+  config_type?: {
+    id: string;
+    name: string;
+    description?: string;
+  };
+}
+
 export interface PackageItem {
   id: string;
+  config_category_id: string;
   name: string;
   data_limit_gb: number;
   duration_days: number;
-  base_fee: number;
   cost_price: number;
   sell_price: number;
+  category_name?: string;
+  config_type_name?: string;
 }
 
 export interface PurchaseResult {
@@ -121,6 +148,11 @@ export interface PurchaseResult {
 
 export const getShopPackages = async (): Promise<PackageItem[]> => {
   const response = await apiClient.get<PackageItem[]>('/shop/packages');
+  return response.data;
+};
+
+export const getShopCategories = async (): Promise<ConfigCategoryItem[]> => {
+  const response = await apiClient.get<ConfigCategoryItem[]>('/shop/categories');
   return response.data;
 };
 

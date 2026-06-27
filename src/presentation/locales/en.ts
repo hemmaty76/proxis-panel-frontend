@@ -33,6 +33,8 @@ export const en = {
             createConfig: 'Create Config',
             manageUsers: 'Manage Users',
             manageShop: 'Manage Shop',
+            manageServices: 'Manage Services & Packages',
+            customPrices: 'Selling Price Settings',
             panelSettings: 'Panel Settings'
         }
     },
@@ -123,7 +125,10 @@ export const en = {
             activeServices: 'Active Services',
             totalCost: 'Total Cost',
             totalRevenue: 'Total Revenue',
-            netProfit: 'Net Profit'
+            netProfit: 'Net Profit',
+            upstreamDebt: 'Debt to Upstream (Marzban)',
+            adminGrossRevenue: 'Admin Gross Revenue',
+            adminNetProfit: 'Admin Net Profit'
         },
         header: {
             title: 'Dashboard',
@@ -132,6 +137,12 @@ export const en = {
         sections: {
             generalStats: 'General Stats',
             profileAndOps: 'Profile & Operations'
+        },
+        adminActions: {
+            servicesTitle: 'Packages & Services Management',
+            servicesSubtitle: 'Configure service types, sales models, and define new volume/time package templates',
+            servicesDesc: 'From this section, you can define service types (VIP, Normal), sales categories, and base purchase prices for shopkeepers.',
+            servicesBtn: 'Go to Services & Packages'
         },
         profile: {
             title: 'Profile & Finances',
@@ -142,11 +153,18 @@ export const en = {
             createdAt: 'Account Created At',
             balance: 'Balance',
             creditLimit: 'Credit Limit',
-            buyPricePerGb: 'Buy Price per GB',
-            notAvailable: 'Profile information is unavailable.'
+            discountPercent: 'Default Discount Percent',
+            notAvailable: 'Profile information is unavailable.',
+            roles: {
+                admin: 'System Admin',
+                shopkeeper: 'Shopkeeper (Reseller)'
+            }
         },
         sellPrice: {
-            title: 'Change Sell Price',
+            title: 'Final Customer Selling Price Settings',
+            subtitle: 'Set custom selling prices to customer',
+            desc: 'The package pricing system has been changed to unit-based and categorized. To edit and customize your selling prices for final customers based on service categories, go to the Selling Price Settings section.',
+            btn: 'Selling Price Settings',
             currentPrice: 'Current Price:',
             emptyPrice: '—',
             newPriceLabel: 'New Sell Price (Toman / GB)',
@@ -181,7 +199,8 @@ export const en = {
             volume: 'Volume:',
             validity: 'Validity:',
             costPrice: 'Cost Price (Buy):',
-            sellPrice: 'Sell Price to Customer:'
+            sellPrice: 'Sell Price to Customer:',
+            noExpiration: 'No expiration date'
         },
         recentPurchases: {
             title: 'Your Recent Purchases',
@@ -203,6 +222,10 @@ export const en = {
         },
         qrModal: {
             title: 'Connection QR Code'
+        },
+        labels: {
+            allPackages: 'All Packages',
+            serviceWithTypeName: 'Service {{typeName}}'
         }
     },
     shopsManagement: {
@@ -220,7 +243,9 @@ export const en = {
             resetPasswordError: 'Error resetting password',
             statsError: 'Error fetching statistics',
             createShopSuccess: 'New shop created successfully',
-            createShopError: 'Error creating the shop'
+            createShopError: 'Error creating the shop',
+            updateSuccess: 'Shop settings updated successfully.',
+            updateError: 'Error updating shop settings.'
         },
         header: {
             title: 'Shop Owners Management',
@@ -239,19 +264,22 @@ export const en = {
             emptyDash: '—',
             limit: 'Limit:',
             sell: 'Sell:',
-            active: 'Active'
+            active: 'Active',
+            discountPercent: 'Discount'
         },
         mobileCard: {
             currentBalance: 'Current Balance',
             creditLimit: 'Credit Limit',
             buyPerGb: 'Buy per GB',
-            defaultSell: 'Default Sell'
+            defaultSell: 'Default Sell',
+            discountPercent: 'Discount Percent'
         },
         tooltips: {
             chargeWallet: 'Recharge Wallet',
             salesStats: 'Sales Stats',
             editDesc: 'Edit Description',
-            resetPassword: 'Reset Password'
+            resetPassword: 'Reset Password',
+            editShop: 'Edit Shop Details'
         },
         actionsShort: {
             charge: 'Recharge',
@@ -277,6 +305,15 @@ export const en = {
                 placeholder: 'Address, location, or note...',
                 submit: 'Save Changes'
             },
+            edit: {
+                title: 'Edit Settings',
+                creditLimit: 'Credit Limit (Toman)',
+                discountPercent: 'Shop Discount Percent (%)',
+                isActive: 'Account is active',
+                adminDesc: 'Admin Description',
+                adminDescPlaceholder: 'Notes about the shopkeeper...',
+                submit: 'Save Changes'
+            },
             stats: {
                 title: 'Shop Statistics',
                 salesCount: 'Sales Count',
@@ -293,7 +330,8 @@ export const en = {
                 buyPrice: 'Buy Price (per GB / Toman)',
                 sellPrice: 'Default Sell Price (Toman)',
                 adminDesc: 'Admin Description (Address/Note)',
-                submit: 'Register Seller Shop'
+                submit: 'Register Seller Shop',
+                discountPercent: 'Shopkeeper Discount Percent (%)'
             }
         }
     },
@@ -329,6 +367,111 @@ export const en = {
         },
         buttons: {
             save: 'Save Settings'
+        }
+    },
+    servicesManagement: {
+        messages: {
+            fetchError: 'Error loading services data.',
+            createTypeSuccess: 'Config type created successfully.',
+            createTypeError: 'Error registering config type.',
+            deleteTypeConfirm: 'Are you sure you want to delete this service type? This will also delete all connected categories.',
+            deleteTypeSuccess: 'Service type deleted successfully.',
+            deleteTypeError: 'Error deleting service type. Probably due to active dependencies.',
+            createCategorySuccess: 'New config category created successfully.',
+            createCategoryError: 'Error registering config category.',
+            updateCategorySuccess: 'Config category updated successfully.',
+            updateCategoryError: 'Error updating config category.',
+            deleteCategoryConfirm: 'Are you sure you want to delete this config category? All packages and custom price settings will be deleted.',
+            deleteCategorySuccess: 'Service category deleted successfully.',
+            deleteCategoryError: 'Error deleting service category.',
+            createPackageSuccess: 'New package created successfully.',
+            createPackageError: 'Error registering new package.',
+            deletePackageConfirm: 'Are you sure you want to delete this template package?',
+            deletePackageSuccess: 'Package deleted successfully.',
+            deletePackageError: 'Error deleting package.',
+            updatePackageSuccess: 'Package status updated successfully.',
+            updatePackageError: 'Error updating package status.'
+        },
+        labels: {
+            sellTypes: {
+                volumeTime: 'Volume & Time (Limited)',
+                unlimitedVolume: 'Unlimited Volume (Time-based)',
+                unlimitedTime: 'Unlimited Time (Volume-based)'
+            },
+            title: 'Manage Services & Packages',
+            subtitle: 'Manage config types (VIP / Normal), sales categories, and template packages',
+            tabs: {
+                packages: 'Purchase Packages',
+                categories: 'Categories & Sales',
+                types: 'Service Types'
+            },
+            forms: {
+                createTypeTitle: 'Create New Service Type',
+                typeName: 'Service Type Name',
+                typeDesc: 'Description',
+                typeDescPlaceholder: 'Optional description...',
+                submitType: 'Register Service Type',
+                createCategoryTitle: 'Create New Sales Category',
+                selectType: 'Select Service Type',
+                sellType: 'Sales & Accounting Model',
+                categoryName: 'Category Display Name',
+                adminCost: 'Admin Cost to Upstream (per Unit - Toman)',
+                shopPrice: 'Base Shopkeeper Price (per Unit - Toman)',
+                submitCategory: 'Register Sales Category',
+                createPackageTitle: 'Create New Package',
+                selectCategory: 'Select Service Category',
+                packageName: 'Package Template Name',
+                volumeGb: 'Volume (GB)',
+                durationDays: 'Duration (Days)',
+                submitPackage: 'Register Package Template',
+                editPackageTitle: 'Edit Package Template',
+                savePackage: 'Save Changes'
+            },
+            tables: {
+                typeName: 'Service Type Name',
+                description: 'Description',
+                actions: 'Actions',
+                noTypes: 'No service types registered.',
+                sellType: 'Sales Model',
+                categoryName: 'Display Name',
+                adminCost: 'Admin Cost',
+                shopPrice: 'Base Shop Price',
+                noCategories: 'No sales categories registered.',
+                noPackages: 'No package templates configured.',
+                volume: 'Volume',
+                duration: 'Duration',
+                unlimited: 'Unlimited',
+                noExpiration: 'No expiration',
+                days: 'days',
+                gigabytes: 'GB',
+                deactivate: 'Deactivate',
+                activate: 'Activate',
+                activeStatus: 'Active',
+                inactiveStatus: 'Inactive',
+                edit: 'Edit'
+            }
+        }
+    },
+    shopCustomPrices: {
+        messages: {
+            fetchError: 'Error loading your custom prices.',
+            invalidPrice: 'Please enter a valid price.',
+            saveSuccess: 'Selling price updated successfully.',
+            saveError: 'Error registering new price.'
+        },
+        labels: {
+            title: 'Final Customer Selling Price Settings',
+            subtitle: 'Here you can specify the final selling price per unit of service (per GB or day) for your customers.',
+            guideTitle: 'How selling prices are computed:',
+            guide1: 'For Volume & Time and Unlimited Time models, the final customer invoice is (price per unit × package volume in GB).',
+            guide2: 'For Unlimited Volume models, pricing is typically day-based but follows the invoice format calculation.',
+            noPrices: 'No price settings found for your account. The administrator must create active sales categories first.',
+            cardTitle: 'Final Customer Selling Price',
+            unitPrice: 'Price per Unit (GB/Day)',
+            changeBtn: 'Change Price',
+            cancelBtn: 'Cancel',
+            saveTitle: 'Save Price',
+            defaultServiceType: 'Service'
         }
     }
 };
