@@ -282,13 +282,15 @@ export default function UsersManagement() {
       {isUsageOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
-            
+
             {/* Header */}
             <div className="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50/50">
               <div>
-                <h3 className="font-extrabold text-slate-800">جزئیات مصرف کانفیگ</h3>
+                <h3 className="font-extrabold text-slate-800">
+                  {t('usageModal.title', 'جزئیات مصرف کانفیگ')}
+                </h3>
                 <p className="text-xs font-semibold text-slate-500 mt-1 dir-ltr text-right">
-                  {selectedUsage?.username || "در حال بارگذاری..."}
+                  {selectedUsage?.username || t('usageModal.loadingUser', 'در حال بارگذاری...')}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -297,7 +299,7 @@ export default function UsersManagement() {
                     onClick={() => handleShowUsage(selectedUsage.username)}
                     disabled={isUsageLoading}
                     className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors disabled:opacity-50"
-                    title="بروزرسانی"
+                    title={t('usageModal.refreshTooltip', 'بروزرسانی')}
                   >
                     <RefreshCw size={18} strokeWidth={2.5} className={isUsageLoading ? 'animate-spin' : ''} />
                   </button>
@@ -316,32 +318,36 @@ export default function UsersManagement() {
               {isUsageLoading ? (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4">
                   <RefreshCw className="animate-spin text-indigo-600" size={32} />
-                  <p className="text-sm font-semibold text-slate-500">دریافت اطلاعات مصرف از سرور اصلی...</p>
+                  <p className="text-sm font-semibold text-slate-500">
+                    {t('usageModal.fetchingInfo', 'دریافت اطلاعات مصرف از سرور اصلی...')}
+                  </p>
                 </div>
               ) : selectedUsage ? (
                 <div className="space-y-6 font-sans">
                   {/* Status */}
                   <div className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    <span className="text-sm font-bold text-slate-500 font-medium">وضعیت سرویس</span>
+                    <span className="text-sm font-bold text-slate-500">
+                      {t('usageModal.status.title', 'وضعیت سرویس')}
+                    </span>
                     <div>
                       {selectedUsage.status === 'active' && (
                         <span className="px-3 py-1.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-700 border border-emerald-200">
-                          فعال (Active)
+                          {t('usageModal.status.active', 'فعال (Active)')}
                         </span>
                       )}
                       {selectedUsage.status === 'on_hold' && (
                         <span className="px-3 py-1.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-700 border border-amber-200">
-                          در انتظار اولین اتصال (On Hold)
+                          {t('usageModal.status.onHold', 'در انتظار اولین اتصال (On Hold)')}
                         </span>
                       )}
                       {selectedUsage.status === 'expired' && (
                         <span className="px-3 py-1.5 rounded-full text-xs font-extrabold bg-rose-100 text-rose-700 border border-rose-200">
-                          منقضی شده (Expired)
+                          {t('usageModal.status.expired', 'منقضی شده (Expired)')}
                         </span>
                       )}
                       {selectedUsage.status === 'disabled' && (
                         <span className="px-3 py-1.5 rounded-full text-xs font-extrabold bg-slate-200 text-slate-700 border border-slate-300">
-                          غیرفعال (Disabled)
+                          {t('usageModal.status.disabled', 'غیرفعال (Disabled)')}
                         </span>
                       )}
                     </div>
@@ -350,27 +356,28 @@ export default function UsersManagement() {
                   {/* Volume Usage */}
                   <div className="space-y-3 bg-gradient-to-br from-indigo-50/50 to-slate-50 p-5 rounded-2xl border border-slate-100/80">
                     <div className="flex justify-between items-baseline">
-                      <span className="text-sm font-bold text-indigo-950">ترافیک مصرفی</span>
+                      <span className="text-sm font-bold text-indigo-950">
+                        {t('usageModal.traffic.title', 'ترافیک مصرفی')}
+                      </span>
                       <span className="text-xs font-bold text-indigo-950/80">
-                        {formatBytes(selectedUsage.used_traffic)} از {selectedUsage.data_limit > 0 ? formatBytes(selectedUsage.data_limit) : 'نامحدود'}
+                        {formatBytes(selectedUsage.used_traffic)} {t('usageModal.traffic.of', 'از')} {selectedUsage.data_limit > 0 ? formatBytes(selectedUsage.data_limit) : t('usageModal.traffic.unlimited', 'نامحدود')}
                       </span>
                     </div>
-                    
+
                     {selectedUsage.data_limit > 0 ? (
                       <div className="space-y-1.5">
                         <div className="w-full bg-slate-200/80 rounded-full h-3 overflow-hidden">
-                          <div 
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              ((selectedUsage.used_traffic / selectedUsage.data_limit) * 100) > 85 ? 'bg-gradient-to-r from-rose-500 to-red-600' : 
-                              ((selectedUsage.used_traffic / selectedUsage.data_limit) * 100) > 60 ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 
-                              'bg-gradient-to-r from-indigo-500 to-emerald-500'
-                            }`}
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${((selectedUsage.used_traffic / selectedUsage.data_limit) * 100) > 85 ? 'bg-gradient-to-r from-rose-500 to-red-600' :
+                                ((selectedUsage.used_traffic / selectedUsage.data_limit) * 100) > 60 ? 'bg-gradient-to-r from-amber-500 to-orange-500' :
+                                  'bg-gradient-to-r from-indigo-500 to-emerald-500'
+                              }`}
                             style={{ width: `${Math.min(100, (selectedUsage.used_traffic / selectedUsage.data_limit) * 100)}%` }}
                           ></div>
                         </div>
                         <div className="flex justify-between text-[11px] text-slate-500 font-bold">
-                          <span>{Math.min(100, (selectedUsage.used_traffic / selectedUsage.data_limit) * 100).toFixed(1)}% مصرف شده</span>
-                          <span>{formatBytes(Math.max(0, selectedUsage.data_limit - selectedUsage.used_traffic))} باقی‌مانده</span>
+                          <span>{Math.min(100, (selectedUsage.used_traffic / selectedUsage.data_limit) * 100).toFixed(1)}% {t('usageModal.traffic.used', 'مصرف شده')}</span>
+                          <span>{formatBytes(Math.max(0, selectedUsage.data_limit - selectedUsage.used_traffic))} {t('usageModal.traffic.remaining', 'باقی‌مانده')}</span>
                         </div>
                       </div>
                     ) : (
@@ -383,41 +390,53 @@ export default function UsersManagement() {
                   {/* Other Info */}
                   <div className="bg-white rounded-2xl border border-slate-100 divide-y divide-slate-50 overflow-hidden shadow-sm">
                     <div className="flex justify-between items-center p-4">
-                      <span className="text-xs font-bold text-slate-500">کل ترافیک مصرفی (Lifetime)</span>
+                      <span className="text-xs font-bold text-slate-500">
+                        {t('usageModal.details.lifetime', 'کل ترافیک مصرفی (Lifetime)')}
+                      </span>
                       <span className="text-sm font-bold text-slate-800 dir-ltr">{formatBytes(selectedUsage.lifetime_used_traffic)}</span>
                     </div>
 
                     <div className="flex justify-between items-center p-4">
-                      <span className="text-xs font-bold text-slate-500">تاریخ ایجاد کانفیگ</span>
+                      <span className="text-xs font-bold text-slate-500">
+                        {t('usageModal.details.createdAt', 'تاریخ ایجاد کانفیگ')}
+                      </span>
                       <span className="text-sm font-bold text-slate-700">{formatDate(selectedUsage.created_at)}</span>
                     </div>
 
                     {selectedUsage.status === 'on_hold' ? (
                       <div className="flex justify-between items-center p-4">
-                        <span className="text-xs font-bold text-slate-500">مدت دوره (پس از اتصال)</span>
+                        <span className="text-xs font-bold text-slate-500">
+                          {t('usageModal.details.duration', 'مدت دوره (پس از اتصال)')}
+                        </span>
                         <span className="text-sm font-bold text-slate-700">
-                          {Math.round(selectedUsage.on_hold_expire_duration / (24 * 3600))} روز
+                          {Math.round(selectedUsage.on_hold_expire_duration / (24 * 3600))} {t('usageModal.details.days', 'روز')}
                         </span>
                       </div>
                     ) : (
                       <div className="flex justify-between items-center p-4">
-                        <span className="text-xs font-bold text-slate-500">تاریخ انقضا</span>
+                        <span className="text-xs font-bold text-slate-500">
+                          {t('usageModal.details.expire', 'تاریخ انقضا')}
+                        </span>
                         <span className="text-sm font-bold text-slate-700">
-                          {selectedUsage.expire ? formatDate(new Date(selectedUsage.expire * 1000).toISOString()) : 'نامحدود'}
+                          {selectedUsage.expire ? formatDate(new Date(selectedUsage.expire * 1000).toISOString()) : t('usageModal.traffic.unlimited', 'نامحدود')}
                         </span>
                       </div>
                     )}
 
                     {selectedUsage.online_at && (
                       <div className="flex justify-between items-center p-4">
-                        <span className="text-xs font-bold text-slate-500">آخرین اتصال به سرور</span>
+                        <span className="text-xs font-bold text-slate-500">
+                          {t('usageModal.details.lastOnline', 'آخرین اتصال به سرور')}
+                        </span>
                         <span className="text-sm font-bold text-slate-700">{formatDate(selectedUsage.online_at)}</span>
                       </div>
                     )}
 
                     {selectedUsage.sub_updated_at && (
                       <div className="flex justify-between items-center p-4">
-                        <span className="text-xs font-bold text-slate-500">آخرین بروزرسانی ساب</span>
+                        <span className="text-xs font-bold text-slate-500">
+                          {t('usageModal.details.lastSubUpdate', 'آخرین بروزرسانی ساب')}
+                        </span>
                         <span className="text-sm font-bold text-slate-700">{formatDate(selectedUsage.sub_updated_at)}</span>
                       </div>
                     )}
@@ -432,7 +451,7 @@ export default function UsersManagement() {
                 onClick={() => setIsUsageOpen(false)}
                 className="px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm"
               >
-                بستن
+                {t('usageModal.closeBtn', 'بستن')}
               </button>
             </div>
 

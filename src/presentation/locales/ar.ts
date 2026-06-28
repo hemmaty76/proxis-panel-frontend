@@ -114,6 +114,20 @@ export const ar = {
     },
     dashboardHome: {
         currency: 'تومان',
+        chargeModal: {
+            "title": "شحن الحساب عبر الإنترنت",
+            "amountLabel": "مبلغ الشحن (تومان)",
+            "notice": "بعد الدفع الناجح، سيتم إضافة المبلغ فوراً إلى رصيد حسابك.",
+            "vpnWarning": "ملاحظة: يرجى إيقاف تشغيل الـ VPN قبل الدخول إلى بوابة الدفع لتجنب حدوث أي خطأ في عملية الدفع.",
+            "submitBtn": "الدفع عبر زرين‌بال"
+        },
+        paymentResult: {
+            "successTitle": "تم شحن الحساب بنجاح",
+            "successDesc": "تم التحقق من معاملتك بنجاح. تم إضافة المبلغ إلى رصيدك فوراً.",
+            "failedTitle": "فشلت عملية الدفع أو تم إلغاؤها",
+            "failedDesc": "فشلت عملية الدفع أو تم إلغاؤها من قبلك. إذا تم خصم أي مبلغ، فسيتم استرداده خلال 72 ساعة.",
+            "closeBtn": "حسناً"
+        },
         messages: {
             fetchError: 'فشل الاتصال بالخادم. يرجى إعادة تحميل الصفحة.',
             invalidPrice: 'يرجى إدخال سعر صالح',
@@ -146,6 +160,7 @@ export const ar = {
         },
         profile: {
             title: 'الملف الشخصي والمالي',
+            chargeBtn: 'إعادة شحن الحساب',
             subtitle: 'معلومات حسابك الخاص',
             active: 'نشط',
             username: 'اسم المستخدم',
@@ -481,7 +496,7 @@ export const ar = {
             "submitError": "فشل في تسجيل الدفع."
         },
         "header": {
-            "title": "تسويات الخادم (Upstream)",
+            "title": "تسويات الخادم",
             "subtitle": "إدارة الديون والمدفوعات لمزود الخادم"
         },
         "buttons": {
@@ -507,5 +522,35 @@ export const ar = {
             "trackingCodeLabel": "رمز التتبع أو الملاحظة",
             "submitBtn": "تأكيد المبلغ"
         }
+    },
+    usageModal: {
+        "title": "تفاصيل استهلاك الإعداد",
+        "loadingUser": "جاري التحميل...",
+        "refreshTooltip": "تحديث",
+        "fetchingInfo": "جاري جلب معلومات الاستهلاك من الخادم الرئيسي...",
+        "status": {
+            "title": "حالة الخدمة",
+            "active": "نشط (Active)",
+            "onHold": "قيد الانتظار (On Hold)",
+            "expired": "منتهي الصلاحية (Expired)",
+            "disabled": "معطل (Disabled)"
+        },
+        "traffic": {
+            "title": "حركة المرور المستهلكة",
+            "of": "من",
+            "unlimited": "غير محدود",
+            "used": "مستهلك",
+            "remaining": "متبقي"
+        },
+        "details": {
+            "lifetime": "إجمالي الاستهلاك (Lifetime)",
+            "createdAt": "تاريخ إنشاء الإعداد",
+            "duration": "المدة (بعد الاتصال)",
+            "days": "أيام",
+            "expire": "تاريخ الانتهاء",
+            "lastOnline": "آخر اتصال بالخادم",
+            "lastSubUpdate": "آخر تحديث للاشتراك"
+        },
+        "closeBtn": "إغلاق"
     }
 };

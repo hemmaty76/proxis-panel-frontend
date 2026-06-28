@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Settings, FilePlus, Package, Coins } from 'lucide-react';
+import { LayoutDashboard, Users,BanknoteCheck,Store ,Settings, FilePlus, Package, Coins } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
@@ -19,10 +19,10 @@ export default function Sidebar({ isOpen, onClose, appVersion }: SidebarProps) {
     { text: t('sidebar.menu.createConfig'), path: '/proxies', icon: <FilePlus size={20} strokeWidth={2.5} /> },
     { text: t('sidebar.menu.manageUsers'), path: '/users', icon: <Users size={20} strokeWidth={2.5} /> },
     ...(userRole === 'ADMIN' ? [
-      { text: t('sidebar.menu.manageShop'), path: '/admin/shops', icon: <Settings size={20} strokeWidth={2.5} /> },
+      { text: t('sidebar.menu.manageShop'), path: '/admin/shops', icon: <Store size={20} strokeWidth={2.5} /> },
       { text: t('sidebar.menu.manageServices'), path: '/admin/services', icon: <Package size={20} strokeWidth={2.5} /> },
       { text: t('sidebar.menu.panelSettings'), path: '/admin/settings', icon: <Settings size={20} strokeWidth={2.5} /> },
-      { text: t('sidebar.menu.panelSettings'), path: '/admin/settlements', icon: <Settings size={20} strokeWidth={2.5} /> }
+      { text: t('settlements.header.title'), path: '/admin/settlements', icon: <BanknoteCheck size={20} strokeWidth={2.5} /> }
     ] : [
       { text: t('sidebar.menu.customPrices'), path: '/settings/prices', icon: <Coins size={20} strokeWidth={2.5} /> }
     ]),

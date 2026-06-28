@@ -114,6 +114,20 @@ export const en = {
     },
     dashboardHome: {
         currency: 'Toman',
+        chargeModal: {
+            "title": "Online Account Recharge",
+            "amountLabel": "Recharge Amount (Toman)",
+            "notice": "Upon successful payment, the amount will be immediately added to your account balance.",
+            "vpnWarning": "Note: Please turn off your VPN before entering the payment gateway to avoid any payment errors.",
+            "submitBtn": "Pay with Zarinpal"
+        },
+        paymentResult: {
+            "successTitle": "Account Charged Successfully",
+            "successDesc": "Your transaction has been verified successfully. The amount has been added to your balance.",
+            "failedTitle": "Payment Failed or Cancelled",
+            "failedDesc": "The payment process failed or was cancelled by you. If any amount was deducted, it will be refunded within 72 hours.",
+            "closeBtn": "Got it"
+        },
         messages: {
             fetchError: 'Could not connect to the server. Please refresh the page.',
             invalidPrice: 'Please enter a valid price',
@@ -146,6 +160,7 @@ export const en = {
         },
         profile: {
             title: 'Profile & Finances',
+            chargeBtn: 'Account recharge',
             subtitle: 'Your account information',
             active: 'Active',
             username: 'Username',
@@ -475,12 +490,12 @@ export const en = {
         }
     },
     common: {
-            "currency": "Toman",
-            "submitting": "Submitting...",
-            "cancel": "Cancel"
-        },
+        "currency": "Toman",
+        "submitting": "Submitting...",
+        "cancel": "Cancel"
+    },
     settlements: {
-        
+
         "messages": {
             "fetchError": "Failed to fetch data.",
             "invalidAmount": "Invalid amount.",
@@ -488,7 +503,7 @@ export const en = {
             "submitError": "Failed to record settlement."
         },
         "header": {
-            "title": "Upstream Settlements",
+            "title": "Settlements",
             "subtitle": "Manage debts and payments to the server provider"
         },
         "buttons": {
@@ -514,5 +529,35 @@ export const en = {
             "trackingCodeLabel": "Tracking Code or Note",
             "submitBtn": "Submit Amount"
         }
+    },
+    usageModal: {
+        "title": "Config Usage Details",
+        "loadingUser": "Loading...",
+        "refreshTooltip": "Refresh",
+        "fetchingInfo": "Fetching usage info from main server...",
+        "status": {
+            "title": "Service Status",
+            "active": "Active",
+            "onHold": "On Hold (Awaiting connection)",
+            "expired": "Expired",
+            "disabled": "Disabled"
+        },
+        "traffic": {
+            "title": "Traffic Usage",
+            "of": "of",
+            "unlimited": "Unlimited",
+            "used": "Used",
+            "remaining": "Remaining"
+        },
+        "details": {
+            "lifetime": "Total Traffic Usage (Lifetime)",
+            "createdAt": "Config Creation Date",
+            "duration": "Duration (after connection)",
+            "days": "Days",
+            "expire": "Expiration Date",
+            "lastOnline": "Last Server Connection",
+            "lastSubUpdate": "Last Subscription Update"
+        },
+        "closeBtn": "Close"
     }
 };

@@ -146,17 +146,7 @@ export default function AdminSettlements() {
         </button>
       </div>
 
-      {/* Info Banner */}
-      <div className="bg-blue-50 border border-blue-200 p-4 rounded-2xl text-blue-800 text-sm leading-relaxed flex gap-3">
-        <Info className="text-blue-500 shrink-0 mt-0.5" size={20} />
-        <div>
-          <p className="font-bold">{t('settlements.labels.guideTitle', 'راهنمای محاسبه وضعیت بدهی:')}</p>
-          <ul className="list-disc list-inside mt-1.5 space-y-1 font-medium text-xs leading-relaxed">
-            <li>{t('settlements.labels.guide1', 'کل بدهی تولید شده، مجموع هزینه‌های ادمین (admin_cost_price) برای تمام کانفیگ‌های ساخته شده است.')}</li>
-            <li>{t('settlements.labels.guide2', 'با ثبت هر پرداختی جدید در این صفحه، مبلغ از "مانده بدهی فعلی" کسر خواهد شد.')}</li>
-          </ul>
-        </div>
-      </div>
+
 
       {/* Main Content */}
       {isLoading || !data ? (
@@ -201,7 +191,7 @@ export default function AdminSettlements() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm text-right text-slate-500">
+                <table className="w-full text-sm text-center text-slate-500">
                   <thead className="text-xs font-bold text-slate-700 bg-slate-50 border-b border-slate-100">
                     <tr>
                       <th className="px-6 py-4">{t('settlements.table.date', 'تاریخ و ساعت')}</th>

@@ -179,4 +179,9 @@ export interface ConfigUsageResponse {
 export const getConfigUsage = async (username: string): Promise<ConfigUsageResponse> => {
   const response = await apiClient.get<ConfigUsageResponse>(`/shop/configs/${username}/usage`);
   return response.data;
-};
+};
+
+export const requestZarinpalCharge = async (amount: number): Promise<{ payment_url: string }> => {
+  const response = await apiClient.post('/payments/zarinpal/request', { amount });
+  return response.data;
+};

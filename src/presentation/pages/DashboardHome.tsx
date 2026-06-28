@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import PasswordChangeForm from '../components/PasswordChangeForm';
 import { useTranslation } from 'react-i18next';
 import {
@@ -10,6 +10,9 @@ import {
   getDashboardStats,
 } from '../../data/services/shopService';
 import { getFinancialReport, type FinancialReport } from '../../data/services/adminService';
+
+import { Wallet, Loader2, X, CreditCard, CheckCircle2, XCircle } from 'lucide-react';
+import { requestZarinpalCharge } from '../../data/services/shopService';
 
 
 interface StatCardProps {
@@ -78,9 +81,10 @@ export default function DashboardHome() {
     }
   };
 
+
   const formatNumber = (value: number) =>
     value.toLocaleString(getLocale());
-  
+
   const formatDate = (iso: string) =>
     new Intl.DateTimeFormat(getLocale(), {
       year: 'numeric',
@@ -97,6 +101,42 @@ export default function DashboardHome() {
 
   const formatCurrency = (value: number) =>
     `${value.toLocaleString(getLocale())} ${t('dashboardHome.currency', 'تومان')}`;
+
+
+  const [isChargeModalOpen, setIsChargeModalOpen] = useState(false);
+  const [chargeAmount, setChargeAmount] = useState('');
+  const [isCharging, setIsCharging] = useState(false);
+
+  const handleChargeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const numericAmount = Number(chargeAmount.replace(/\D/g, ''));
+
+    if (!numericAmount || numericAmount < 10000) {
+      toast.error(t('dashboardHome.messages.minCharge', 'حداقل مبلغ شارژ ۱۰,۰۰۰ تومان است.'));
+      return;
+    }
+
+    setIsCharging(true);
+    try {
+      const data = await requestZarinpalCharge(numericAmount);
+      window.location.href = data.payment_url;
+    } catch {
+      toast.error(t('dashboardHome.messages.chargeError', 'خطا در اتصال به درگاه پرداخت.'));
+      setIsCharging(false);
+    }
+  };
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const paymentStatus = searchParams.get('payment'); // مقدار 'success' یا 'failed' را می‌گیرد
+
+  const [isResultModalOpen, setIsResultModalOpen] = useState(!!paymentStatus);
+
+  const handleCloseResultModal = () => {
+    setIsResultModalOpen(false);
+    searchParams.delete('payment');
+    setSearchParams(searchParams, { replace: true });
+  };
+
 
   useEffect(() => {
     let cancelled = false;
@@ -313,10 +353,19 @@ export default function DashboardHome() {
                 </div>
 
                 {profile.role !== 'ADMIN' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                    <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4 min-h-[88px] flex flex-col justify-center transition-colors duration-200 hover:bg-slate-50">
-                      <p className="text-xs font-semibold text-slate-500 mb-1">{t('dashboardHome.profile.balance', 'موجودی')}</p>
-                      <p className="text-xl font-extrabold text-slate-900 tabular-nums">
+                  < div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4 min-h-[88px] flex flex-col justify-between transition-colors duration-200 hover:bg-slate-50">
+                      <div className="flex justify-between items-start">
+                        <p className="text-xs font-semibold text-slate-500 mb-1">{t('dashboardHome.profile.balance', 'موجودی')}</p>
+                        <button
+                          onClick={() => setIsChargeModalOpen(true)}
+                          className="px-2.5 py-1 bg-white border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 text-emerald-600 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                        >
+                          <Wallet size={14} />
+                          {t('dashboardHome.profile.chargeBtn', 'شارژ حساب')}
+                        </button>
+                      </div>
+                      <p className="text-xl font-extrabold text-slate-900 tabular-nums mt-2">
                         {formatCurrency(profile.balance)}
                       </p>
                     </div>
@@ -329,14 +378,7 @@ export default function DashboardHome() {
                   </div>
                 )}
 
-                {profile.role !== 'ADMIN' && (
-                  <div className="flex items-center justify-between text-sm pt-1 border-t border-slate-100">
-                    <span className="text-slate-500">{t('dashboardHome.profile.discountPercent', 'درصد تخفیف پیش‌فرض')}</span>
-                    <span className="font-bold text-slate-700 tabular-nums">
-                      {profile.discount_percent} %
-                    </span>
-                  </div>
-                )}
+              
               </>
             ) : (
               <p className="text-sm text-slate-500 text-center py-8">
@@ -404,7 +446,123 @@ export default function DashboardHome() {
             </div>
           </div>
         </div>
-      </section>
-    </div>
+      </section >
+      {/* مُدال شارژ حساب آنلاین */}
+      {isChargeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <h3 className="text-lg font-extrabold text-slate-800 flex items-center gap-2">
+                <CreditCard className="text-emerald-600" size={20} />
+                {t('dashboardHome.chargeModal.title', 'شارژ آنلاین حساب')}
+              </h3>
+              <button onClick={() => setIsChargeModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleChargeSubmit} className="p-6 space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                  {t('dashboardHome.chargeModal.amountLabel', 'مبلغ شارژ (تومان)')}
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  required
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none dir-ltr font-bold text-slate-800"
+                  value={chargeAmount}
+                  onChange={(e) => {
+                    const rawValue = e.target.value.replace(/\D/g, '');
+                    setChargeAmount(rawValue ? Number(rawValue).toLocaleString('en-US') : '');
+                  }}
+                  placeholder="مثال: 50,000"
+                />
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl text-xs font-medium leading-relaxed space-y-2">
+                <p>
+                  {t('dashboardHome.chargeModal.notice', 'پس از پرداخت موفق، مبلغ بلافاصله به موجودی حساب شما افزوده خواهد شد.')}
+                </p>
+                <p className="font-bold text-amber-900 border-t border-amber-200/60 pt-2 flex items-start gap-1">
+                  <span>⚠️</span>
+                  <span>{t('dashboardHome.chargeModal.vpnWarning', 'توجه: لطفاً قبل از ورود به درگاه پرداخت، فیلترشکن (VPN) خود را خاموش کنید تا در فرآیند پرداخت خطایی رخ ندهد.')}</span>
+                </p>
+              </div>
+
+              <div className="pt-2 flex gap-3">
+                <button
+                  type="submit"
+                  disabled={isCharging || !chargeAmount}
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold disabled:opacity-50 transition-all flex justify-center items-center gap-2 shadow-sm"
+                >
+                  {isCharging ? <Loader2 className="animate-spin" size={20} /> : null}
+                  {t('dashboardHome.chargeModal.submitBtn', 'پرداخت با زرین‌پال')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsChargeModalOpen(false)}
+                  disabled={isCharging}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-bold transition-colors"
+                >
+                  {t('common.cancel', 'انصراف')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* مُدال نمایش نتیجه پرداخت زرین‌پال */}
+      {isResultModalOpen && paymentStatus && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200 p-6 text-center space-y-4">
+
+            {/* حالت پرداخت موفق */}
+            {paymentStatus === 'success' ? (
+              <>
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-8 ring-emerald-100/50">
+                  <CheckCircle2 size={36} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-extrabold text-slate-800">
+                    {t('dashboardHome.paymentResult.successTitle', 'افزایش موجودی موفقیت‌آمیز بود')}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                    {t('dashboardHome.paymentResult.successDesc', 'تراکنش شما با موفقیت تایید شد. مبلغ پرداختی بلافاصله به موجودی حساب شما اضافه گردید.')}
+                  </p>
+                </div>
+                <button
+                  onClick={handleCloseResultModal}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold shadow-sm transition-all"
+                >
+                  {t('dashboardHome.paymentResult.closeBtn', 'متوجه شدم')}
+                </button>
+              </>
+            ) : (
+              /* حالت پرداخت ناموفق */
+              <>
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-600 ring-8 ring-red-100/50">
+                  <XCircle size={36} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-extrabold text-slate-800">
+                    {t('dashboardHome.paymentResult.failedTitle', 'پرداخت ناموفق یا انصراف')}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                    {t('dashboardHome.paymentResult.failedDesc', 'عملیات پرداخت با خطا مواجه شد و یا توسط شما لغو گردید.')}
+                  </p>
+                </div>
+                <button
+                  onClick={handleCloseResultModal}
+                  className="w-full bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-xl font-bold shadow-sm transition-all"
+                >
+                  {t('dashboardHome.paymentResult.closeBtn', 'متوجه شدم')}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </div >
   );
-}
+}
