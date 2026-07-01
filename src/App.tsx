@@ -12,6 +12,7 @@ import AdminSettlements from './presentation/pages/admin/AdminSettlements';
 import ShopCustomPrices from './presentation/pages/ShopCustomPrices';
 import type { JSX } from 'react/jsx-runtime';
 import SystemSettingsPage from './presentation/pages/admin/SystemSetting';
+import ServersManagement from './presentation/pages/admin/ServersManagement';
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const isAuthenticated = !!localStorage.getItem('access_token');
@@ -145,6 +146,16 @@ function App() {
               <AdminRoute>
                 <DashboardLayout>
                   <AdminSettlements />
+                </DashboardLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/servers"
+            element={
+              <AdminRoute>
+                <DashboardLayout>
+                  <ServersManagement />
                 </DashboardLayout>
               </AdminRoute>
             }

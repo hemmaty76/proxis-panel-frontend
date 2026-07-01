@@ -196,19 +196,62 @@ export const getSettlementDashboard = async (): Promise<SettlementDashboardRespo
   return response.data;
 };
 
-export const createSettlement = async (amount: number, trackingCode: string): Promise<SettlementResponse> => {
+export const createSettlement = async (serverId: string, amount: number, trackingCode: string): Promise<SettlementResponse> => {
   const response = await apiClient.post('/admin/settlements/', {
+    server_id: serverId,
     amount,
     tracking_code: trackingCode,
   });
   return response.data;
 };
 
+export interface ServerResponse {
+  id: string;
+  name: string;
+  base_url: string;
+  username: string;
+  password?: string;
+  is_active: boolean;
+}
 
-// مسیر احتمالی: src/data/services/adminService.ts
+export interface ServerCreateInput {
+  name: string;
+  base_url: string;
+  username: string;
+  password?: string;
+  is_active: boolean;
+}
+
+export interface ServerUpdateInput {
+  name?: string;
+  base_url?: string;
+  username?: string;
+  password?: string;
+  is_active?: boolean;
+}
+
+export const getServers = async (): Promise<ServerResponse[]> => {
+  const response = await apiClient.get('/admin/servers/');
+  return response.data;
+};
+
+export const createServer = async (data: ServerCreateInput): Promise<ServerResponse> => {
+  const response = await apiClient.post('/admin/servers/', data);
+  return response.data;
+};
+
+export const updateServer = async (id: string, data: ServerUpdateInput): Promise<ServerResponse> => {
+  const response = await apiClient.patch(`/admin/servers/${id}`, data);
+  return response.data;
+};
+
+export const deleteServer = async (id: string): Promise<void> => {
+  await apiClient.delete(`/admin/servers/${id}`);
+};
 
 export interface SettlementResponse {
   id: string;
+  server_id: string;
   amount: number;
   tracking_code: string | null;
   created_at: string;

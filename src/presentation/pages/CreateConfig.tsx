@@ -48,6 +48,7 @@ export default function CreateConfig() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState<PackageItem | null>(null);
+  const [customSellPrice, setCustomSellPrice] = useState<number | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [recentPurchases, setRecentPurchases] = useState<PurchaseResult['config_details'][]>([]);
   const [copiedUsername, setCopiedUsername] = useState<string | null>(null);
@@ -79,6 +80,10 @@ export default function CreateConfig() {
     return () => { isMounted = false; };
   }, []);
 
+  useEffect(() => {
+    setCustomSellPrice(null);
+  }, [selectedPackage]);
+
   // محاسبه قیمت تمام شده (مبلغی که از کیف پول کسر می‌شود)
   const getCostPrice = (pkg: PackageItem) => {
     return pkg.cost_price;
@@ -94,7 +99,7 @@ export default function CreateConfig() {
 
     setIsPurchasing(true);
     try {
-      const result = await purchasePackage(selectedPackage.id);
+      const result = await purchasePackage(selectedPackage.id, customSellPrice);
       toast.success(t('createConfig.messages.purchaseSuccess'));
 
       // کسر کردن "قیمت تمام شده" از موجودی
@@ -307,11 +312,43 @@ export default function CreateConfig() {
                 )}
               </div>
 
+              {/* قیمت فروش دلخواه */}
+              <div className="mt-4 text-start">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  {t('createConfig.labels.customSellPrice')}
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={customSellPrice !== null ? customSellPrice : ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '') {
+                      setCustomSellPrice(null);
+                    } else {
+                      const num = parseInt(val, 10);
+                      if (!isNaN(num) && num >= 0) {
+                        setCustomSellPrice(num);
+                      }
+                    }
+                  }}
+                  disabled={isPurchasing}
+                  className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 outline-none transition-all duration-200 text-slate-700 font-medium placeholder:text-slate-400 disabled:opacity-60 disabled:cursor-not-allowed"
+                  placeholder={t('createConfig.labels.customSellPricePlaceholder')}
+                />
+                <p className="mt-1.5 text-[11px] text-slate-500">
+                  {t('createConfig.labels.customSellPriceHelper').replace(
+                    '{{price}}',
+                    formatCurrency(getSellPrice(selectedPackage))
+                  )}
+                </p>
+              </div>
+
               {/* راهنمای قیمت فروش برای فروشنده */}
               <div className="mt-4 flex items-start gap-2 bg-blue-50/50 text-blue-700 text-xs p-3 rounded-xl text-right">
                 <Info size={16} className="shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
-                  {t('createConfig.modal.guideStart')} <strong>{formatCurrency(getSellPrice(selectedPackage))}</strong> {t('createConfig.modal.guideMiddle')} <strong>{formatCurrency(getSellPrice(selectedPackage) - getCostPrice(selectedPackage))}</strong> {t('createConfig.modal.guideEnd')}
+                  {t('createConfig.modal.guideStart')} <strong>{formatCurrency(customSellPrice !== null ? customSellPrice : getSellPrice(selectedPackage))}</strong> {t('createConfig.modal.guideMiddle')} <strong>{formatCurrency((customSellPrice !== null ? customSellPrice : getSellPrice(selectedPackage)) - getCostPrice(selectedPackage))}</strong> {t('createConfig.modal.guideEnd')}
                 </p>
               </div>
             </div>

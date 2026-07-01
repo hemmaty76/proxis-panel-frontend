@@ -35,7 +35,8 @@ export const ar = {
             manageShop: 'إدارة المتجر',
             manageServices: 'إدارة الخدمات والحزم',
             customPrices: 'إعدادات سعر البيع',
-            panelSettings: 'إعدادات اللوحة'
+            panelSettings: 'إعدادات اللوحة',
+            manageServers: 'إدارة الخوادم'
         }
     },
     usersManagement: {
@@ -240,7 +241,10 @@ export const ar = {
         },
         labels: {
             allPackages: 'جميع الحزم',
-            serviceWithTypeName: 'خدمة {{typeName}}'
+            serviceWithTypeName: 'خدمة {{typeName}}',
+            customSellPrice: 'سعر البيع للعميل (تومان)',
+            customSellPricePlaceholder: 'مثال: ٥٠,٠٠٠',
+            customSellPriceHelper: 'سعر البيع المقترح: {{price}}'
         }
     },
     shopsManagement: {
@@ -493,11 +497,12 @@ export const ar = {
             "fetchError": "حدث خطأ أثناء جلب البيانات.",
             "invalidAmount": "المبلغ غير صالح.",
             "success": "تم تسجيل الدفع بنجاح.",
-            "submitError": "فشل في تسجيل الدفع."
+            "submitError": "فشل في تسجيل الدفع.",
+            "selectSupplier": "الرجاء تحديد المورد."
         },
         "header": {
-            "title": "تسويات الخادم",
-            "subtitle": "إدارة الديون والمدفوعات لمزود الخادم"
+            "title": "تسويات الخادم بالاسري",
+            "subtitle": "إدارة الديون والمدفوعات لمزود الخادم الرئيسي"
         },
         "buttons": {
             "newSettlement": "تسجيل دفعة جديدة"
@@ -514,13 +519,56 @@ export const ar = {
         "table": {
             "date": "التاريخ والوقت",
             "amount": "المبلغ المدفوع",
-            "trackingCode": "رمز التتبع / ملاحظة"
+            "trackingCode": "رمز التتبع / ملاحظة",
+            "supplierName": "اسم المورد"
         },
         "modal": {
             "title": "تسجيل دفعة جديدة",
             "amountLabel": "مبلغ الدفع (تومان)",
             "trackingCodeLabel": "رمز التتبع أو الملاحظة",
+            "supplierLabel": "اختر المورد",
+            "selectSupplierPlaceholder": "-- اختر المورد --",
             "submitBtn": "تأكيد المبلغ"
+        }
+    },
+    servers: {
+        "header": {
+            "title": "إدارة الخوادم / الموردين",
+            "subtitle": "إضافة وتعديل وإدارة خوادم مرزبان بالاسري"
+        },
+        "buttons": {
+            "newServer": "إضافة خادم جديد"
+        },
+        "table": {
+            "name": "اسم المورد",
+            "url": "عنوان لوحة مرزبان",
+            "username": "اسم المستخدم",
+            "status": "الحالة",
+            "actions": "العمليات"
+        },
+        "status": {
+            "active": "نشط",
+            "inactive": "غير نشط"
+        },
+        "modal": {
+            "createTitle": "إضافة خادم جديد",
+            "editTitle": "تعديل الخادم",
+            "nameLabel": "اسم المورد/الخادم",
+            "urlLabel": "عنوان لوحة مرزبان",
+            "usernameLabel": "اسم المستخدم",
+            "passwordLabel": "كلمة المرور",
+            "activeLabel": "الخادم النشط للمشتريات الجديدة",
+            "activeWarning": "سيؤدي تنشيط هذا الخادم إلى إلغاء تنشيط الخادم النشط حاليًا للمشتريات الجديدة تلقائيًا."
+        },
+        "messages": {
+            "fetchError": "فشل تحميل قائمة الخوادم.",
+            "createSuccess": "تم تسجيل الخادم بنجاح.",
+            "createError": "فشل تسجيل الخادم الجديد.",
+            "updateSuccess": "تم تحديث الخادم بنجاح.",
+            "updateError": "فشل تحديث الخادم.",
+            "deleteSuccess": "تم حذف الخادم بنجاح.",
+            "deleteError": "فشل حذف الخادم.",
+            "deleteBlocked": "لا يمكن حذف هذا الخادم لأنه يحتوي على إعدادات نشطة. يرجى إلغاء تنشيط حالته بدلاً من ذلك."
         }
     },
     usageModal: {

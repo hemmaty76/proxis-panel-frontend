@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users,BanknoteCheck,Store ,Settings, FilePlus, Package, Coins } from 'lucide-react';
+import { LayoutDashboard, Users, BanknoteCheck, Store, Settings, FilePlus, Package, Coins, Server } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
@@ -21,6 +21,7 @@ export default function Sidebar({ isOpen, onClose, appVersion }: SidebarProps) {
     ...(userRole === 'ADMIN' ? [
       { text: t('sidebar.menu.manageShop'), path: '/admin/shops', icon: <Store size={20} strokeWidth={2.5} /> },
       { text: t('sidebar.menu.manageServices'), path: '/admin/services', icon: <Package size={20} strokeWidth={2.5} /> },
+      { text: t('sidebar.menu.manageServers', 'مدیریت سرورها'), path: '/admin/servers', icon: <Server size={20} strokeWidth={2.5} /> },
       { text: t('sidebar.menu.panelSettings'), path: '/admin/settings', icon: <Settings size={20} strokeWidth={2.5} /> },
       { text: t('settlements.header.title'), path: '/admin/settlements', icon: <BanknoteCheck size={20} strokeWidth={2.5} /> }
     ] : [

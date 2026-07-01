@@ -35,7 +35,8 @@ export const en = {
             manageShop: 'Manage Shop',
             manageServices: 'Manage Services & Packages',
             customPrices: 'Selling Price Settings',
-            panelSettings: 'Panel Settings'
+            panelSettings: 'Panel Settings',
+            manageServers: 'Manage Servers'
         }
     },
     usersManagement: {
@@ -240,7 +241,10 @@ export const en = {
         },
         labels: {
             allPackages: 'All Packages',
-            serviceWithTypeName: 'Service {{typeName}}'
+            serviceWithTypeName: 'Service {{typeName}}',
+            customSellPrice: 'Selling Price to Customer (Toman)',
+            customSellPricePlaceholder: 'e.g., 50,000',
+            customSellPriceHelper: 'Suggested sell price: {{price}}'
         }
     },
     shopsManagement: {
@@ -500,11 +504,12 @@ export const en = {
             "fetchError": "Failed to fetch data.",
             "invalidAmount": "Invalid amount.",
             "success": "Settlement recorded successfully.",
-            "submitError": "Failed to record settlement."
+            "submitError": "Failed to record settlement.",
+            "selectSupplier": "Please select a supplier."
         },
         "header": {
-            "title": "Settlements",
-            "subtitle": "Manage debts and payments to the server provider"
+            "title": "Upstream Settlements",
+            "subtitle": "Manage debts and payments to the main server provider"
         },
         "buttons": {
             "newSettlement": "New Settlement"
@@ -521,13 +526,56 @@ export const en = {
         "table": {
             "date": "Date & Time",
             "amount": "Amount Paid",
-            "trackingCode": "Tracking Code / Note"
+            "trackingCode": "Tracking Code / Note",
+            "supplierName": "Supplier Name"
         },
         "modal": {
             "title": "Record New Settlement",
             "amountLabel": "Payment Amount (Toman)",
             "trackingCodeLabel": "Tracking Code or Note",
+            "supplierLabel": "Select Supplier",
+            "selectSupplierPlaceholder": "-- Select Supplier --",
             "submitBtn": "Submit Amount"
+        }
+    },
+    servers: {
+        "header": {
+            "title": "Servers/Suppliers Management",
+            "subtitle": "Add, edit and manage upstream Marzban servers"
+        },
+        "buttons": {
+            "newServer": "Add New Server"
+        },
+        "table": {
+            "name": "Supplier Name",
+            "url": "Marzban Panel URL",
+            "username": "Username",
+            "status": "Status",
+            "actions": "Actions"
+        },
+        "status": {
+            "active": "Active",
+            "inactive": "Inactive"
+        },
+        "modal": {
+            "createTitle": "Add New Server",
+            "editTitle": "Edit Server",
+            "nameLabel": "Supplier/Server Name",
+            "urlLabel": "Marzban Panel URL",
+            "usernameLabel": "Username",
+            "passwordLabel": "Password",
+            "activeLabel": "Active server for new purchases",
+            "activeWarning": "Activating this server will automatically deactivate the currently active server for new purchases."
+        },
+        "messages": {
+            "fetchError": "Failed to load servers list.",
+            "createSuccess": "Server registered successfully.",
+            "createError": "Failed to register new server.",
+            "updateSuccess": "Server updated successfully.",
+            "updateError": "Failed to update server.",
+            "deleteSuccess": "Server deleted successfully.",
+            "deleteError": "Failed to delete server.",
+            "deleteBlocked": "This server cannot be deleted because it has active configurations. Please disable its status instead."
         }
     },
     usageModal: {

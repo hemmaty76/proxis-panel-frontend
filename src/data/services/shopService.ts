@@ -156,8 +156,9 @@ export const getShopCategories = async (): Promise<ConfigCategoryItem[]> => {
   return response.data;
 };
 
-export const purchasePackage = async (packageId: string): Promise<PurchaseResult> => {
-  const response = await apiClient.post<PurchaseResult>(`/shop/purchase/${packageId}`);
+export const purchasePackage = async (packageId: string, customSellPrice?: number | null): Promise<PurchaseResult> => {
+  const body = customSellPrice !== undefined && customSellPrice !== null ? { custom_sell_price: customSellPrice } : undefined;
+  const response = await apiClient.post<PurchaseResult>(`/shop/purchase/${packageId}`, body);
   return response.data;
 };
 

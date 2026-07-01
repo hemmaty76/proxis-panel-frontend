@@ -35,7 +35,8 @@ export const fa = {
             manageShop: 'مدیریت مغازه',
             manageServices: 'مدیریت خدمات و پکیج‌ها',
             customPrices: 'تنظیمات قیمت فروش',
-            panelSettings: 'تنظیمات پنل'
+            panelSettings: 'تنظیمات پنل',
+            manageServers: 'مدیریت سرورها'
         }
     },
     usersManagement: {
@@ -240,7 +241,10 @@ export const fa = {
         },
         labels: {
             allPackages: 'همه پکیج‌ها',
-            serviceWithTypeName: 'سرویس {{typeName}}'
+            serviceWithTypeName: 'سرویس {{typeName}}',
+            customSellPrice: 'قیمت فروش به مشتری (تومان)',
+            customSellPricePlaceholder: 'مثال: ۵۰,۰۰۰',
+            customSellPriceHelper: 'قیمت فروش پیشنهادی: {{price}}'
         }
     },
     shopsManagement: {
@@ -509,11 +513,12 @@ export const fa = {
             "fetchError": "دریافت اطلاعات با خطا مواجه شد.",
             "invalidAmount": "مبلغ معتبر نیست.",
             "success": "پرداختی با موفقیت ثبت شد.",
-            "submitError": "خطا در ثبت پرداختی."
+            "submitError": "خطا در ثبت پرداختی.",
+            "selectSupplier": "لطفاً تامین‌کننده را انتخاب کنید."
         },
         "header": {
-            "title": "تسویه‌حساب",
-            "subtitle": "مدیریت بدهی‌ها و پرداختی‌ها به ارائه‌دهنده سرور"
+            "title": "تسویه‌حساب آپ‌استریم",
+            "subtitle": "مدیریت بدهی‌ها و پرداختی‌ها به ارائه‌دهنده سرور اصلی"
         },
         "buttons": {
             "newSettlement": "ثبت پرداختی جدید"
@@ -530,13 +535,56 @@ export const fa = {
         "table": {
             "date": "تاریخ و ساعت",
             "amount": "مبلغ پرداختی",
-            "trackingCode": "کد پیگیری / یادداشت"
+            "trackingCode": "کد پیگیری / یادداشت",
+            "supplierName": "نام تامین‌کننده"
         },
         "modal": {
             "title": "ثبت پرداختی جدید",
             "amountLabel": "مبلغ پرداختی (تومان)",
             "trackingCodeLabel": "کد پیگیری یا یادداشت",
+            "supplierLabel": "انتخاب تامین‌کننده",
+            "selectSupplierPlaceholder": "-- انتخاب کنید --",
             "submitBtn": "ثبت مبلغ"
+        }
+    },
+    servers: {
+        "header": {
+            "title": "مدیریت سرورها/تامین‌کنندگان",
+            "subtitle": "افزودن، ویرایش و مدیریت سرورهای مرزبان بالاسری"
+        },
+        "buttons": {
+            "newServer": "افزودن سرور جدید"
+        },
+        "table": {
+            "name": "نام تامین‌کننده",
+            "url": "آدرس پنل مرزبان",
+            "username": "نام کاربری",
+            "status": "وضعیت",
+            "actions": "عملیات"
+        },
+        "status": {
+            "active": "فعال",
+            "inactive": "غیرفعال"
+        },
+        "modal": {
+            "createTitle": "ثبت سرور جدید",
+            "editTitle": "ویرایش سرور",
+            "nameLabel": "نام تامین‌کننده/سرور",
+            "urlLabel": "آدرس پنل مرزبان",
+            "usernameLabel": "نام کاربری",
+            "passwordLabel": "رمز عبور",
+            "activeLabel": "سرور فعال برای خریدهای جدید",
+            "activeWarning": "فعال‌سازی این سرور باعث غیرفعال شدن خودکار سرور فعال فعلی برای خریدهای جدید خواهد شد."
+        },
+        "messages": {
+            "fetchError": "خطا در بارگذاری لیست سرورها.",
+            "createSuccess": "سرور با موفقیت ثبت شد.",
+            "createError": "خطا در ثبت سرور جدید.",
+            "updateSuccess": "سرور با موفقیت بروزرسانی شد.",
+            "updateError": "خطا در بروزرسانی سرور.",
+            "deleteSuccess": "سرور با موفقیت حذف شد.",
+            "deleteError": "خطا در حذف سرور.",
+            "deleteBlocked": "امکان حذف این سرور وجود ندارد زیرا دارای کانفیگ‌های فعال است. لطفاً به جای حذف، وضعیت آن را غیرفعال کنید."
         }
     },
     usageModal: {
