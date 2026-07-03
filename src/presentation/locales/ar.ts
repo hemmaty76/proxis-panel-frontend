@@ -27,7 +27,7 @@ export const ar = {
         }
     },
     sidebar: {
-        title: 'إدارة الوكيل (البروكسي)',
+        title: 'إدارة الوكيل',
         menu: {
             dashboard: 'لوحة التحكم والإحصائيات',
             createConfig: 'إنشاء تكوین (كونفيج)',
@@ -396,6 +396,8 @@ export const ar = {
             deleteTypeConfirm: 'هل أنت متأكد من حذف نوع الخدمة هذا؟ سيؤدي هذا أيضًا إلى حذف جميع الفئات المرتبطة.',
             deleteTypeSuccess: 'تم حذف نوع الخدمة بنجاح.',
             deleteTypeError: 'خطأ في حذف نوع الخدمة. ربما بسبب وجود تبعيات نشطة.',
+            updateTypeSuccess: 'تم تعديل نوع التكوين بنجاح.',
+            updateTypeError: 'خطأ في تعديل نوع التكوين.',
             createCategorySuccess: 'تم إنشاء فئة تكوين جديدة بنجاح.',
             createCategoryError: 'خطأ في تسجيل فئة التكوين.',
             deleteCategoryConfirm: 'هل أنت متأكد من حذف فئة التكوين هذه؟ سيتم حذف جميع الحزم وإعدادات الأسعار المخصصة المرتبطة بها.',
@@ -427,6 +429,8 @@ export const ar = {
                 typeName: 'اسم نوع الخدمة',
                 typeDesc: 'الوصف',
                 typeDescPlaceholder: 'وصف اختياري...',
+                typeKey: 'مفتاح نوع الخدمة',
+                typeKeyPlaceholder: 'مثال: 1',
                 submitType: 'تسجيل نوع الخدمة',
                 createCategoryTitle: 'إنشاء فئة مبيعات جديدة',
                 selectType: 'اختر نوع الخدمة',
@@ -444,6 +448,7 @@ export const ar = {
             tables: {
                 typeName: 'اسم نوع الخدمة',
                 description: 'الوصف',
+                typeKey: 'المفتاح',
                 actions: 'العمليات',
                 noTypes: 'لم يتم تسجيل أي نوع خدمة.',
                 sellType: 'نموذج المبيعات',

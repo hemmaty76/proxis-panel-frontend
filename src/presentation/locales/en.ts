@@ -27,7 +27,7 @@ export const en = {
         }
     },
     sidebar: {
-        title: 'Proxy Management',
+        title: 'Management',
         menu: {
             dashboard: 'Dashboard & Stats',
             createConfig: 'Create Config',
@@ -396,6 +396,8 @@ export const en = {
             deleteTypeConfirm: 'Are you sure you want to delete this service type? This will also delete all connected categories.',
             deleteTypeSuccess: 'Service type deleted successfully.',
             deleteTypeError: 'Error deleting service type. Probably due to active dependencies.',
+            updateTypeSuccess: 'Config type updated successfully.',
+            updateTypeError: 'Error updating config type.',
             createCategorySuccess: 'New config category created successfully.',
             createCategoryError: 'Error registering config category.',
             updateCategorySuccess: 'Config category updated successfully.',
@@ -429,6 +431,8 @@ export const en = {
                 typeName: 'Service Type Name',
                 typeDesc: 'Description',
                 typeDescPlaceholder: 'Optional description...',
+                typeKey: 'Service Type Key',
+                typeKeyPlaceholder: 'Example: 1',
                 submitType: 'Register Service Type',
                 createCategoryTitle: 'Create New Sales Category',
                 selectType: 'Select Service Type',
@@ -449,6 +453,7 @@ export const en = {
             tables: {
                 typeName: 'Service Type Name',
                 description: 'Description',
+                typeKey: 'Key',
                 actions: 'Actions',
                 noTypes: 'No service types registered.',
                 sellType: 'Sales Model',

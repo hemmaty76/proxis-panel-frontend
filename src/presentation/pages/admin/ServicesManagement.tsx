@@ -5,7 +5,7 @@ import {
   Layers, Package, Settings, Plus, Trash2, Loader2, HardDrive, Clock, X
 } from 'lucide-react';
 import {
-  getConfigTypes, createConfigType, deleteConfigType,
+  getConfigTypes, createConfigType, updateConfigType, deleteConfigType,
   getConfigCategories, createConfigCategory, updateConfigCategory, deleteConfigCategory,
   adminGetPackages, adminCreatePackage, adminDeletePackage, adminUpdatePackage,
   type ConfigTypeItem, type ConfigCategoryItem, type AdminPackageItem
@@ -29,6 +29,13 @@ export default function ServicesManagement() {
   // 1. Config Type inputs
   const [typeName, setTypeName] = useState('');
   const [typeDesc, setTypeDesc] = useState('');
+  const [typeKey, setTypeKey] = useState('1');
+
+  // Config Type inline edit states
+  const [editingTypeId, setEditingTypeId] = useState<string | null>(null);
+  const [editTypeName, setEditTypeName] = useState('');
+  const [editTypeDesc, setEditTypeDesc] = useState('');
+  const [editTypeKey, setEditTypeKey] = useState('');
 
   // 2. Config Category inputs
   const [catTypeId, setCatTypeId] = useState('');
@@ -88,15 +95,39 @@ export default function ServicesManagement() {
     if (!typeName) return;
     setIsSubmitting(true);
     try {
-      await createConfigType({ name: typeName, description: typeDesc });
+      await createConfigType({ name: typeName, description: typeDesc, key: typeKey });
       toast.success(t('servicesManagement.messages.createTypeSuccess', 'نوع کانفیگ با موفقیت ساخته شد.'));
       setTypeName('');
       setTypeDesc('');
+      setTypeKey('1');
       fetchData();
     } catch (err: any) {
       toast.error(err.response?.data?.detail || t('servicesManagement.messages.createTypeError', 'خطا در ثبت نوع کانفیگ.'));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const startEditingType = (tItem: ConfigTypeItem) => {
+    setEditingTypeId(tItem.id);
+    setEditTypeName(tItem.name);
+    setEditTypeDesc(tItem.description || '');
+    setEditTypeKey(tItem.key);
+  };
+
+  const handleUpdateType = async (id: string) => {
+    if (!editTypeName || !editTypeKey) return;
+    try {
+      await updateConfigType(id, {
+        name: editTypeName,
+        description: editTypeDesc,
+        key: editTypeKey
+      });
+      toast.success(t('servicesManagement.messages.updateTypeSuccess', 'نوع کانفیگ با موفقیت ویرایش شد.'));
+      setEditingTypeId(null);
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || t('servicesManagement.messages.updateTypeError', 'خطا در ویرایش نوع کانفیگ.'));
     }
   };
 
@@ -306,6 +337,10 @@ export default function ServicesManagement() {
                   <input type="text" placeholder="مثلاً: VIP" required value={typeName} onChange={e => setTypeName(e.target.value)} className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium" />
                 </div>
                 <div>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">{t('servicesManagement.labels.forms.typeKey', 'کلید نوع سرویس')}</label>
+                  <input type="text" placeholder={t('servicesManagement.labels.forms.typeKeyPlaceholder', 'مثال: 1')} required value={typeKey} onChange={e => setTypeKey(e.target.value)} className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium" />
+                </div>
+                <div>
                   <label className="block text-xs font-bold text-slate-600 mb-1">{t('servicesManagement.labels.forms.typeDesc', 'توضیحات')}</label>
                   <textarea placeholder={t('servicesManagement.labels.forms.typeDescPlaceholder', 'توضیحات اختیاری...')} value={typeDesc} onChange={e => setTypeDesc(e.target.value)} rows={3} className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium resize-none" />
                 </div>
@@ -425,22 +460,65 @@ export default function ServicesManagement() {
                     <tr>
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.typeName', 'نام نوع سرویس')}</th>
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.description', 'توضیحات')}</th>
-                      <th className="px-6 py-3 text-center w-20">{t('servicesManagement.labels.tables.actions', 'عملیات')}</th>
+                      <th className="px-6 py-3">{t('servicesManagement.labels.tables.typeKey', 'کلید')}</th>
+                      <th className="px-6 py-3 text-center w-28">{t('servicesManagement.labels.tables.actions', 'عملیات')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-medium">
                     {types.length === 0 ? (
-                      <tr><td colSpan={3} className="px-6 py-8 text-center text-slate-400">{t('servicesManagement.labels.tables.noTypes', 'هیچ نوع سرویسی ثبت نشده است.')}</td></tr>
+                      <tr><td colSpan={4} className="px-6 py-8 text-center text-slate-400">{t('servicesManagement.labels.tables.noTypes', 'هیچ نوع سرویسی ثبت نشده است.')}</td></tr>
                     ) : (
-                      types.map(tItem => (
-                        <tr key={tItem.id} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="px-6 py-4 font-bold text-slate-800">{tItem.name}</td>
-                          <td className="px-6 py-4 text-slate-500">{tItem.description || '—'}</td>
-                          <td className="px-6 py-4 text-center">
-                            <button onClick={() => handleDeleteType(tItem.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
-                          </td>
-                        </tr>
-                      ))
+                      types.map(tItem => {
+                        if (editingTypeId === tItem.id) {
+                          return (
+                            <tr key={tItem.id} className="bg-indigo-50/20">
+                              <td className="px-6 py-3.5">
+                                <input
+                                  type="text"
+                                  value={editTypeName}
+                                  onChange={e => setEditTypeName(e.target.value)}
+                                  className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-indigo-500 outline-none"
+                                />
+                              </td>
+                              <td className="px-6 py-3.5">
+                                <input
+                                  type="text"
+                                  value={editTypeDesc}
+                                  onChange={e => setEditTypeDesc(e.target.value)}
+                                  className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-indigo-500 outline-none"
+                                />
+                              </td>
+                              <td className="px-6 py-3.5">
+                                <input
+                                  type="text"
+                                  value={editTypeKey}
+                                  onChange={e => setEditTypeKey(e.target.value)}
+                                  className="w-20 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:ring-1 focus:ring-indigo-500 outline-none"
+                                />
+                              </td>
+                              <td className="px-6 py-3.5 text-center">
+                                <div className="flex items-center justify-center gap-1.5">
+                                  <button onClick={() => handleUpdateType(tItem.id)} className="px-2.5 py-1 bg-indigo-600 text-white rounded-md font-bold text-[10px] hover:bg-indigo-700 transition-colors">ثبت</button>
+                                  <button onClick={() => setEditingTypeId(null)} className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md font-bold text-[10px] hover:bg-slate-200 transition-colors">لغو</button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        }
+                        return (
+                          <tr key={tItem.id} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="px-6 py-4 font-bold text-slate-800">{tItem.name}</td>
+                            <td className="px-6 py-4 text-slate-500">{tItem.description || '—'}</td>
+                            <td className="px-6 py-4 text-slate-600 font-bold">{tItem.key}</td>
+                            <td className="px-6 py-4 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                <button onClick={() => startEditingType(tItem)} className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-bold text-xs">ویرایش</button>
+                                <button onClick={() => handleDeleteType(tItem.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>

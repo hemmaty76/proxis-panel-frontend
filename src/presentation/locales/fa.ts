@@ -27,7 +27,7 @@ export const fa = {
         }
     },
     sidebar: {
-        title: 'مدیریت پروکسی',
+        title: 'مدیریت',
         menu: {
             dashboard: 'داشبورد و آمار',
             createConfig: 'ساخت کانفیگ',
@@ -396,6 +396,8 @@ export const fa = {
             deleteTypeConfirm: 'آیا از حذف این نوع سرویس مطمئن هستید؟ با این کار تمام دسته‌بندی‌های متصل نیز حذف می‌شوند.',
             deleteTypeSuccess: 'نوع سرویس با موفقیت حذف شد.',
             deleteTypeError: 'خطا در حذف نوع سرویس. احتمالاً به علت وجود وابستگی‌های فعال است.',
+            updateTypeSuccess: 'نوع کانفیگ با موفقیت ویرایش شد.',
+            updateTypeError: 'خطا در ویرایش نوع کانفیگ.',
             createCategorySuccess: 'دسته کانفیگ جدید با موفقیت ایجاد شد.',
             createCategoryError: 'خطا در ثبت دسته کانفیگ.',
             updateCategorySuccess: 'دسته کانفیگ با موفقیت ویرایش شد.',
@@ -429,6 +431,8 @@ export const fa = {
                 typeName: 'نام نوع سرویس',
                 typeDesc: 'توضیحات',
                 typeDescPlaceholder: 'توضیحات اختیاری...',
+                typeKey: 'کلید نوع سرویس',
+                typeKeyPlaceholder: 'مثال: 1',
                 submitType: 'ثبت نوع سرویس',
                 createCategoryTitle: 'ایجاد دسته فروش جدید',
                 selectType: 'انتخاب نوع سرویس',
@@ -449,6 +453,7 @@ export const fa = {
             tables: {
                 typeName: 'نام نوع سرویس',
                 description: 'توضیحات',
+                typeKey: 'کلید',
                 actions: 'عملیات',
                 noTypes: 'هیچ نوع سرویسی ثبت نشده است.',
                 sellType: 'مدل فروش',

@@ -109,13 +109,18 @@ export interface ConfigTypeItem {
   id: string;
   name: string;
   description?: string;
+  key: string;
 }
 export const getConfigTypes = async (): Promise<ConfigTypeItem[]> => {
   const response = await apiClient.get<ConfigTypeItem[]>('/admin/config-types');
   return response.data;
 };
-export const createConfigType = async (data: { name: string; description?: string }): Promise<ConfigTypeItem> => {
+export const createConfigType = async (data: { name: string; description?: string; key: string }): Promise<ConfigTypeItem> => {
   const response = await apiClient.post<ConfigTypeItem>('/admin/config-types', data);
+  return response.data;
+};
+export const updateConfigType = async (id: string, data: { name: string; description?: string; key: string }): Promise<ConfigTypeItem> => {
+  const response = await apiClient.patch<ConfigTypeItem>(`/admin/config-types/${id}`, data);
   return response.data;
 };
 export const deleteConfigType = async (id: string): Promise<any> => {

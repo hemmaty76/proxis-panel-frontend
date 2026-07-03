@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const apiClient = axios.create({
-  baseURL: 'https://api.agentor.ir/api/v1',
+  baseURL: import.meta.env.BACKEND_URL || 'https://api.agentor.ir/api/v1',
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
