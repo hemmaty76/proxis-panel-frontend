@@ -36,7 +36,8 @@ export const en = {
             manageServices: 'Manage Services & Packages',
             customPrices: 'Selling Price Settings',
             panelSettings: 'Panel Settings',
-            manageServers: 'Manage Servers'
+            manageServers: 'Manage Servers',
+            shopSettings: 'Support Settings'
         }
     },
     usersManagement: {
@@ -177,16 +178,12 @@ export const en = {
             }
         },
         sellPrice: {
-            title: 'Final Customer Selling Price Settings',
-            subtitle: 'Set custom selling prices to customer',
-            desc: 'The package pricing system has been changed to unit-based and categorized. To edit and customize your selling prices for final customers based on service categories, go to the Selling Price Settings section.',
-            btn: 'Selling Price Settings',
-            currentPrice: 'Current Price:',
-            emptyPrice: '—',
-            newPriceLabel: 'New Sell Price (Toman / GB)',
-            placeholder: 'e.g., 3,500',
-            submitting: 'Submitting...',
-            submitBtn: 'Submit New Price'
+            title: 'Shop Profit Percentage Settings (Accounting & Sales)',
+            subtitle: 'Set default profit percentage for calculating client selling prices',
+            desc: 'This percentage is for shopkeeper accounting purposes and setting default package selling prices. The final selling price is calculated as: Purchase Cost + (Purchase Cost * Profit % / 100). You can still manually edit the final selling price at checkout.',
+            label: 'Default Shopkeeper Profit Percentage',
+            saving: 'Saving...',
+            saveBtn: 'Update Profit Percentage'
         },
         password: {
             title: 'Change Password',
@@ -612,5 +609,27 @@ export const en = {
             "lastSubUpdate": "Last Subscription Update"
         },
         "closeBtn": "Close"
+    },
+    shopSettings: {
+        messages: {
+            fetchError: "Error loading shop settings.",
+            saveSuccess: "Shop support settings saved successfully.",
+            saveError: "Error saving shop settings."
+        },
+        labels: {
+            title: "Shop & Support Settings",
+            subtitle: "The following details will be saved in the note section of your configurations, allowing users to reach you.",
+            shopName: "Shop Name",
+            supportChannel: "Support Channel Address (Telegram, etc.)",
+            supportId: "Support ID Address (Telegram, etc.)",
+            supportPhone: "Support Phone Number"
+        },
+        placeholders: {
+            shopName: "My Online Shop"
+        },
+        buttons: {
+            saving: "Saving...",
+            save: "Save Settings"
+        }
     }
 };

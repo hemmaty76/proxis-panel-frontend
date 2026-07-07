@@ -41,9 +41,14 @@ export interface UserProfile {
   balance: number;
   credit_limit: number;
   discount_percent: number;
+  percent_shop: number;
   role: string;
   is_active: boolean;
   created_at: string;
+  shop_name?: string;
+  support_channel?: string;
+  support_id?: string;
+  support_phone?: string;
 }
 export interface SystemSettings {
   dashboard_message: string;
@@ -57,6 +62,19 @@ export const getSettings = async (): Promise<SystemSettings> => {
 };
 export const getProfile = async (): Promise<UserProfile> => {
   const response = await apiClient.get<UserProfile>('/shop/me');
+  return response.data;
+};
+
+export interface ShopSettingsPayload {
+  shop_name?: string;
+  support_channel?: string;
+  support_id?: string;
+  support_phone?: string;
+  percent_shop?: number;
+}
+
+export const updateProfile = async (payload: ShopSettingsPayload): Promise<UserProfile> => {
+  const response = await apiClient.put<UserProfile>('/shop/me', payload);
   return response.data;
 };
 
@@ -77,24 +95,7 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
 
 
 
-export interface ShopCustomPriceItem {
-  id: string;
-  config_category_id: string;
-  config_type_name?: string;
-  sell_type?: string;
-  category_name?: string;
-  sell_price_per_unit: number;
-}
 
-export const getShopCustomPrices = async (): Promise<ShopCustomPriceItem[]> => {
-  const response = await apiClient.get<ShopCustomPriceItem[]>('/shop/custom-prices');
-  return response.data;
-};
-
-export const updateShopCustomPrice = async (id: string, sell_price_per_unit: number): Promise<any> => {
-  const response = await apiClient.put(`/shop/custom-prices/${id}`, { sell_price_per_unit });
-  return response.data;
-};
 
 
 

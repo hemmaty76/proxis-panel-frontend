@@ -8,10 +8,11 @@ import {
   type DashboardStats,
   getProfile,
   getDashboardStats,
+  updateProfile,
 } from '../../data/services/shopService';
 import { getFinancialReport, type FinancialReport } from '../../data/services/adminService';
 
-import { Wallet, Loader2, X, CreditCard, CheckCircle2, XCircle } from 'lucide-react';
+import { Wallet, Loader2, X, CreditCard, CheckCircle2, XCircle, Percent } from 'lucide-react';
 import { requestZarinpalCharge } from '../../data/services/shopService';
 
 
@@ -99,6 +100,32 @@ export default function DashboardHome() {
   const [adminReport, setAdminReport] = useState<FinancialReport | null>(null);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
+  const [percentShop, setPercentShop] = useState('150');
+  const [isUpdatingPercent, setIsUpdatingPercent] = useState(false);
+
+  const handleUpdatePercentShop = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const numericValue = Number(percentShop.replace(/\D/g, ''));
+    if (isNaN(numericValue) || numericValue < 0) {
+      toast.error(t('dashboardHome.messages.invalidPercent', 'لطفاً درصد معتبری وارد کنید.'));
+      return;
+    }
+
+    setIsUpdatingPercent(true);
+    try {
+      const updatedProfile = await updateProfile({
+        percent_shop: numericValue
+      });
+      setProfile(updatedProfile);
+      setPercentShop(String(updatedProfile.percent_shop));
+      toast.success(t('dashboardHome.messages.percentUpdateSuccess', 'درصد سود شما با موفقیت به‌روزرسانی شد.'));
+    } catch {
+      toast.error(t('dashboardHome.messages.percentUpdateError', 'خطا در به‌روزرسانی درصد سود.'));
+    } finally {
+      setIsUpdatingPercent(false);
+    }
+  };
+
   const formatCurrency = (value: number) =>
     `${value.toLocaleString(getLocale())} ${t('dashboardHome.currency', 'تومان')}`;
 
@@ -147,6 +174,7 @@ export default function DashboardHome() {
         const profileData = await getProfile();
         if (cancelled) return;
         setProfile(profileData);
+        setPercentShop(String(profileData.percent_shop ?? 150));
 
         if (profileData.role === 'ADMIN') {
           const reportData = await getFinancialReport();
@@ -378,7 +406,7 @@ export default function DashboardHome() {
                   </div>
                 )}
 
-              
+
               </>
             ) : (
               <p className="text-sm text-slate-500 text-center py-8">
@@ -413,23 +441,54 @@ export default function DashboardHome() {
             </div>
           ) : (
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-              <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-l from-blue-50/30 to-white">
-                <h2 className="text-lg font-bold text-blue-900">{t('dashboardHome.sellPrice.title', 'قیمت‌گذاری فروش به مشتری')}</h2>
+              <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-l from-indigo-50/30 to-white">
+                <h2 className="text-lg font-bold text-indigo-900">{t('dashboardHome.sellPrice.title', 'تنظیم درصد سود فروش به مشتری')}</h2>
                 <p className="text-sm text-slate-500 mt-0.5">
-                  {t('dashboardHome.sellPrice.subtitle', 'تنظیم قیمت‌های اختصاصی فروش به مشتری')}
+                  {t('dashboardHome.sellPrice.subtitle', 'تعیین درصد سود پیش‌فرض برای فروش پکیج‌ها')}
                 </p>
               </div>
-              <div className="p-6 space-y-4">
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  {t('dashboardHome.sellPrice.desc', 'سیستم قیمت‌گذاری پکیج‌ها به صورت واحدی و طبقه‌بندی شده تغییر یافته است. برای تغییر و شخصی‌سازی قیمت‌های فروش خود به مشتری بر اساس دسته‌بندی سرویس‌ها، از بخش تنظیمات قیمت فروش اقدام کنید.')}
+              <form onSubmit={handleUpdatePercentShop} className="p-6 space-y-4">
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  {t('dashboardHome.sellPrice.desc', 'درصد سود وارد شده به صورت خودکار به قیمت خرید شما اضافه می‌شود تا قیمت فروش به مشتری نهایی محاسبه گردد. فرمول: قیمت خرید + (قیمت خرید × درصد سود).')}
                 </p>
+
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-slate-500">
+                    {t('dashboardHome.sellPrice.label', 'درصد سود پیش‌فرض')}
+                  </label>
+                  <div className="relative rounded-xl shadow-sm">
+                    <input
+                      type="text"
+                      dir="ltr"
+                      value={percentShop}
+                      onChange={(e) => setPercentShop(e.target.value.replace(/\D/g, ''))}
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm text-left font-[inherit]"
+                      placeholder="150"
+                    />
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                      <span className="text-slate-400 font-bold text-sm">%</span>
+                    </div>
+                  </div>
+                </div>
+
                 <button
-                  onClick={() => navigate('/settings/prices')}
-                  className="w-full py-3 px-4 rounded-xl text-white font-semibold shadow-sm bg-blue-600 hover:bg-blue-700 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex justify-center items-center gap-2"
+                  type="submit"
+                  disabled={isUpdatingPercent}
+                  className="w-full py-3 px-4 rounded-xl text-white font-semibold shadow-sm bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex justify-center items-center gap-2"
                 >
-                  {t('dashboardHome.sellPrice.btn', 'تنظیمات قیمت فروش')}
+                  {isUpdatingPercent ? (
+                    <>
+                      <Loader2 className="animate-spin" size={18} />
+                      {t('dashboardHome.sellPrice.saving', 'در حال ذخیره...')}
+                    </>
+                  ) : (
+                    <>
+                      <Percent size={18} />
+                      {t('dashboardHome.sellPrice.saveBtn', 'به‌روزرسانی درصد سود')}
+                    </>
+                  )}
                 </button>
-              </div>
+              </form>
             </div>
           )}
 
