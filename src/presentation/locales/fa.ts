@@ -571,12 +571,17 @@ export const fa = {
             "name": "نام تامین‌کننده",
             "url": "آدرس پنل مرزبان",
             "username": "نام کاربری",
+            "type": "نوع پنل",
             "status": "وضعیت",
             "actions": "عملیات"
         },
         "status": {
             "active": "فعال",
             "inactive": "غیرفعال"
+        },
+        "types": {
+            "marzban": "مرزبان (Marzban)",
+            "pasargad": "پاسارگاد (Pasargad)"
         },
         "modal": {
             "createTitle": "ثبت سرور جدید",
@@ -585,6 +590,7 @@ export const fa = {
             "urlLabel": "آدرس پنل مرزبان",
             "usernameLabel": "نام کاربری",
             "passwordLabel": "رمز عبور",
+            "typeLabel": "نوع پنل سرور",
             "activeLabel": "سرور فعال برای خریدهای جدید",
             "activeWarning": "فعال‌سازی این سرور باعث غیرفعال شدن خودکار سرور فعال فعلی برای خریدهای جدید خواهد شد."
         },

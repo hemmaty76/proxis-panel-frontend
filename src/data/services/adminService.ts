@@ -218,6 +218,7 @@ export interface ServerResponse {
   username: string;
   password?: string;
   is_active: boolean;
+  type: string;
 }
 
 export interface ServerCreateInput {
@@ -226,6 +227,7 @@ export interface ServerCreateInput {
   username: string;
   password?: string;
   is_active: boolean;
+  type: string;
 }
 
 export interface ServerUpdateInput {
@@ -234,6 +236,7 @@ export interface ServerUpdateInput {
   username?: string;
   password?: string;
   is_active?: boolean;
+  type?: string;
 }
 
 export const getServers = async (): Promise<ServerResponse[]> => {

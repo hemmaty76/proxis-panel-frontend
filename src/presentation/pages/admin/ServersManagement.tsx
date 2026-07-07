@@ -35,6 +35,7 @@ export default function ServersManagement() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isActive, setIsActive] = useState(false);
+  const [serverType, setServerType] = useState('PASARGAD');
   const [isSaving, setIsSaving] = useState(false);
 
   const fetchServers = async () => {
@@ -60,6 +61,7 @@ export default function ServersManagement() {
     setUsername('');
     setPassword('');
     setIsActive(false);
+    setServerType('PASARGAD');
     setIsModalOpen(true);
   };
 
@@ -70,6 +72,7 @@ export default function ServersManagement() {
     setUsername(server.username);
     setPassword(''); // Keep password blank unless changing it
     setIsActive(server.is_active);
+    setServerType(server.type || 'PASARGAD');
     setIsModalOpen(true);
   };
 
@@ -82,7 +85,8 @@ export default function ServersManagement() {
           name,
           base_url: baseUrl,
           username,
-          is_active: isActive
+          is_active: isActive,
+          type: serverType
         };
         if (password) {
           updateData.password = password;
@@ -95,7 +99,8 @@ export default function ServersManagement() {
           base_url: baseUrl,
           username,
           password,
-          is_active: isActive
+          is_active: isActive,
+          type: serverType
         });
         toast.success(t('servers.messages.createSuccess', 'سرور با موفقیت ثبت شد.'));
       }
@@ -178,6 +183,7 @@ export default function ServersManagement() {
                     <th className="px-6 py-4">{t('servers.table.name', 'نام تامین‌کننده')}</th>
                     <th className="px-6 py-4">{t('servers.table.url', 'آدرس پنل مرزبان')}</th>
                     <th className="px-6 py-4">{t('servers.table.username', 'نام کاربری')}</th>
+                    <th className="px-6 py-4">{t('servers.table.type', 'نوع پنل')}</th>
                     <th className="px-6 py-4">{t('servers.table.status', 'وضعیت')}</th>
                     <th className="px-6 py-4">{t('servers.table.actions', 'عملیات')}</th>
                   </tr>
@@ -202,6 +208,9 @@ export default function ServersManagement() {
                       </td>
                       <td className="px-6 py-4 font-medium text-slate-600 dir-ltr">{srv.base_url}</td>
                       <td className="px-6 py-4 font-medium text-slate-600">{srv.username}</td>
+                      <td className="px-6 py-4 font-semibold text-slate-700">
+                        {srv.type === 'MARZBAN' ? t('servers.types.marzban', 'مرزبان') : t('servers.types.pasargad', 'پاسارگاد')}
+                      </td>
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
@@ -329,6 +338,21 @@ export default function ServersManagement() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                  {t('servers.modal.typeLabel', 'نوع پنل سرور')}
+                </label>
+                <select
+                  required
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none bg-white text-slate-800 font-semibold cursor-pointer"
+                  value={serverType}
+                  onChange={(e) => setServerType(e.target.value)}
+                >
+                  <option value="PASARGAD">{t('servers.types.pasargad', 'پاسارگاد (Pasargad)')}</option>
+                  <option value="MARZBAN">{t('servers.types.marzban', 'مرزبان (Marzban)')}</option>
+                </select>
               </div>
 
               {/* is_active Toggle */}
