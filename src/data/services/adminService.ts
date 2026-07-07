@@ -110,12 +110,13 @@ export interface ConfigTypeItem {
   name: string;
   description?: string;
   key: string;
+  server_id: string;
 }
 export const getConfigTypes = async (): Promise<ConfigTypeItem[]> => {
   const response = await apiClient.get<ConfigTypeItem[]>('/admin/config-types');
   return response.data;
 };
-export const createConfigType = async (data: { name: string; description?: string; key: string }): Promise<ConfigTypeItem> => {
+export const createConfigType = async (data: { name: string; description?: string; key: string; server_id: string }): Promise<ConfigTypeItem> => {
   const response = await apiClient.post<ConfigTypeItem>('/admin/config-types', data);
   return response.data;
 };
@@ -196,8 +197,8 @@ export const adminUpdatePackage = async (id: string, data: Partial<AdminPackageI
   return response.data;
 };
 
-export const getSettlementDashboard = async (): Promise<SettlementDashboardResponse> => {
-  const response = await apiClient.get('/admin/settlements/');
+export const getSettlementDashboard = async (params?: { page?: number; page_size?: number; server_id?: string }): Promise<SettlementDashboardResponse> => {
+  const response = await apiClient.get<SettlementDashboardResponse>('/admin/settlements/', { params });
   return response.data;
 };
 
@@ -266,7 +267,13 @@ export interface SettlementDashboardResponse {
   total_debt: number;
   total_paid: number;
   remaining_debt: number;
-  history: SettlementResponse[];
+  history: {
+    total_count: number;
+    total_pages: number;
+    current_page: number;
+    page_size: number;
+    items: SettlementResponse[];
+  };
 }
 
 

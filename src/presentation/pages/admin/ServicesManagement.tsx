@@ -8,7 +8,8 @@ import {
   getConfigTypes, createConfigType, updateConfigType, deleteConfigType,
   getConfigCategories, createConfigCategory, updateConfigCategory, deleteConfigCategory,
   adminGetPackages, adminCreatePackage, adminDeletePackage, adminUpdatePackage,
-  type ConfigTypeItem, type ConfigCategoryItem, type AdminPackageItem
+  getServers,
+  type ConfigTypeItem, type ConfigCategoryItem, type AdminPackageItem, type ServerResponse
 } from '../../../data/services/adminService';
 
 type TabType = 'types' | 'categories' | 'packages';
@@ -30,6 +31,8 @@ export default function ServicesManagement() {
   const [typeName, setTypeName] = useState('');
   const [typeDesc, setTypeDesc] = useState('');
   const [typeKey, setTypeKey] = useState('1');
+  const [typeServerId, setTypeServerId] = useState('');
+  const [serversList, setServersList] = useState<ServerResponse[]>([]);
 
   // Config Type inline edit states
   const [editingTypeId, setEditingTypeId] = useState<string | null>(null);
@@ -66,18 +69,21 @@ export default function ServicesManagement() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const [tList, cList, pList] = await Promise.all([
+      const [tList, cList, pList, sList] = await Promise.all([
         getConfigTypes(),
         getConfigCategories(),
-        adminGetPackages()
+        adminGetPackages(),
+        getServers()
       ]);
       setTypes(tList);
       setCategories(cList);
       setPackages(pList);
+      setServersList(sList);
 
       // Pre-select first options if available
       if (tList.length > 0) setCatTypeId(tList[0].id);
       if (cList.length > 0) setPkgCatId(cList[0].id);
+      if (sList.length > 0) setTypeServerId(sList[0].id);
     } catch (err) {
       toast.error(t('servicesManagement.messages.fetchError', 'خطا در بارگذاری داده‌های خدمات.'));
     } finally {
@@ -92,14 +98,15 @@ export default function ServicesManagement() {
   // --- Handlers ---
   const handleCreateType = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!typeName) return;
+    if (!typeName || !typeServerId) return;
     setIsSubmitting(true);
     try {
-      await createConfigType({ name: typeName, description: typeDesc, key: typeKey });
+      await createConfigType({ name: typeName, description: typeDesc, key: typeKey, server_id: typeServerId });
       toast.success(t('servicesManagement.messages.createTypeSuccess', 'نوع کانفیگ با موفقیت ساخته شد.'));
       setTypeName('');
       setTypeDesc('');
       setTypeKey('1');
+      if (serversList.length > 0) setTypeServerId(serversList[0].id);
       fetchData();
     } catch (err: any) {
       toast.error(err.response?.data?.detail || t('servicesManagement.messages.createTypeError', 'خطا در ثبت نوع کانفیگ.'));
@@ -341,6 +348,15 @@ export default function ServicesManagement() {
                   <input type="text" placeholder={t('servicesManagement.labels.forms.typeKeyPlaceholder', 'مثال: 1')} required value={typeKey} onChange={e => setTypeKey(e.target.value)} className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium" />
                 </div>
                 <div>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">{t('servicesManagement.labels.forms.typeServer', 'سرور متصل')}</label>
+                  <select required value={typeServerId} onChange={e => setTypeServerId(e.target.value)} className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium">
+                    <option value="" disabled>{t('servicesManagement.labels.forms.typeServerPlaceholder', 'انتخاب سرور...')}</option>
+                    {serversList.map(s => (
+                      <option key={s.id} value={s.id}>{s.name} ({s.base_url})</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
                   <label className="block text-xs font-bold text-slate-600 mb-1">{t('servicesManagement.labels.forms.typeDesc', 'توضیحات')}</label>
                   <textarea placeholder={t('servicesManagement.labels.forms.typeDescPlaceholder', 'توضیحات اختیاری...')} value={typeDesc} onChange={e => setTypeDesc(e.target.value)} rows={3} className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium resize-none" />
                 </div>
@@ -461,12 +477,13 @@ export default function ServicesManagement() {
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.typeName', 'نام نوع سرویس')}</th>
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.description', 'توضیحات')}</th>
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.typeKey', 'کلید')}</th>
+                      <th className="px-6 py-3">{t('servicesManagement.labels.tables.serverName', 'سرور متصل')}</th>
                       <th className="px-6 py-3 text-center w-28">{t('servicesManagement.labels.tables.actions', 'عملیات')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-medium">
                     {types.length === 0 ? (
-                      <tr><td colSpan={4} className="px-6 py-8 text-center text-slate-400">{t('servicesManagement.labels.tables.noTypes', 'هیچ نوع سرویسی ثبت نشده است.')}</td></tr>
+                      <tr><td colSpan={5} className="px-6 py-8 text-center text-slate-400">{t('servicesManagement.labels.tables.noTypes', 'هیچ نوع سرویسی ثبت نشده است.')}</td></tr>
                     ) : (
                       types.map(tItem => {
                         if (editingTypeId === tItem.id) {
@@ -496,6 +513,9 @@ export default function ServicesManagement() {
                                   className="w-20 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:ring-1 focus:ring-indigo-500 outline-none"
                                 />
                               </td>
+                              <td className="px-6 py-3.5 text-slate-500 text-xs font-semibold">
+                                {serversList.find(s => s.id === tItem.server_id)?.name || 'نامشخص'}
+                              </td>
                               <td className="px-6 py-3.5 text-center">
                                 <div className="flex items-center justify-center gap-1.5">
                                   <button onClick={() => handleUpdateType(tItem.id)} className="px-2.5 py-1 bg-indigo-600 text-white rounded-md font-bold text-[10px] hover:bg-indigo-700 transition-colors">ثبت</button>
@@ -510,6 +530,9 @@ export default function ServicesManagement() {
                             <td className="px-6 py-4 font-bold text-slate-800">{tItem.name}</td>
                             <td className="px-6 py-4 text-slate-500">{tItem.description || '—'}</td>
                             <td className="px-6 py-4 text-slate-600 font-bold">{tItem.key}</td>
+                            <td className="px-6 py-4 text-slate-600 font-semibold">
+                              {serversList.find(s => s.id === tItem.server_id)?.name || 'نامشخص'}
+                            </td>
                             <td className="px-6 py-4 text-center">
                               <div className="flex items-center justify-center gap-1">
                                 <button onClick={() => startEditingType(tItem)} className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-bold text-xs">ویرایش</button>

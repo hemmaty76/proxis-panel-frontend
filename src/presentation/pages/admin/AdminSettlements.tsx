@@ -75,6 +75,11 @@ export default function AdminSettlements() {
   const [data, setData] = useState<SettlementDashboardResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [servers, setServers] = useState<ServerResponse[]>([]);
+  
+  // Pagination & Filtering States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filterServerId, setFilterServerId] = useState('');
+  const pageSize = 10;
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -83,15 +88,24 @@ export default function AdminSettlements() {
   const [selectedServerId, setSelectedServerId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fetchDashboardData = async () => {
+  const fetchServersList = async () => {
+    try {
+      const serversData = await getServers();
+      setServers(serversData);
+    } catch {
+      // Silent error
+    }
+  };
+
+  const fetchDashboardData = async (page = 1, serverId = '') => {
     setIsLoading(true);
     try {
-      const [settlementData, serversData] = await Promise.all([
-        getSettlementDashboard(),
-        getServers()
-      ]);
+      const params: any = { page, page_size: pageSize };
+      if (serverId) {
+        params.server_id = serverId;
+      }
+      const settlementData = await getSettlementDashboard(params);
       setData(settlementData);
-      setServers(serversData);
     } catch {
       toast.error(t('settlements.messages.fetchError', 'خطا در بارگذاری اطلاعات تسویه‌حساب.'));
     } finally {
@@ -100,8 +114,12 @@ export default function AdminSettlements() {
   };
 
   useEffect(() => {
-    fetchDashboardData();
+    fetchServersList();
   }, []);
+
+  useEffect(() => {
+    fetchDashboardData(currentPage, filterServerId);
+  }, [currentPage, filterServerId]);
 
   const handleOpenModal = () => {
     setNewAmount('');
@@ -129,13 +147,21 @@ export default function AdminSettlements() {
       await createSettlement(selectedServerId, numericAmount, newTrackingCode);
       toast.success(t('settlements.messages.success', 'پرداختی با موفقیت ثبت شد.'));
       setIsModalOpen(false);
-      fetchDashboardData();
+      fetchDashboardData(currentPage, filterServerId);
     } catch {
       toast.error(t('settlements.messages.submitError', 'خطا در ثبت پرداختی.'));
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const handleServerFilterChange = (serverId: string) => {
+    setFilterServerId(serverId);
+    setCurrentPage(1);
+  };
+
+  const historyResponse = data?.history;
+  const historyItems = historyResponse?.items || [];
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -150,16 +176,32 @@ export default function AdminSettlements() {
             {t('settlements.header.subtitle', 'مدیریت بدهی‌ها و پرداختی‌ها به ارائه‌دهنده سرور اصلی')}
           </p>
         </div>
-        <button
-          onClick={handleOpenModal}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-sm transition-all flex items-center justify-center gap-2 w-full md:w-auto"
-        >
-          <Plus size={20} />
-          {t('settlements.buttons.newSettlement', 'ثبت پرداختی جدید')}
-        </button>
+        
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          {/* Server Filter Dropdown */}
+          <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 shadow-sm text-sm">
+            <span className="text-slate-500 font-bold shrink-0">{t('settlements.filter.serverLabel', 'سرور:')}</span>
+            <select
+              value={filterServerId}
+              onChange={e => handleServerFilterChange(e.target.value)}
+              className="bg-transparent border-none outline-none font-bold text-slate-800 focus:ring-0 cursor-pointer"
+            >
+              <option value="">{t('settlements.filter.allServers', 'همه سرورها')}</option>
+              {servers.map(s => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={handleOpenModal}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-sm transition-all flex items-center justify-center gap-2 w-full md:w-auto"
+          >
+            <Plus size={20} />
+            {t('settlements.buttons.newSettlement', 'ثبت پرداختی جدید')}
+          </button>
+        </div>
       </div>
-
-
 
       {/* Main Content */}
       {isLoading || !data ? (
@@ -169,19 +211,19 @@ export default function AdminSettlements() {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <StatCard
-              title={t('settlements.stats.totalDebt', 'کل بدهی تولید شده')}
+              title={filterServerId ? t('settlements.stats.serverDebt', 'بدهی تولید شده سرور') : t('settlements.stats.totalDebt', 'کل بدهی تولید شده')}
               value={formatCurrency(data.total_debt)}
               accent="slate"
               icon={<TrendingDown size={22} />}
             />
             <StatCard
-              title={t('settlements.stats.totalPaid', 'کل مبلغ تسویه شده')}
+              title={filterServerId ? t('settlements.stats.serverPaid', 'مبلغ تسویه شده سرور') : t('settlements.stats.totalPaid', 'کل مبلغ تسویه شده')}
               value={formatCurrency(data.total_paid)}
               accent="green"
               icon={<CheckCircle2 size={22} />}
             />
             <StatCard
-              title={t('settlements.stats.remainingDebt', 'مانده بدهی فعلی')}
+              title={filterServerId ? t('settlements.stats.serverRemainingDebt', 'مانده بدهی سرور') : t('settlements.stats.remainingDebt', 'مانده بدهی فعلی')}
               value={formatCurrency(data.remaining_debt)}
               accent={data.remaining_debt > 0 ? "red" : "default"}
               icon={<AlertCircle size={22} />}
@@ -195,7 +237,7 @@ export default function AdminSettlements() {
               <h2 className="text-lg font-bold text-slate-800">{t('settlements.history.title', 'تاریخچه پرداختی‌ها')}</h2>
             </div>
 
-            {data.history.length === 0 ? (
+            {historyItems.length === 0 ? (
               <div className="p-12 text-center bg-slate-50/50">
                 <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-base font-bold text-slate-500">
@@ -214,7 +256,7 @@ export default function AdminSettlements() {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.history.map((record) => {
+                    {historyItems.map((record) => {
                       const associatedServer = servers.find(s => s.id === record.server_id);
                       return (
                         <tr key={record.id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
@@ -229,6 +271,31 @@ export default function AdminSettlements() {
                     })}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            {historyResponse && historyResponse.total_pages > 1 && (
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4 text-xs font-bold text-slate-500">
+                <span>
+                  {t('settlements.pagination.page', 'صفحه')} {historyResponse.current_page} {t('settlements.pagination.of', 'از')} {historyResponse.total_pages}
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    disabled={currentPage <= 1}
+                    onClick={() => setCurrentPage(prev => prev - 1)}
+                    className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white text-slate-700 transition-colors"
+                  >
+                    قبلی
+                  </button>
+                  <button
+                    disabled={currentPage >= historyResponse.total_pages}
+                    onClick={() => setCurrentPage(prev => prev + 1)}
+                    className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white text-slate-700 transition-colors"
+                  >
+                    بعدی
+                  </button>
+                </div>
               </div>
             )}
           </div>

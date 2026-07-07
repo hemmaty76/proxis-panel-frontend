@@ -430,6 +430,8 @@ export const fa = {
                 typeDescPlaceholder: 'توضیحات اختیاری...',
                 typeKey: 'کلید نوع سرویس',
                 typeKeyPlaceholder: 'مثال: 1',
+                typeServer: 'سرور متصل',
+                typeServerPlaceholder: 'انتخاب سرور...',
                 submitType: 'ثبت نوع سرویس',
                 createCategoryTitle: 'ایجاد دسته فروش جدید',
                 selectType: 'انتخاب نوع سرویس',
@@ -451,6 +453,7 @@ export const fa = {
                 typeName: 'نام نوع سرویس',
                 description: 'توضیحات',
                 typeKey: 'کلید',
+                serverName: 'سرور متصل',
                 actions: 'عملیات',
                 noTypes: 'هیچ نوع سرویسی ثبت نشده است.',
                 sellType: 'مدل فروش',
@@ -525,10 +528,17 @@ export const fa = {
         "buttons": {
             "newSettlement": "ثبت پرداختی جدید"
         },
+        "filter": {
+            "serverLabel": "سرور:",
+            "allServers": "همه سرورها"
+        },
         "stats": {
             "totalDebt": "کل بدهی تولید شده",
             "totalPaid": "کل مبلغ تسویه شده",
-            "remainingDebt": "مانده بدهی فعلی"
+            "remainingDebt": "مانده بدهی فعلی",
+            "serverDebt": "بدهی تولید شده سرور",
+            "serverPaid": "مبلغ تسویه شده سرور",
+            "serverRemainingDebt": "مانده بدهی سرور"
         },
         "history": {
             "title": "تاریخچه پرداختی‌ها",
