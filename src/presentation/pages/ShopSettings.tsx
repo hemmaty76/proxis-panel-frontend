@@ -64,7 +64,7 @@ export default function ShopSettings() {
           {t('shopSettings.labels.title', 'تنظیمات فروشگاه و پشتیبانی')}
         </h1>
         <p className="text-sm text-slate-500 font-medium mt-1">
-          {t('shopSettings.labels.subtitle', 'اطلاعات زیر در بخش توضیحات (Note) کانفیگ‌های خریداران شما قرار می‌گیرد تا بتوانند با شما در ارتباط باشند.')}
+          {t('shopSettings.labels.subtitle', 'اطلاعات زیر در لینک سابسکریپشن نمایش داده می‌شود و برای کانفیگ‌های جدید اعمال خواهد شد.')}
         </p>
       </div>
 

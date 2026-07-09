@@ -9,7 +9,6 @@ import {
   Trash2,
   X,
   Check,
-  AlertTriangle,
   Globe,
   User,
   Key
@@ -371,19 +370,6 @@ export default function ServersManagement() {
                     <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                   </label>
                 </div>
-
-                {/* Activation Logic Warning */}
-                {isActive && (
-                  <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 flex items-start gap-2.5 animate-in fade-in slide-in-from-top-1">
-                    <AlertTriangle size={18} className="text-amber-500 shrink-0 mt-0.5" />
-                    <p className="text-xs font-semibold leading-relaxed">
-                      {t(
-                        'servers.modal.activeWarning',
-                        'فعال‌سازی این سرور باعث غیرفعال شدن خودکار سرور فعال فعلی برای خریدهای جدید خواهد شد.'
-                      )}
-                    </p>
-                  </div>
-                )}
               </div>
 
               <div className="pt-4 flex gap-3">

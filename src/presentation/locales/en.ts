@@ -618,7 +618,7 @@ export const en = {
         },
         labels: {
             title: "Shop & Support Settings",
-            subtitle: "The following details will be saved in the note section of your configurations, allowing users to reach you.",
+            subtitle: "This information appears in the subscription link and is applied to new configurations.",
             shopName: "Shop Name",
             supportChannel: "Support Channel Address (Telegram, etc.)",
             supportId: "Support ID Address (Telegram, etc.)",
