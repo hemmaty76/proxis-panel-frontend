@@ -597,6 +597,7 @@ export const en = {
             "editTitle": "Edit Server",
             "nameLabel": "Supplier/Server Name",
             "urlLabel": "Marzban Panel URL",
+            "subLabel": "Subscription URL (sub)",
             "usernameLabel": "Username",
             "passwordLabel": "Password",
             "activeLabel": "Active server for new purchases",

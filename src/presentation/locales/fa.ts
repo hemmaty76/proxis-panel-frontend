@@ -621,6 +621,7 @@ export const fa = {
             "editTitle": "ویرایش سرور",
             "nameLabel": "نام تامین‌کننده/سرور",
             "urlLabel": "آدرس پنل مرزبان",
+            "subLabel": "آدرس ساب (sub)",
             "usernameLabel": "نام کاربری",
             "passwordLabel": "رمز عبور",
             "typeLabel": "نوع پنل سرور",

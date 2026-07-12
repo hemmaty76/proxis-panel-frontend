@@ -32,6 +32,7 @@ export default function ServersManagement() {
   // Form states
   const [name, setName] = useState('');
   const [baseUrl, setBaseUrl] = useState('');
+  const [sub, setSub] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isActive, setIsActive] = useState(false);
@@ -58,6 +59,7 @@ export default function ServersManagement() {
     setEditingServer(null);
     setName('');
     setBaseUrl('');
+    setSub('');
     setUsername('');
     setPassword('');
     setIsActive(false);
@@ -69,6 +71,7 @@ export default function ServersManagement() {
     setEditingServer(server);
     setName(server.name);
     setBaseUrl(server.base_url);
+    setSub(server.sub || '');
     setUsername(server.username);
     setPassword(''); // Keep password blank unless changing it
     setIsActive(server.is_active);
@@ -84,6 +87,7 @@ export default function ServersManagement() {
         const updateData: any = {
           name,
           base_url: baseUrl,
+          sub: sub || undefined,
           username,
           is_active: isActive,
           type: serverType
@@ -97,6 +101,7 @@ export default function ServersManagement() {
         await createServer({
           name,
           base_url: baseUrl,
+          sub: sub || undefined,
           username,
           password,
           is_active: isActive,
@@ -214,7 +219,14 @@ export default function ServersManagement() {
                           {srv.owner ? srv.owner.username : 'مدیر سیستم'}
                         </td>
                       )}
-                      <td className="px-6 py-4 font-medium text-slate-600 dir-ltr">{srv.base_url}</td>
+                      <td className="px-6 py-4 font-medium text-slate-600 dir-ltr">
+                        <div>{srv.base_url}</div>
+                        {srv.sub && (
+                          <div className="text-xs text-slate-400 mt-1 font-semibold">
+                            Sub: {srv.sub}
+                          </div>
+                        )}
+                      </td>
                       <td className="px-6 py-4 font-medium text-slate-600">{srv.username}</td>
                       <td className="px-6 py-4 font-semibold text-slate-700">
                         {srv.type === 'MARZBAN' ? t('servers.types.marzban', 'مرزبان') : t('servers.types.pasargad', 'پاسارگاد')}
@@ -309,6 +321,23 @@ export default function ServersManagement() {
                     className="w-full pr-11 pl-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-slate-800"
                     value={baseUrl}
                     onChange={(e) => setBaseUrl(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                  {t('servers.modal.subLabel', 'آدرس ساب (sub)')}
+                </label>
+                <div className="relative flex items-center">
+                  <Globe className="absolute right-3.5 text-slate-400" size={18} />
+                  <input
+                    type="text"
+                    dir="ltr"
+                    placeholder="https://sub.example.com"
+                    className="w-full pr-11 pl-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-slate-800"
+                    value={sub}
+                    onChange={(e) => setSub(e.target.value)}
                   />
                 </div>
               </div>

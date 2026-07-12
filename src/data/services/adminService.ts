@@ -220,6 +220,7 @@ export interface ServerResponse {
   id: string;
   name: string;
   base_url: string;
+  sub?: string;
   username: string;
   password?: string;
   is_active: boolean;
@@ -234,6 +235,7 @@ export interface ServerResponse {
 export interface ServerCreateInput {
   name: string;
   base_url: string;
+  sub?: string;
   username: string;
   password?: string;
   is_active: boolean;
@@ -243,6 +245,7 @@ export interface ServerCreateInput {
 export interface ServerUpdateInput {
   name?: string;
   base_url?: string;
+  sub?: string;
   username?: string;
   password?: string;
   is_active?: boolean;

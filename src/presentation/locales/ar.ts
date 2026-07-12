@@ -590,6 +590,7 @@ export const ar = {
             "editTitle": "تعديل الخادم",
             "nameLabel": "اسم المورد/الخادم",
             "urlLabel": "عنوان لوحة مرزبان",
+            "subLabel": "عنوان الساب (sub)",
             "usernameLabel": "اسم المستخدم",
             "passwordLabel": "كلمة المرور",
             "activeLabel": "الخادم النشط للمشتريات الجديدة",
