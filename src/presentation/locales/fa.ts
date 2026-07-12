@@ -37,7 +37,11 @@ export const fa = {
             customPrices: 'تنظیمات قیمت فروش',
             panelSettings: 'تنظیمات پنل',
             manageServers: 'مدیریت سرورها',
-            shopSettings: 'تنظیمات پشتیبانی'
+            shopSettings: 'تنظیمات پشتیبانی',
+            myShops: 'مغازه‌های من',
+            newTestConfig: 'کانفیگ تست جدید',
+            testConfigs: 'کانفیگ‌های تست',
+            transactions: 'تراکنش‌های واریزی'
         }
     },
     usersManagement: {
@@ -142,7 +146,7 @@ export const fa = {
             totalCost: 'کل هزینه',
             totalRevenue: 'کل درآمد',
             netProfit: 'سود خالص',
-            upstreamDebt: 'بدهی به آپ‌استریم (مرزبان)',
+            upstreamDebt: 'کل بدهی',
             adminGrossRevenue: 'کل درآمد ناخالص ادمین',
             adminNetProfit: 'سود خالص ادمین'
         },
@@ -174,6 +178,8 @@ export const fa = {
             notAvailable: 'اطلاعات پروفایل در دسترس نیست.',
             roles: {
                 admin: 'مدیر سیستم',
+                supplier: 'تامین‌کننده سیستم',
+                visitor: 'ویزیتور',
                 shopkeeper: 'نماینده فروش (مغازه‌دار)'
             }
         },
@@ -246,6 +252,22 @@ export const fa = {
     },
     shopsManagement: {
         currency: 'تومان',
+        tabs: {
+            suppliers: 'تامین‌کنندگان',
+            visitors: 'ویزیتورها'
+        },
+        buttons: {
+            addSupplier: 'افزودن تامین‌کننده جدید',
+            addVisitor: 'افزودن ویزیتور جدید'
+        },
+        roles: {
+            shop: 'مغازه‌دار (SHOP)',
+            supplier: 'تامین‌کننده (SUPPLIER)',
+            visitor: 'ویزیتور (VISITOR)'
+        },
+        labels: {
+            userRole: 'نقش کاربر'
+        },
         messages: {
             fetchError: 'خطا در دریافت لیست مغازه‌داران',
             invalidAmount: 'لطفاً مبلغ معتبری وارد کنید',
@@ -281,7 +303,8 @@ export const fa = {
             limit: 'سقف:',
             sell: 'فروش:',
             active: 'فعال',
-            discountPercent: 'تخفیف'
+            discountPercent: 'تخفیف',
+            testConfigsCount: 'تعداد کانفیگ تست ساخته‌شده'
         },
         mobileCard: {
             currentBalance: 'موجودی فعلی',
@@ -513,7 +536,14 @@ export const fa = {
         "cancel": "انصراف"
     },
     settlements: {
-
+        roles: {
+            visitor: 'ویزیتور',
+            supplier: 'تامین‌کننده'
+        },
+        labels: {
+            userFilter: 'نام کاربر:',
+            allUsers: 'همه کاربران'
+        },
         "messages": {
             "fetchError": "دریافت اطلاعات با خطا مواجه شد.",
             "invalidAmount": "مبلغ معتبر نیست.",
@@ -548,7 +578,8 @@ export const fa = {
             "date": "تاریخ و ساعت",
             "amount": "مبلغ پرداختی",
             "trackingCode": "کد پیگیری / یادداشت",
-            "supplierName": "نام تامین‌کننده"
+            "supplierName": "نام تامین‌کننده",
+            you: 'شما'
         },
         "modal": {
             "title": "ثبت پرداختی جدید",
@@ -556,7 +587,9 @@ export const fa = {
             "trackingCodeLabel": "کد پیگیری یا یادداشت",
             "supplierLabel": "انتخاب تامین‌کننده",
             "selectSupplierPlaceholder": "-- انتخاب کنید --",
-            "submitBtn": "ثبت مبلغ"
+            "submitBtn": "ثبت مبلغ",
+            selectUser: 'انتخاب تامین‌کننده / ویزیتور *',
+            selectPlaceholder: '-- انتخاب کنید --'
         }
     },
     servers: {
@@ -655,6 +688,201 @@ export const fa = {
         buttons: {
             saving: "در حال ذخیره...",
             save: "ذخیره تنظیمات"
+        }
+    },
+    visitor: {
+        dashboard: {
+            title: 'پنل ویزیتور',
+            subtitle: 'مدیریت مغازه‌های زیرمجموعه و پورسانت‌های دریافتی',
+            searchPlaceholder: 'جستجوی مغازه...',
+            addShopBtn: 'مغازه‌دار جدید',
+            stats: {
+                totalEarnings: 'کل درآمد پورسانت',
+                totalPaid: 'مجموع تسویه‌ها',
+                remainingBalance: 'طلب باقیمانده شما',
+                totalSales: 'تعداد کل فروش',
+                testConfigsCount: 'کانفیگ تست ساخته‌شده'
+            },
+            shopsList: {
+                title: 'لیست مغازه‌داران شما',
+                subtitle: 'مغازه‌های ثبت شده توسط شما که از خریدهای آن‌ها پورسانت دریافت می‌کنید.'
+            },
+            table: {
+                userAndPhone: 'نام کاربری و تلفن',
+                desc: 'توضیحات',
+                balanceAndCredit: 'موجودی و سقف اعتبار',
+                discountPercent: 'درصد تخفیف',
+                actions: 'عملیات',
+                loading: 'در حال بارگذاری اطلاعات...',
+                empty: 'مغازه‌ای یافت نشد.',
+                creditLimitLabel: 'سقف اعتبار: '
+            },
+            tooltips: {
+                edit: 'ویرایش مغازه‌دار',
+                resetPassword: 'تغییر رمز عبور به 123456'
+            },
+            modals: {
+                edit: {
+                    title: 'ویرایش مغازه‌دار',
+                    creditLimit: 'سقف اعتبار (تومان)',
+                    discountPercent: 'درصد تخفیف مغازه‌دار',
+                    isActive: 'فعال بودن حساب مغازه',
+                    desc: 'توضیحات',
+                    descPlaceholder: 'توضیحات اختیاری...',
+                    submit: 'ثبت تغییرات'
+                },
+                create: {
+                    title: 'ثبت مغازه‌دار جدید',
+                    username: 'نام کاربری',
+                    phone: 'تلفن همراه',
+                    password: 'رمز عبور',
+                    submit: 'ثبت و ساخت اکانت'
+                }
+            },
+            messages: {
+                fetchError: 'خطا در دریافت اطلاعات داشبورد.',
+                createSuccess: 'مغازه‌دار جدید با موفقیت ثبت شد.',
+                createError: 'خطا در ثبت مغازه‌دار جدید.',
+                updateSuccess: 'اطلاعات مغازه‌دار با موفقیت بروزرسانی شد.',
+                updateError: 'خطا در بروزرسانی اطلاعات.',
+                resetPasswordConfirm: 'آیا از تغییر رمز عبور کاربر {{username}} به "123456" اطمینان دارید؟',
+                resetPasswordSuccess: 'رمز عبور مغازه‌دار به "123456" بازنشانی شد.',
+                resetPasswordError: 'خطا در بازنشانی رمز عبور.'
+            }
+        },
+        testConfig: {
+            title: 'ایجاد کانفیگ تست رایگان',
+            subtitle: 'ساخت اکانت‌های تست موقت برای بررسی سرعت و اتصال',
+            rules: {
+                title: 'قوانین اکانت تست ویزیتور:',
+                rule1: 'حجم کل این اکانت‌ها برابر ۱ گیگابایت است.',
+                rule2: 'مدت زمان فعال بودن اکانت‌ها حداکثر ۱۰ روز می‌باشد.',
+                rule3: 'ساخت کانفیگ تست کاملاً رایگان است و هیچ هزینه‌ای برای مغازه‌دار یا شما ندارد.',
+                rule4: 'این اکانت‌ها در لیست اصلی فاکتورها ثبت نمی‌شوند اما تعداد آن‌ها در اطلاعات شما شمارش می‌شود.'
+            },
+            form: {
+                locationLabel: 'انتخاب نوع سرویس/لوکیشن',
+                loadingLocations: 'در حال دریافت لوکیشن‌ها...',
+                clientNameLabel: 'نام دلخواه برای تفکیک مشتری (انگلیسی)',
+                clientNameHelper: 'نام کاربری نهایی شامل پیشوند ویزیتوری شما خواهد بود.',
+                submitting: 'در حال ساخت اکانت در مرزبان...',
+                submitBtn: 'ایجاد کانفیگ تست'
+            },
+            result: {
+                successTitle: 'کانفیگ با موفقیت در سرور ایجاد شد!',
+                usernameLabel: 'نام کاربری در سرور:',
+                subLinkLabel: 'لینک اشتراک (Subscription URL):',
+                copyBtn: 'کپی لینک'
+            },
+            messages: {
+                fetchTypesError: 'خطا در دریافت لیست سرویس‌ها.',
+                selectTypeRequired: 'لطفاً نوع سرویس را انتخاب کنید.',
+                clientNameRequired: 'لطفاً نام مشتری را وارد کنید.',
+                createSuccess: 'کانفیگ تست با موفقیت ایجاد شد!',
+                createError: 'خطا در ایجاد کانفیگ تست.',
+                copySuccess: 'لینک اشتراک کپی شد.'
+            }
+        },
+        testConfigsList: {
+            messages: {
+                updateDescSuccess: 'توضیحات با موفقیت ویرایش شد.',
+                updateDescError: 'خطا در ویرایش توضیحات.'
+            },
+            header: {
+                title: 'کانفیگ‌های تست رایگان',
+                subtitle: 'لیست کامل اکانت‌های تست موقت صادر شده توسط ویزیتورها و وضعیت آن‌ها'
+            },
+            buttons: {
+                create: 'ساخت کانفیگ تست جدید'
+            },
+            loading: 'در حال دریافت لیست کانفیگ‌های تست...',
+            empty: {
+                title: 'هیچ کانفیگ تستی صادر نشده است',
+                description: 'در صورت صادر شدن اکانت‌های تست توسط ویزیتورها، مشخصات و لینک‌های آن‌ها در این بخش نمایش داده خواهد شد.'
+            },
+            table: {
+                username: 'نام کاربری',
+                visitor: 'ویزیتور',
+                server: 'سرور / لوکیشن',
+                volume: 'حجم (اعتبار)',
+                description: 'توضیحات (ارائه شده به)',
+                createdAt: 'تاریخ ساخت',
+                actions: 'عملیات',
+                unknown: 'نامشخص',
+                noDescription: 'بدون توضیح'
+            },
+            tooltips: {
+                editDescription: 'مشاهده / ویرایش توضیحات',
+                copyLink: 'کپی لینک اشتراک',
+                showQr: 'نمایش بارکد (QR Code)'
+            },
+            pagination: {
+                total: 'مجموع: {{count}} کانفیگ',
+                pageOf: 'صفحه {{current}} از {{total}}'
+            },
+            modals: {
+                qr: {
+                    title: 'بارکد اتصال کانفیگ تست',
+                    guide: 'برای اتصال، این بارکد را در اپلیکیشن کلاینت خود اسکن کنید.'
+                },
+                desc: {
+                    title: 'توضیحات کانفیگ تست',
+                    label: 'توضیحات (ارائه شده به):',
+                    placeholder: 'توضیحات ارائه این کانفیگ تست...',
+                    cancel: 'انصراف',
+                    submit: 'ثبت تغییرات'
+                }
+            },
+            volumeFormat: {
+                zero: '۰ گیگابایت',
+                gb: '{{gb}} گیگابایت'
+            }
+        }
+    },
+    transactions: {
+        messages: {
+            fetchError: 'خطا در بارگذاری تراکنش‌ها.'
+        },
+        status: {
+            success: 'موفق',
+            failed: 'ناموفق',
+            pending: 'در انتظار'
+        },
+        gateway: {
+            zarinpal: 'زرین‌پال',
+            crypto: 'رمزارز',
+            manual: 'دستی (ادمین)'
+        },
+        header: {
+            title: 'تراکنش‌های واریزی',
+            subtitle: 'مشاهده و فیلتر تمامی پرداخت‌ها، شارژهای دستی و تراکنش‌های بانکی',
+            searchPlaceholder: 'فیلتر شماره تلفن...'
+        },
+        empty: {
+            title: 'تراکنشی یافت نشد',
+            withFilter: 'هیچ تراکنشی با این شماره تلفن ثبت نشده است.',
+            noFilter: 'تاکنون هیچ تراکنشی در سیستم ثبت نگردیده است.',
+            clearFilter: 'پاک کردن فیلتر'
+        },
+        table: {
+            user: 'کاربر',
+            phone: 'شماره تلفن',
+            amount: 'مبلغ واریزی',
+            balanceAfter: 'موجودی پس از تراکنش',
+            gateway: 'درگاه پرداخت',
+            reference: 'شناسه مرجع / Authority',
+            status: 'وضعیت',
+            description: 'توضیحات',
+            date: 'تاریخ تراکنش',
+            unknownUser: 'نامشخص',
+            noPhone: 'بدون شماره',
+            noDescription: 'بدون توضیح'
+        },
+        pagination: {
+            total: 'تعداد کل: {{count}} تراکنش',
+            prev: 'قبلی',
+            next: 'بعدی',
+            pageOf: '{{current}} از {{total}}'
         }
     }
 }

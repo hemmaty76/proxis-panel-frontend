@@ -20,7 +20,7 @@ interface StatCardProps {
   title: string;
   value: string;
   icon: ReactNode;
-  accent: 'default' | 'slate' | 'indigo' | 'green';
+  accent: 'default' | 'slate' | 'indigo' | 'green' | 'red';
 }
 
 function StatCard({ title, value, icon, accent }: StatCardProps) {
@@ -44,6 +44,11 @@ function StatCard({ title, value, icon, accent }: StatCardProps) {
       ring: 'ring-emerald-100',
       iconBg: 'bg-emerald-50 text-emerald-600',
       value: 'text-emerald-700',
+    },
+    red: {
+      ring: 'ring-red-100',
+      iconBg: 'bg-red-50 text-red-600',
+      value: 'text-red-700',
     },
   }[accent];
 
@@ -98,6 +103,8 @@ export default function DashboardHome() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [adminReport, setAdminReport] = useState<FinancialReport | null>(null);
+  const [supplierStats, setSupplierStats] = useState<any | null>(null);
+  const [supplierSummary, setSupplierSummary] = useState<any[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
   const [percentShop, setPercentShop] = useState('150');
@@ -180,6 +187,17 @@ export default function DashboardHome() {
           const reportData = await getFinancialReport();
           if (cancelled) return;
           setAdminReport(reportData);
+        } else if (profileData.role === 'SUPPLIER') {
+          const { getSupplierDashboard, getSupplierSalesSummary } = await import('../../data/services/supplierService');
+          const [statsData, summaryData] = await Promise.all([
+            getSupplierDashboard(),
+            getSupplierSalesSummary()
+          ]);
+          if (cancelled) return;
+          setSupplierStats(statsData);
+          setSupplierSummary(summaryData);
+        } else if (profileData.role === 'VISITOR') {
+          // Visitors don't show stats on main dashboard to avoid duplication with "My Shops" page.
         } else {
           const statsData = await getDashboardStats();
           if (cancelled) return;
@@ -220,17 +238,70 @@ export default function DashboardHome() {
         accent: 'indigo',
         icon: (
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         ),
       },
       {
-        title: t('dashboardHome.stats.adminNetProfit', 'سود خالص ادمین'),
+        title: t('dashboardHome.stats.adminNetRevenue', 'سود خالص ادمین'),
         value: formatCurrency(adminReport.admin_net_profit),
         accent: 'green',
         icon: (
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        ),
+      }
+    );
+  } else if (profile?.role === 'SUPPLIER' && supplierStats) {
+    statCards.push(
+      {
+        title: 'طلب شما از ادمین (کل بدهی)',
+        value: formatCurrency(supplierStats.total_debt),
+        accent: 'slate',
+        icon: (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        ),
+      },
+      {
+        title: 'کل تسویه شده با شما',
+        value: formatCurrency(supplierStats.total_paid),
+        accent: 'green',
+        icon: (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        ),
+      },
+      {
+        title: 'مانده طلب شما (بدهی ادمین)',
+        value: formatCurrency(supplierStats.remaining_debt),
+        accent: supplierStats.remaining_debt > 0 ? 'red' : 'indigo',
+        icon: (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        ),
+      },
+      {
+        title: 'تعداد کل فروش سرورها',
+        value: formatNumber(supplierStats.total_sales_count),
+        accent: 'indigo',
+        icon: (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+        ),
+      },
+      {
+        title: 'کانفیگ‌های فعال',
+        value: formatNumber(supplierStats.active_services_count),
+        accent: 'green',
+        icon: (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         ),
       }
@@ -303,26 +374,28 @@ export default function DashboardHome() {
         </p>
       </header>
 
-      <section aria-label={t('dashboardHome.sections.generalStats', 'آمار کلی')}>
-        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${profile?.role === 'ADMIN' ? 'xl:grid-cols-3' : 'xl:grid-cols-5'} gap-4`}>
-          {isLoadingData
-            ? Array.from({ length: skeletonCount }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm min-h-[132px] animate-pulse"
-              >
-                <div className="h-11 w-11 rounded-xl bg-slate-100" />
-                <div className="mt-4 space-y-2">
-                  <div className="h-4 w-24 rounded bg-slate-100" />
-                  <div className="h-7 w-32 rounded bg-slate-100" />
+      {profile?.role !== 'VISITOR' && (
+        <section aria-label={t('dashboardHome.sections.generalStats', 'آمار کلی')}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${profile?.role === 'ADMIN' ? 'xl:grid-cols-3' : 'xl:grid-cols-5'} gap-4`}>
+            {isLoadingData
+              ? Array.from({ length: skeletonCount }).map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm min-h-[132px] animate-pulse"
+                >
+                  <div className="h-11 w-11 rounded-xl bg-slate-100" />
+                  <div className="mt-4 space-y-2">
+                    <div className="h-4 w-24 rounded bg-slate-100" />
+                    <div className="h-7 w-32 rounded bg-slate-100" />
+                  </div>
                 </div>
-              </div>
-            ))
-            : statCards.map((card) => (
-              <StatCard key={card.title} {...card} />
-            ))}
-        </div>
-      </section>
+              ))
+              : statCards.map((card) => (
+                <StatCard key={card.title} {...card} />
+              ))}
+          </div>
+        </section>
+      )}
 
       <section
         aria-label={t('dashboardHome.sections.profileAndOps', 'پروفایل و عملیات')}
@@ -350,7 +423,13 @@ export default function DashboardHome() {
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide bg-indigo-600 text-white shadow-sm shadow-indigo-600/20">
                     <span className="h-1.5 w-1.5 rounded-full bg-white/90 animate-pulse" />
-                    {profile.role === 'ADMIN' ? t('dashboardHome.profile.roles.admin', 'مدیر سیستم') : t('dashboardHome.profile.roles.shopkeeper', 'نماینده فروش (مغازه‌دار)')}
+                    {profile.role === 'ADMIN'
+                      ? t('dashboardHome.profile.roles.admin', 'مدیر سیستم')
+                      : profile.role === 'SUPPLIER'
+                      ? t('dashboardHome.profile.roles.supplier', 'تامین‌کننده سیستم')
+                      : profile.role === 'VISITOR'
+                      ? t('dashboardHome.profile.roles.visitor', 'ویزیتور')
+                      : t('dashboardHome.profile.roles.shopkeeper', 'نماینده فروش (مغازه‌دار)')}
                   </span>
                   {profile.is_active && (
                     <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
@@ -380,8 +459,8 @@ export default function DashboardHome() {
                   </div>
                 </div>
 
-                {profile.role !== 'ADMIN' && (
-                  < div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                {profile.role === 'SHOP' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                     <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4 min-h-[88px] flex flex-col justify-between transition-colors duration-200 hover:bg-slate-50">
                       <div className="flex justify-between items-start">
                         <p className="text-xs font-semibold text-slate-500 mb-1">{t('dashboardHome.profile.balance', 'موجودی')}</p>
@@ -439,7 +518,27 @@ export default function DashboardHome() {
                 </button>
               </div>
             </div>
-          ) : (
+          ) : profile?.role === 'SUPPLIER' ? (
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-l from-indigo-50/30 to-white">
+                <h2 className="text-lg font-bold text-indigo-900">مدیریت سرورهای شما</h2>
+                <p className="text-sm text-slate-500 mt-0.5">
+                  مدیریت سرورها و پکیج‌های تعریف شده بر روی آن‌ها
+                </p>
+              </div>
+              <div className="p-6 space-y-4">
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  به عنوان تامین‌کننده، شما می‌توانید سرور جدید ثبت کرده و بسته‌های دلخواهتان را روی آن‌ها تعریف کنید تا مغازه‌داران بتوانند اقدام به خرید کنند.
+                </p>
+                <button
+                  onClick={() => navigate('/admin/servers')}
+                  className="w-full py-3 px-4 rounded-xl text-white font-semibold shadow-sm bg-indigo-600 hover:bg-indigo-700 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex justify-center items-center gap-2"
+                >
+                  برو به مدیریت سرورها
+                </button>
+              </div>
+            </div>
+          ) : profile?.role === 'SHOP' ? (
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
               <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-l from-indigo-50/30 to-white">
                 <h2 className="text-lg font-bold text-indigo-900">{t('dashboardHome.sellPrice.title', 'تنظیم درصد سود فروش به مشتری')}</h2>
@@ -490,7 +589,7 @@ export default function DashboardHome() {
                 </button>
               </form>
             </div>
-          )}
+          ) : null}
 
           {/* Form B: Change Password */}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
@@ -621,6 +720,45 @@ export default function DashboardHome() {
             )}
           </div>
         </div>
+      )}
+      {/* بخش آمار فروش کانفیگ‌ها به تفکیک پکیج (فقط برای تامین‌کنندگان) */}
+      {profile?.role === 'SUPPLIER' && supplierSummary && supplierSummary.length > 0 && (
+        <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-6">
+          <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-l from-indigo-50/30 to-white flex items-center gap-2">
+            <svg className="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <h2 className="text-lg font-bold text-indigo-900">آمار فروش به تفکیک پکیج و سرور</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-center text-slate-500">
+              <thead className="text-xs font-bold text-slate-700 bg-slate-50 border-b border-slate-100">
+                <tr>
+                  <th className="px-6 py-4">نام سرور</th>
+                  <th className="px-6 py-4">نوع سرویس</th>
+                  <th className="px-6 py-4">نوع فروش</th>
+                  <th className="px-6 py-4">بسته (پکیج)</th>
+                  <th className="px-6 py-4">تعداد فروش</th>
+                  <th className="px-6 py-4">کل طلب (تومان)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {supplierSummary.map((item, idx) => (
+                  <tr key={idx} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
+                    <td className="px-6 py-4 font-semibold text-slate-900">{item.server_name}</td>
+                    <td className="px-6 py-4 font-medium text-slate-700">{item.config_type_name}</td>
+                    <td className="px-6 py-4 font-medium text-slate-600">
+                      {item.sell_type === 'VOLUME_LIMIT' ? 'حجمی' : 'زمانی'}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-slate-700">{item.package_name || '-'}</td>
+                    <td className="px-6 py-4 font-black text-indigo-600 tabular-nums">{item.sales_count}</td>
+                    <td className="px-6 py-4 font-black text-emerald-600 tabular-nums">{formatCurrency(item.total_cost)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       )}
     </div >
   );

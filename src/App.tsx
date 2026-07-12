@@ -13,6 +13,10 @@ import ShopSettings from './presentation/pages/ShopSettings';
 import type { JSX } from 'react/jsx-runtime';
 import SystemSettingsPage from './presentation/pages/admin/SystemSetting';
 import ServersManagement from './presentation/pages/admin/ServersManagement';
+import VisitorDashboard from './presentation/pages/visitor/VisitorDashboard';
+import VisitorTestConfig from './presentation/pages/visitor/VisitorTestConfig';
+import TestConfigsList from './presentation/pages/admin/TestConfigsList';
+import TransactionsList from './presentation/pages/admin/TransactionsList';
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const isAuthenticated = !!localStorage.getItem('access_token');
@@ -30,6 +34,48 @@ const AdminRoute = ({ children }: { children: JSX.Element }) => {
   const role = localStorage.getItem('user_role');
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (role !== 'ADMIN') return <Navigate to="/dashboard" replace />;
+
+  return children;
+};
+
+const AdminOrSupplierRoute = ({ children }: { children: JSX.Element }) => {
+  const isAuthenticated = !!localStorage.getItem('access_token');
+  const role = localStorage.getItem('user_role');
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (role !== 'ADMIN' && role !== 'SUPPLIER') return <Navigate to="/dashboard" replace />;
+
+  return children;
+};
+
+const VisitorRoute = ({ children }: { children: JSX.Element }) => {
+  const isAuthenticated = !!localStorage.getItem('access_token');
+  const role = localStorage.getItem('user_role');
+  const needsPasswordChange = localStorage.getItem('password_change_required') === 'true';
+
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (needsPasswordChange) return <Navigate to="/force-password-change" replace />;
+  if (role !== 'VISITOR') return <Navigate to="/dashboard" replace />;
+
+  return children;
+};
+
+const AdminOrSupplierOrVisitorRoute = ({ children }: { children: JSX.Element }) => {
+  const isAuthenticated = !!localStorage.getItem('access_token');
+  const role = localStorage.getItem('user_role');
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (role !== 'ADMIN' && role !== 'SUPPLIER' && role !== 'VISITOR') return <Navigate to="/dashboard" replace />;
+
+  return children;
+};
+
+const ShopOrAdminRoute = ({ children }: { children: JSX.Element }) => {
+  const isAuthenticated = !!localStorage.getItem('access_token');
+  const role = localStorage.getItem('user_role');
+  const needsPasswordChange = localStorage.getItem('password_change_required') === 'true';
+
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (needsPasswordChange) return <Navigate to="/force-password-change" replace />;
+  if (role === 'SUPPLIER') return <Navigate to="/dashboard" replace />;
 
   return children;
 };
@@ -81,22 +127,22 @@ function App() {
           <Route
             path="/users"
             element={
-              <PrivateRoute>
+              <ShopOrAdminRoute>
                 <DashboardLayout>
                   <UsersManagement />
                 </DashboardLayout>
-              </PrivateRoute>
+              </ShopOrAdminRoute>
             }
           />
 
           <Route
             path="/proxies"
             element={
-              <PrivateRoute>
+              <ShopOrAdminRoute>
                 <DashboardLayout>
                   <CreateConfig />
                 </DashboardLayout>
-              </PrivateRoute>
+              </ShopOrAdminRoute>
             }
           />
 
@@ -113,11 +159,11 @@ function App() {
           <Route
             path="/admin/services"
             element={
-              <AdminRoute>
+              <AdminOrSupplierRoute>
                 <DashboardLayout>
                   <ServicesManagement />
                 </DashboardLayout>
-              </AdminRoute>
+              </AdminOrSupplierRoute>
             }
           />
           <Route
@@ -126,6 +172,16 @@ function App() {
               <AdminRoute>
                 <DashboardLayout>
                   <SystemSettingsPage />
+                </DashboardLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/transactions"
+            element={
+              <AdminRoute>
+                <DashboardLayout>
+                  <TransactionsList />
                 </DashboardLayout>
               </AdminRoute>
             }
@@ -144,21 +200,51 @@ function App() {
           <Route
             path="/admin/settlements"
             element={
-              <AdminRoute>
+              <AdminOrSupplierOrVisitorRoute>
                 <DashboardLayout>
                   <AdminSettlements />
                 </DashboardLayout>
-              </AdminRoute>
+              </AdminOrSupplierOrVisitorRoute>
             }
           />
           <Route
             path="/admin/servers"
             element={
-              <AdminRoute>
+              <AdminOrSupplierRoute>
                 <DashboardLayout>
                   <ServersManagement />
                 </DashboardLayout>
-              </AdminRoute>
+              </AdminOrSupplierRoute>
+            }
+          />
+          <Route
+            path="/visitor/shops"
+            element={
+              <VisitorRoute>
+                <DashboardLayout>
+                  <VisitorDashboard />
+                </DashboardLayout>
+              </VisitorRoute>
+            }
+          />
+          <Route
+            path="/visitor/test-config"
+            element={
+              <VisitorRoute>
+                <DashboardLayout>
+                  <VisitorTestConfig />
+                </DashboardLayout>
+              </VisitorRoute>
+            }
+          />
+          <Route
+            path="/visitor/test-configs"
+            element={
+              <AdminOrSupplierOrVisitorRoute>
+                <DashboardLayout>
+                  <TestConfigsList />
+                </DashboardLayout>
+              </AdminOrSupplierOrVisitorRoute>
             }
           />
         </Routes>

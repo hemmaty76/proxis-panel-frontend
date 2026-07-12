@@ -14,10 +14,10 @@ import {
 } from 'lucide-react';
 import {
   type SettlementDashboardResponse,
-  type ServerResponse,
+  type AdminUserItem,
   getSettlementDashboard,
   createSettlement,
-  getServers
+  getAllShops
 } from '../../../data/services/adminService';
 
 interface StatCardProps {
@@ -72,37 +72,42 @@ export default function AdminSettlements() {
       year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit',
     }).format(new Date(iso));
 
+  const userRole = localStorage.getItem('user_role');
+
   const [data, setData] = useState<SettlementDashboardResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [servers, setServers] = useState<ServerResponse[]>([]);
+  const [suppliers, setSuppliers] = useState<AdminUserItem[]>([]);
   
   // Pagination & Filtering States
   const [currentPage, setCurrentPage] = useState(1);
-  const [filterServerId, setFilterServerId] = useState('');
+  const [filterUserId, setFilterUserId] = useState('');
   const pageSize = 10;
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newAmount, setNewAmount] = useState('');
   const [newTrackingCode, setNewTrackingCode] = useState('');
-  const [selectedServerId, setSelectedServerId] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fetchServersList = async () => {
+  const fetchSuppliersList = async () => {
     try {
-      const serversData = await getServers();
-      setServers(serversData);
+      const [suppliersData, visitorsData] = await Promise.all([
+        getAllShops(1, 100, undefined, 'SUPPLIER'),
+        getAllShops(1, 100, undefined, 'VISITOR')
+      ]);
+      setSuppliers([...suppliersData.items, ...visitorsData.items]);
     } catch {
       // Silent error
     }
   };
 
-  const fetchDashboardData = async (page = 1, serverId = '') => {
+  const fetchDashboardData = async (page = 1, userId = '') => {
     setIsLoading(true);
     try {
       const params: any = { page, page_size: pageSize };
-      if (serverId) {
-        params.server_id = serverId;
+      if (userId) {
+        params.user_id = userId;
       }
       const settlementData = await getSettlementDashboard(params);
       setData(settlementData);
@@ -114,17 +119,19 @@ export default function AdminSettlements() {
   };
 
   useEffect(() => {
-    fetchServersList();
+    if (userRole === 'ADMIN') {
+      fetchSuppliersList();
+    }
   }, []);
 
   useEffect(() => {
-    fetchDashboardData(currentPage, filterServerId);
-  }, [currentPage, filterServerId]);
+    fetchDashboardData(currentPage, filterUserId);
+  }, [currentPage, filterUserId]);
 
   const handleOpenModal = () => {
     setNewAmount('');
     setNewTrackingCode('');
-    setSelectedServerId('');
+    setSelectedUserId('');
     setIsModalOpen(true);
   };
 
@@ -132,7 +139,7 @@ export default function AdminSettlements() {
     e.preventDefault();
     const numericAmount = Number(newAmount.replace(/\D/g, ''));
 
-    if (!selectedServerId) {
+    if (!selectedUserId) {
       toast.error(t('settlements.messages.selectSupplier', 'لطفاً تامین‌کننده را انتخاب کنید.'));
       return;
     }
@@ -144,10 +151,10 @@ export default function AdminSettlements() {
 
     setIsSubmitting(true);
     try {
-      await createSettlement(selectedServerId, numericAmount, newTrackingCode);
+      await createSettlement(selectedUserId, numericAmount, newTrackingCode);
       toast.success(t('settlements.messages.success', 'پرداختی با موفقیت ثبت شد.'));
       setIsModalOpen(false);
-      fetchDashboardData(currentPage, filterServerId);
+      fetchDashboardData(currentPage, filterUserId);
     } catch {
       toast.error(t('settlements.messages.submitError', 'خطا در ثبت پرداختی.'));
     } finally {
@@ -155,8 +162,8 @@ export default function AdminSettlements() {
     }
   };
 
-  const handleServerFilterChange = (serverId: string) => {
-    setFilterServerId(serverId);
+  const handleSupplierFilterChange = (userId: string) => {
+    setFilterUserId(userId);
     setCurrentPage(1);
   };
 
@@ -178,28 +185,32 @@ export default function AdminSettlements() {
         </div>
         
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-          {/* Server Filter Dropdown */}
-          <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 shadow-sm text-sm">
-            <span className="text-slate-500 font-bold shrink-0">{t('settlements.filter.serverLabel', 'سرور:')}</span>
-            <select
-              value={filterServerId}
-              onChange={e => handleServerFilterChange(e.target.value)}
-              className="bg-transparent border-none outline-none font-bold text-slate-800 focus:ring-0 cursor-pointer"
-            >
-              <option value="">{t('settlements.filter.allServers', 'همه سرورها')}</option>
-              {servers.map(s => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-          </div>
+          {/* Supplier Filter Dropdown */}
+          {userRole === 'ADMIN' && (
+            <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 shadow-sm text-sm">
+              <span className="text-slate-500 font-bold shrink-0">{t('settlements.labels.userFilter', 'نام کاربر:')}</span>
+              <select
+                value={filterUserId}
+                onChange={e => handleSupplierFilterChange(e.target.value)}
+                className="bg-transparent border-none outline-none font-bold text-slate-800 focus:ring-0 cursor-pointer"
+              >
+                <option value="">{t('settlements.labels.allUsers', 'همه کاربران')}</option>
+                {suppliers.map(s => (
+                  <option key={s.id} value={s.id}>{s.username} ({s.role === 'VISITOR' ? t('settlements.roles.visitor', 'ویزیتور') : t('settlements.roles.supplier', 'تامین‌کننده')})</option>
+                ))}
+              </select>
+            </div>
+          )}
 
-          <button
-            onClick={handleOpenModal}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-sm transition-all flex items-center justify-center gap-2 w-full md:w-auto"
-          >
-            <Plus size={20} />
-            {t('settlements.buttons.newSettlement', 'ثبت پرداختی جدید')}
-          </button>
+          {userRole === 'ADMIN' && (
+            <button
+              onClick={handleOpenModal}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-sm transition-all flex items-center justify-center gap-2 w-full md:w-auto"
+            >
+              <Plus size={20} />
+              {t('settlements.buttons.newSettlement', 'ثبت پرداختی جدید')}
+            </button>
+          )}
         </div>
       </div>
 
@@ -211,19 +222,19 @@ export default function AdminSettlements() {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <StatCard
-              title={filterServerId ? t('settlements.stats.serverDebt', 'بدهی تولید شده سرور') : t('settlements.stats.totalDebt', 'کل بدهی تولید شده')}
+              title={userRole === 'SUPPLIER' || userRole === 'VISITOR' ? 'طلب تولید شده شما (طلب کل)' : filterUserId ? 'بدهی تولید شده تامین‌کننده' : t('settlements.stats.totalDebt', 'کل بدهی تولید شده')}
               value={formatCurrency(data.total_debt)}
               accent="slate"
               icon={<TrendingDown size={22} />}
             />
             <StatCard
-              title={filterServerId ? t('settlements.stats.serverPaid', 'مبلغ تسویه شده سرور') : t('settlements.stats.totalPaid', 'کل مبلغ تسویه شده')}
+              title={userRole === 'SUPPLIER' || userRole === 'VISITOR' ? 'دریافتی‌های تسویه شده شما' : filterUserId ? 'مبلغ تسویه شده تامین‌کننده' : t('settlements.stats.totalPaid', 'کل مبلغ تسویه شده')}
               value={formatCurrency(data.total_paid)}
               accent="green"
               icon={<CheckCircle2 size={22} />}
             />
             <StatCard
-              title={filterServerId ? t('settlements.stats.serverRemainingDebt', 'مانده بدهی سرور') : t('settlements.stats.remainingDebt', 'مانده بدهی فعلی')}
+              title={userRole === 'SUPPLIER' || userRole === 'VISITOR' ? 'مانده طلب فعلی شما' : filterUserId ? 'مانده بدهی تامین‌کننده' : t('settlements.stats.remainingDebt', 'مانده بدهی فعلی')}
               value={formatCurrency(data.remaining_debt)}
               accent={data.remaining_debt > 0 ? "red" : "default"}
               icon={<AlertCircle size={22} />}
@@ -257,12 +268,12 @@ export default function AdminSettlements() {
                   </thead>
                   <tbody>
                     {historyItems.map((record) => {
-                      const associatedServer = servers.find(s => s.id === record.server_id);
+                      const associatedSupplier = suppliers.find(s => s.id === record.user_id);
                       return (
                         <tr key={record.id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
                           <td className="px-6 py-4 font-medium text-slate-900">{formatDate(record.created_at)}</td>
                           <td className="px-6 py-4 font-semibold text-slate-800">
-                            {associatedServer ? associatedServer.name : t('settlements.table.unknownServer', 'نامشخص')}
+                            {associatedSupplier ? `${associatedSupplier.username} (${associatedSupplier.role === 'VISITOR' ? t('settlements.roles.visitor', 'ویزیتور') : t('settlements.roles.supplier', 'تامین‌کننده')})` : (userRole !== 'ADMIN' ? t('settlements.table.you', 'شما') : t('settlements.table.unknownServer', 'نامشخص'))}
                           </td>
                           <td className="px-6 py-4 font-black text-emerald-600">{formatCurrency(record.amount)}</td>
                           <td className="px-6 py-4 font-medium text-slate-600">{record.tracking_code || '-'}</td>
@@ -318,18 +329,18 @@ export default function AdminSettlements() {
             <form onSubmit={handleSubmitSettlement} className="p-6 space-y-5">
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1.5">
-                  {t('settlements.modal.supplierLabel', 'انتخاب تامین‌کننده')} *
+                  {t('settlements.modal.selectUser', 'انتخاب تامین‌کننده / ویزیتور *')}
                 </label>
                 <select
                   required
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none bg-white text-slate-800 font-semibold cursor-pointer"
-                  value={selectedServerId}
-                  onChange={(e) => setSelectedServerId(e.target.value)}
+                  value={selectedUserId}
+                  onChange={(e) => setSelectedUserId(e.target.value)}
                 >
-                  <option value="">{t('settlements.modal.selectSupplierPlaceholder', '-- انتخاب کنید --')}</option>
-                  {servers.map((s) => (
+                  <option value="">{t('settlements.modal.selectPlaceholder', '-- انتخاب کنید --')}</option>
+                  {suppliers.map((s) => (
                     <option key={s.id} value={s.id}>
-                      {s.name} {s.is_active ? `(${t('servers.status.active', 'فعال')})` : ''}
+                      {s.username} ({s.role === 'VISITOR' ? t('settlements.roles.visitor', 'ویزیتور') : t('settlements.roles.supplier', 'تامین‌کننده')})
                     </option>
                   ))}
                 </select>

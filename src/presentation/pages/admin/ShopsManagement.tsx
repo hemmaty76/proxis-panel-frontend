@@ -27,12 +27,14 @@ export default function ShopsManagement() {
   const [isLoading, setIsLoading] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [chargeModal, setChargeModal] = useState<{ user: AdminUserItem } | null>(null);
+  const [activeRole, setActiveRole] = useState<'SHOP' | 'SUPPLIER' | 'VISITOR'>('SHOP');
   const [editModal, setEditModal] = useState<{
     user: AdminUserItem;
     discountPercent: string;
     creditLimit: string;
     isActive: boolean;
     description: string;
+    role: string;
   } | null>(null);
   const [statsModal, setStatsModal] = useState<{ user: AdminUserItem, stats: AdminUserStats | null, loading: boolean } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,10 +44,10 @@ export default function ShopsManagement() {
   const [createCreditLimit, setCreateCreditLimit] = useState('0');
   const [createDiscountPercent, setCreateDiscountPercent] = useState('0');
 
-  const fetchUsers = async (page = currentPage, phone = searchPhone) => {
+  const fetchUsers = async (page = currentPage, phone = searchPhone, role = activeRole) => {
     setIsLoading(true);
     try {
-      const res = await getAllShops(page, 10, phone);
+      const res = await getAllShops(page, 10, phone, role);
       setUsers(res.items);
       setTotalPages(res.total_pages || 1);
       setCurrentPage(res.current_page || 1);
@@ -56,12 +58,12 @@ export default function ShopsManagement() {
     }
   };
 
-  useEffect(() => { fetchUsers(); }, []);
+  useEffect(() => { fetchUsers(1, searchPhone, activeRole); }, [activeRole]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchUsers(1, searchPhone);
+    fetchUsers(1, searchPhone, activeRole);
   };
 
   // --- هندلرهای عملیات ---
@@ -104,11 +106,12 @@ export default function ShopsManagement() {
         credit_limit: Number(editModal.creditLimit.replace(/\D/g, '')),
         discount_percent: Number(editModal.discountPercent),
         is_active: editModal.isActive,
-        description_admin: editModal.description
+        description_admin: editModal.description,
+        role: editModal.role
       });
       toast.success(t('shopsManagement.messages.updateSuccess'));
       setEditModal(null);
-      fetchUsers();
+      fetchUsers(currentPage, searchPhone, activeRole);
     } catch {
       toast.error(t('shopsManagement.messages.updateError'));
     } finally {
@@ -148,6 +151,7 @@ export default function ShopsManagement() {
       description_admin: String(formData.get('description_admin')),
       credit_limit: Number(createCreditLimit.replace(/\D/g, '')),
       discount_percent: Number(createDiscountPercent),
+      role: String(formData.get('role') || 'SHOP')
     };
 
     setIsSubmitting(true);
@@ -157,7 +161,7 @@ export default function ShopsManagement() {
       setCreateModalOpen(false);
       setCreateCreditLimit('0');
       setCreateDiscountPercent('0');
-      fetchUsers();
+      fetchUsers(1, searchPhone, activeRole);
     } catch {
       toast.error(t('shopsManagement.messages.createShopError'));
     } finally {
@@ -192,13 +196,37 @@ export default function ShopsManagement() {
             </button>
           </form>
 
-          <button
-            onClick={() => setCreateModalOpen(true)}
-            className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-sm"
-          >
-            <Plus size={18} /> {t('shopsManagement.header.createShopBtn')}
-          </button>
+          {activeRole !== 'SHOP' && (
+            <button
+              onClick={() => setCreateModalOpen(true)}
+              className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-sm"
+            >
+              <Plus size={18} /> {activeRole === 'SUPPLIER' ? t('shopsManagement.buttons.addSupplier', 'افزودن تامین‌کننده جدید') : t('shopsManagement.buttons.addVisitor', 'افزودن ویزیتور جدید')}
+            </button>
+          )}
         </div>
+      </div>
+
+      {/* تب‌ها برای تغییر نقش */}
+      <div className="flex border-b border-slate-200 gap-4">
+        <button
+          onClick={() => { setActiveRole('SHOP'); setCurrentPage(1); }}
+          className={`px-4 py-2 text-sm font-bold border-b-2 transition-all ${activeRole === 'SHOP' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+        >
+          {t('dashboardHome.profile.roles.shopkeeper', 'مغازه‌داران')}
+        </button>
+        <button
+          onClick={() => { setActiveRole('SUPPLIER'); setCurrentPage(1); }}
+          className={`px-4 py-2 text-sm font-bold border-b-2 transition-all ${activeRole === 'SUPPLIER' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+        >
+          {t('shopsManagement.tabs.suppliers', 'تامین‌کنندگان')}
+        </button>
+        <button
+          onClick={() => { setActiveRole('VISITOR'); setCurrentPage(1); }}
+          className={`px-4 py-2 text-sm font-bold border-b-2 transition-all ${activeRole === 'VISITOR' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+        >
+          {t('shopsManagement.tabs.visitors', 'ویزیتورها')}
+        </button>
       </div>
 
       {/* جدول کاربران (دسکتاپ) */}
@@ -209,8 +237,14 @@ export default function ShopsManagement() {
               <tr>
                 <th className="px-6 py-4">{t('shopsManagement.table.userAndPhone')}</th>
                 <th className="px-6 py-4">{t('shopsManagement.table.adminDesc')}</th>
-                <th className="px-6 py-4">{t('shopsManagement.table.balanceAndCredit')}</th>
-                <th className="px-6 py-4">{t('shopsManagement.table.discountPercent')}</th>
+                {activeRole !== 'VISITOR' ? (
+                  <>
+                    <th className="px-6 py-4">{t('shopsManagement.table.balanceAndCredit')}</th>
+                    <th className="px-6 py-4">{t('shopsManagement.table.discountPercent')}</th>
+                  </>
+                ) : (
+                  <th className="px-6 py-4">{t('shopsManagement.table.testConfigsCount', 'تعداد کانفیگ تست ساخته‌شده')}</th>
+                )}
                 <th className="px-6 py-4 text-center">{t('shopsManagement.table.actions')}</th>
               </tr>
             </thead>
@@ -229,18 +263,26 @@ export default function ShopsManagement() {
                     <td className="px-6 py-4 text-slate-600 font-medium max-w-[200px] truncate" title={user.description_admin}>
                       {user.description_admin || t('shopsManagement.table.emptyDash')}
                     </td>
-                    <td className="px-6 py-4">
-                      <p className="font-bold text-slate-800 tabular-nums">{formatCurrency(user.balance)}</p>
-                      <p className="text-xs text-indigo-600 font-semibold mt-0.5">{t('shopsManagement.table.limit')} {formatCurrency(user.credit_limit)}</p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="font-bold text-slate-800 tabular-nums">{user.discount_percent} %</p>
-                    </td>
+                    {activeRole !== 'VISITOR' ? (
+                      <>
+                        <td className="px-6 py-4">
+                          <p className="font-bold text-slate-800 tabular-nums">{formatCurrency(user.balance)}</p>
+                          <p className="text-xs text-indigo-600 font-semibold mt-0.5">{t('shopsManagement.table.limit')} {formatCurrency(user.credit_limit)}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="font-bold text-slate-800 tabular-nums">{user.discount_percent} %</p>
+                        </td>
+                      </>
+                    ) : (
+                      <td className="px-6 py-4 font-bold text-slate-800 tabular-nums">
+                        {user.test_configs_count || 0}
+                      </td>
+                    )}
                     <td className="px-6 py-4">
                       <div className="flex justify-center items-center gap-1.5">
                         <button onClick={() => { setChargeAmount(''); setChargeModal({ user }); }} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title={t('shopsManagement.tooltips.chargeWallet')}><Wallet size={18} /></button>
                         <button onClick={() => openStatsModal(user)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title={t('shopsManagement.tooltips.salesStats')}><BarChart3 size={18} /></button>
-                        <button onClick={() => setEditModal({ user, discountPercent: String(user.discount_percent), creditLimit: String(user.credit_limit), isActive: user.is_active, description: user.description_admin || '' })} className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" title={t('shopsManagement.tooltips.editShop')}><Edit3 size={18} /></button>
+                        <button onClick={() => setEditModal({ user, discountPercent: String(user.discount_percent), creditLimit: String(user.credit_limit), isActive: user.is_active, description: user.description_admin || '', role: user.role })} className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" title={t('shopsManagement.tooltips.editShop')}><Edit3 size={18} /></button>
                         <button onClick={() => handleResetPassword(user)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title={t('shopsManagement.tooltips.resetPassword')}><KeyRound size={18} /></button>
                       </div>
                     </td>
@@ -294,7 +336,7 @@ export default function ShopsManagement() {
                   <button onClick={() => openStatsModal(user)} className="flex-1 flex flex-col items-center justify-center gap-1.5 p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors">
                     <BarChart3 size={20} strokeWidth={2.5} /><span className="text-[10px] font-bold">{t('shopsManagement.actionsShort.stats')}</span>
                   </button>
-                  <button onClick={() => setEditModal({ user, discountPercent: String(user.discount_percent), creditLimit: String(user.credit_limit), isActive: user.is_active, description: user.description_admin || '' })} className="flex-1 flex flex-col items-center justify-center gap-1.5 p-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                  <button onClick={() => setEditModal({ user, discountPercent: String(user.discount_percent), creditLimit: String(user.credit_limit), isActive: user.is_active, description: user.description_admin || '', role: user.role })} className="flex-1 flex flex-col items-center justify-center gap-1.5 p-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
                     <Edit3 size={20} strokeWidth={2.5} /><span className="text-[10px] font-bold">{t('shopsManagement.actionsShort.edit')}</span>
                   </button>
                   <button onClick={() => handleResetPassword(user)} className="flex-1 flex flex-col items-center justify-center gap-1.5 p-2 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-colors">
@@ -394,6 +436,18 @@ export default function ShopsManagement() {
                   className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded"
                 />
                 <label htmlFor="edit_is_active" className="text-sm font-bold text-slate-700 select-none">{t('shopsManagement.modals.edit.isActive')}</label>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">{t('shopsManagement.labels.userRole', 'نقش کاربر')}</label>
+                <select
+                  value={editModal.role}
+                  onChange={(e) => setEditModal(prev => prev ? { ...prev, role: e.target.value } : null)}
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-sm font-medium"
+                >
+                  <option value="SHOP">{t('shopsManagement.roles.shop', 'مغازه‌دار (SHOP)')}</option>
+                  <option value="SUPPLIER">{t('shopsManagement.roles.supplier', 'تامین‌کننده (SUPPLIER)')}</option>
+                  <option value="VISITOR">{t('shopsManagement.roles.visitor', 'ویزیتور (VISITOR)')}</option>
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1">{t('shopsManagement.modals.edit.adminDesc')}</label>
@@ -497,6 +551,19 @@ export default function ShopsManagement() {
                     onChange={(e) => setCreateDiscountPercent(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-left font-bold font-[inherit]"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">{t('shopsManagement.labels.userRole', 'نقش کاربر')}</label>
+                  <select
+                    name="role"
+                    required
+                    value={activeRole === 'VISITOR' ? 'VISITOR' : 'SUPPLIER'}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium"
+                  >
+                    <option value="SUPPLIER">{t('shopsManagement.roles.supplier', 'تامین‌کننده (SUPPLIER)')}</option>
+                    <option value="VISITOR">{t('shopsManagement.roles.visitor', 'ویزیتور (VISITOR)')}</option>
+                  </select>
                 </div>
 
                 <div className="sm:col-span-2">

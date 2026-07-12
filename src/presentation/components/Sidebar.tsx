@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, BanknoteCheck, Store, Settings, FilePlus, Package, Server } from 'lucide-react';
+import { LayoutDashboard, Users, BanknoteCheck, Store, Settings, FilePlus, Package, Server, FileSpreadsheet, Receipt } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
@@ -16,14 +16,28 @@ export default function Sidebar({ isOpen, onClose, appVersion }: SidebarProps) {
 
   const menuItems = [
     { text: t('sidebar.menu.dashboard'), path: '/dashboard', icon: <LayoutDashboard size={20} strokeWidth={2.5} /> },
-    { text: t('sidebar.menu.createConfig'), path: '/proxies', icon: <FilePlus size={20} strokeWidth={2.5} /> },
-    { text: t('sidebar.menu.manageUsers'), path: '/users', icon: <Users size={20} strokeWidth={2.5} /> },
+    ...(userRole !== 'SUPPLIER' && userRole !== 'VISITOR' ? [
+      { text: t('sidebar.menu.createConfig'), path: '/proxies', icon: <FilePlus size={20} strokeWidth={2.5} /> },
+      { text: t('sidebar.menu.manageUsers'), path: '/users', icon: <Users size={20} strokeWidth={2.5} /> }
+    ] : []),
     ...(userRole === 'ADMIN' ? [
-      { text: t('sidebar.menu.manageShop'), path: '/admin/shops', icon: <Store size={20} strokeWidth={2.5} /> },
+      { text: t('sidebar.menu.manageUsers'), path: '/admin/shops', icon: <Store size={20} strokeWidth={2.5} /> },
       { text: t('sidebar.menu.manageServices'), path: '/admin/services', icon: <Package size={20} strokeWidth={2.5} /> },
       { text: t('sidebar.menu.manageServers', 'مدیریت سرورها'), path: '/admin/servers', icon: <Server size={20} strokeWidth={2.5} /> },
       { text: t('sidebar.menu.panelSettings'), path: '/admin/settings', icon: <Settings size={20} strokeWidth={2.5} /> },
-      { text: t('settlements.header.title'), path: '/admin/settlements', icon: <BanknoteCheck size={20} strokeWidth={2.5} /> }
+      { text: t('settlements.header.title'), path: '/admin/settlements', icon: <BanknoteCheck size={20} strokeWidth={2.5} /> },
+      { text: t('sidebar.menu.transactions', 'تراکنش‌های واریزی'), path: '/admin/transactions', icon: <Receipt size={20} strokeWidth={2.5} /> },
+      { text: t('sidebar.menu.testConfigs', 'کانفیگ‌های تست'), path: '/visitor/test-configs', icon: <FileSpreadsheet size={20} strokeWidth={2.5} /> }
+    ] : userRole === 'SUPPLIER' ? [
+      { text: t('sidebar.menu.manageServices'), path: '/admin/services', icon: <Package size={20} strokeWidth={2.5} /> },
+      { text: t('sidebar.menu.manageServers', 'مدیریت سرورها'), path: '/admin/servers', icon: <Server size={20} strokeWidth={2.5} /> },
+      { text: t('settlements.header.title'), path: '/admin/settlements', icon: <BanknoteCheck size={20} strokeWidth={2.5} /> },
+      { text: t('sidebar.menu.testConfigs', 'کانفیگ‌های تست'), path: '/visitor/test-configs', icon: <FileSpreadsheet size={20} strokeWidth={2.5} /> }
+    ] : userRole === 'VISITOR' ? [
+      { text: t('sidebar.menu.myShops', 'مغازه‌های من'), path: '/visitor/shops', icon: <Store size={20} strokeWidth={2.5} /> },
+      { text: t('sidebar.menu.newTestConfig', 'کانفیگ تست جدید'), path: '/visitor/test-config', icon: <FilePlus size={20} strokeWidth={2.5} /> },
+      { text: t('settlements.header.title'), path: '/admin/settlements', icon: <BanknoteCheck size={20} strokeWidth={2.5} /> },
+      { text: t('sidebar.menu.testConfigs', 'کانفیگ‌های تست'), path: '/visitor/test-configs', icon: <FileSpreadsheet size={20} strokeWidth={2.5} /> }
     ] : [
       { text: t('sidebar.menu.shopSettings', 'تنظیمات پشتیبانی'), path: '/settings/shop', icon: <Settings size={20} strokeWidth={2.5} /> }
     ]),

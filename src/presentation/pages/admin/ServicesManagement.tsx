@@ -11,11 +11,13 @@ import {
   getServers,
   type ConfigTypeItem, type ConfigCategoryItem, type AdminPackageItem, type ServerResponse
 } from '../../../data/services/adminService';
+import { getSettings } from '../../../data/services/shopService';
 
 type TabType = 'types' | 'categories' | 'packages';
 
 export default function ServicesManagement() {
   const { t } = useTranslation();
+  const userRole = localStorage.getItem('user_role');
   const [activeTab, setActiveTab] = useState<TabType>('packages');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -43,12 +45,12 @@ export default function ServicesManagement() {
   const [catTypeId, setCatTypeId] = useState('');
   const [catSellType, setCatSellType] = useState('VOLUME_TIME');
   const [catAdminCost, setCatAdminCost] = useState('');
-  const [catShopPrice, setCatShopPrice] = useState('');
+  const [percentAdminCost, setPercentAdminCost] = useState<number>(0);
+  const [percentVisitorCost, setPercentVisitorCost] = useState<number>(0);
 
   // Category edit modal states
   const [editingCat, setEditingCat] = useState<ConfigCategoryItem | null>(null);
   const [editCatAdminCost, setEditCatAdminCost] = useState('');
-  const [editCatShopPrice, setEditCatShopPrice] = useState('');
 
   // 3. Package inputs
   const [pkgCatId, setPkgCatId] = useState('');
@@ -66,16 +68,19 @@ export default function ServicesManagement() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const [tList, cList, pList, sList] = await Promise.all([
+      const [tList, cList, pList, sList, settings] = await Promise.all([
         getConfigTypes(),
         getConfigCategories(),
         adminGetPackages(),
-        getServers()
+        getServers(),
+        getSettings()
       ]);
       setTypes(tList);
       setCategories(cList);
       setPackages(pList);
       setServersList(sList);
+      setPercentAdminCost(settings.PercentAdminCost ?? 0);
+      setPercentVisitorCost(settings.PercentVisitorCost ?? 0);
 
       // Pre-select first options if available
       if (tList.length > 0) setCatTypeId(tList[0].id);
@@ -152,18 +157,16 @@ export default function ServicesManagement() {
 
   const handleCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!catTypeId || !catAdminCost || !catShopPrice) return;
+    if (!catTypeId || !catAdminCost) return;
     setIsSubmitting(true);
     try {
       await createConfigCategory({
         config_type_id: catTypeId,
         sell_type: catSellType,
-        admin_cost_per_unit: Number(catAdminCost.replace(/\D/g, '')),
-        shop_price_per_unit: Number(catShopPrice.replace(/\D/g, ''))
+        admin_cost_per_unit: Number(catAdminCost.replace(/\D/g, ''))
       });
       toast.success(t('servicesManagement.messages.createCategorySuccess', 'دسته کانفیگ جدید با موفقیت ایجاد شد.'));
       setCatAdminCost('');
-      setCatShopPrice('');
       fetchData();
     } catch (err: any) {
       toast.error(err.response?.data?.detail || t('servicesManagement.messages.createCategoryError', 'خطا در ثبت دسته کانفیگ.'));
@@ -186,17 +189,15 @@ export default function ServicesManagement() {
   const startEditingCategory = (c: ConfigCategoryItem) => {
     setEditingCat(c);
     setEditCatAdminCost(c.admin_cost_per_unit.toString());
-    setEditCatShopPrice(c.shop_price_per_unit.toString());
   };
 
   const handleUpdateCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingCat || !editCatAdminCost || !editCatShopPrice) return;
+    if (!editingCat || !editCatAdminCost) return;
     setIsSubmitting(true);
     try {
       await updateConfigCategory(editingCat.id, {
-        admin_cost_per_unit: Number(editCatAdminCost.replace(/\D/g, '')),
-        shop_price_per_unit: Number(editCatShopPrice.replace(/\D/g, ''))
+        admin_cost_per_unit: Number(editCatAdminCost.replace(/\D/g, ''))
       });
       toast.success(t('servicesManagement.messages.updateCategorySuccess', 'دسته کانفیگ با موفقیت ویرایش شد.'));
       setEditingCat(null);
@@ -406,12 +407,11 @@ export default function ServicesManagement() {
                   <label className="block text-xs font-bold text-slate-600 mb-1">{t('servicesManagement.labels.forms.shopPrice', 'قیمت فروش پایه به مغازه‌دار (هر واحد - تومان)')}</label>
                   <input
                     type="text"
-                    required
+                    disabled
                     dir="ltr"
-                    value={catShopPrice ? Number(catShopPrice).toLocaleString('en-US') : ''}
-                    onChange={e => setCatShopPrice(e.target.value.replace(/\D/g, ''))}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-left font-bold text-sm"
-                    placeholder="مثلاً: 1,000"
+                    value={catAdminCost ? Math.round(Number(catAdminCost) * (1 + (percentAdminCost + percentVisitorCost) / 100)).toLocaleString('en-US') : ''}
+                    className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl outline-none text-left font-bold text-sm text-slate-500 cursor-not-allowed"
+                    placeholder="محاسبه خودکار..."
                   />
                 </div>
                 <button type="submit" disabled={isSubmitting || types.length === 0} className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 flex justify-center shadow-sm transition-all disabled:opacity-50">{isSubmitting ? <Loader2 className="animate-spin" size={18} /> : t('servicesManagement.labels.forms.submitCategory', 'ثبت دسته فروش')}</button>
@@ -475,29 +475,40 @@ export default function ServicesManagement() {
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.description', 'توضیحات')}</th>
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.typeKey', 'کلید')}</th>
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.serverName', 'سرور متصل')}</th>
+                      {userRole === 'ADMIN' && (
+                        <th className="px-6 py-3 text-center">ثبت کننده / تامین‌کننده</th>
+                      )}
                       <th className="px-6 py-3 text-center w-28">{t('servicesManagement.labels.tables.actions', 'عملیات')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-medium">
                     {types.length === 0 ? (
-                      <tr><td colSpan={5} className="px-6 py-8 text-center text-slate-400">{t('servicesManagement.labels.tables.noTypes', 'هیچ نوع سرویسی ثبت نشده است.')}</td></tr>
+                      <tr><td colSpan={userRole === 'ADMIN' ? 6 : 5} className="px-6 py-8 text-center text-slate-400">{t('servicesManagement.labels.tables.noTypes', 'هیچ نوع سرویسی ثبت نشده است.')}</td></tr>
                     ) : (
-                      types.map(tItem => (
-                        <tr key={tItem.id} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="px-6 py-4 font-bold text-slate-800">{tItem.name}</td>
-                          <td className="px-6 py-4 text-slate-500 max-w-[200px] truncate" title={tItem.description}>{tItem.description || '—'}</td>
-                          <td className="px-6 py-4 text-slate-600 font-bold">{tItem.key}</td>
-                          <td className="px-6 py-4 text-slate-600 font-semibold">
-                            {serversList.find(s => s.id === tItem.server_id)?.name || 'نامشخص'}
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <div className="flex items-center justify-center gap-1">
-                              <button onClick={() => startEditingType(tItem)} className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-bold text-xs">ویرایش</button>
-                              <button onClick={() => handleDeleteType(tItem.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
+                      types.map(tItem => {
+                        const associatedServer = serversList.find(s => s.id === tItem.server_id);
+                        return (
+                          <tr key={tItem.id} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="px-6 py-4 font-bold text-slate-800">{tItem.name}</td>
+                            <td className="px-6 py-4 text-slate-500 max-w-[200px] truncate" title={tItem.description}>{tItem.description || '—'}</td>
+                            <td className="px-6 py-4 text-slate-600 font-bold">{tItem.key}</td>
+                            <td className="px-6 py-4 text-slate-600 font-semibold">
+                              {associatedServer?.name || 'نامشخص'}
+                            </td>
+                            {userRole === 'ADMIN' && (
+                              <td className="px-6 py-4 font-semibold text-slate-700 text-center">
+                                {associatedServer?.owner ? associatedServer.owner.username : 'مدیر سیستم'}
+                              </td>
+                            )}
+                            <td className="px-6 py-4 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                <button onClick={() => startEditingType(tItem)} className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-bold text-xs">ویرایش</button>
+                                <button onClick={() => handleDeleteType(tItem.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
@@ -510,6 +521,9 @@ export default function ServicesManagement() {
                   <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
                     <tr>
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.categoryName', 'نام دسته‌بندی')}</th>
+                      {userRole === 'ADMIN' && (
+                        <th className="px-6 py-3">ثبت کننده / تامین‌کننده</th>
+                      )}
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.adminCost', 'هزینه ادمین')}</th>
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.shopPrice', 'قیمت پایه مغازه')}</th>
                       <th className="px-6 py-3 text-center w-28">{t('servicesManagement.labels.tables.actions', 'عملیات')}</th>
@@ -517,21 +531,30 @@ export default function ServicesManagement() {
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-medium">
                     {categories.length === 0 ? (
-                      <tr><td colSpan={4} className="px-6 py-8 text-center text-slate-400">{t('servicesManagement.labels.tables.noCategories', 'هیچ دسته‌بندی فروشی ثبت نشده است.')}</td></tr>
+                      <tr><td colSpan={userRole === 'ADMIN' ? 5 : 4} className="px-6 py-8 text-center text-slate-400">{t('servicesManagement.labels.tables.noCategories', 'هیچ دسته‌بندی فروشی ثبت نشده است.')}</td></tr>
                     ) : (
-                      categories.map(c => (
-                        <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="px-6 py-4 text-slate-600 font-bold">{c.name || '—'}</td>
-                          <td className="px-6 py-4 text-slate-700 font-bold tabular-nums">{c.admin_cost_per_unit.toLocaleString()} {t('usersManagement.currency', 'تومان')}</td>
-                          <td className="px-6 py-4 text-indigo-600 font-bold tabular-nums">{c.shop_price_per_unit.toLocaleString()} {t('usersManagement.currency', 'تومان')}</td>
-                          <td className="px-6 py-4 text-center">
-                            <div className="flex items-center justify-center gap-1">
-                              <button onClick={() => startEditingCategory(c)} className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-bold text-xs">ویرایش</button>
-                              <button onClick={() => handleDeleteCategory(c.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
+                      categories.map(c => {
+                        const typeItem = types.find(tItem => tItem.id === c.config_type_id);
+                        const associatedServer = typeItem ? serversList.find(s => s.id === typeItem.server_id) : undefined;
+                        return (
+                          <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="px-6 py-4 text-slate-600 font-bold">{c.name || '—'}</td>
+                            {userRole === 'ADMIN' && (
+                              <td className="px-6 py-4 font-semibold text-slate-700">
+                                {associatedServer?.owner ? associatedServer.owner.username : 'مدیر سیستم'}
+                              </td>
+                            )}
+                            <td className="px-6 py-4 text-slate-700 font-bold tabular-nums">{c.admin_cost_per_unit.toLocaleString()} {t('usersManagement.currency', 'تومان')}</td>
+                            <td className="px-6 py-4 text-indigo-600 font-bold tabular-nums">{c.shop_price_per_unit.toLocaleString()} {t('usersManagement.currency', 'تومان')}</td>
+                            <td className="px-6 py-4 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                <button onClick={() => startEditingCategory(c)} className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-bold text-xs">ویرایش</button>
+                                <button onClick={() => handleDeleteCategory(c.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
@@ -549,8 +572,10 @@ export default function ServicesManagement() {
                   packages.map(pkg => {
                     const c = categories.find(cat => cat.id === pkg.config_category_id);
                     const typeName = c ? (types.find(tItem => tItem.id === c.config_type_id)?.name || 'سرویس') : 'سرویس';
+                    const typeItem = c ? types.find(tItem => tItem.id === c.config_type_id) : undefined;
+                    const associatedServer = typeItem ? serversList.find(s => s.id === typeItem.server_id) : undefined;
                     return (
-                      <div key={pkg.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[175px] group">
+                      <div key={pkg.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[185px] group">
                         <div>
                           <div className="flex justify-between items-start gap-4 mb-3">
                             <div className="flex flex-wrap gap-1.5 max-w-[70%]">
@@ -558,6 +583,11 @@ export default function ServicesManagement() {
                               {c && (
                                 <span className="px-2 py-0.5 bg-slate-50 text-slate-500 text-[10px] font-medium rounded-md border border-slate-100 shrink-0">
                                   {c.name || getSellTypeLabel(c.sell_type)}
+                                </span>
+                              )}
+                              {userRole === 'ADMIN' && (
+                                <span className="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-bold rounded-md border border-amber-100 shrink-0">
+                                  تامین‌کننده: {associatedServer?.owner ? associatedServer.owner.username : 'مدیر سیستم'}
                                 </span>
                               )}
                             </div>
@@ -717,11 +747,10 @@ export default function ServicesManagement() {
                 <label className="block text-xs font-bold text-slate-600 mb-1">{t('servicesManagement.labels.forms.shopPrice', 'قیمت فروش پایه به مغازه‌دار (هر واحد - تومان)')}</label>
                 <input
                   type="text"
-                  required
+                  disabled
                   dir="ltr"
-                  value={editCatShopPrice ? Number(editCatShopPrice).toLocaleString('en-US') : ''}
-                  onChange={e => setEditCatShopPrice(e.target.value.replace(/\D/g, ''))}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-left font-bold text-sm"
+                  value={editCatAdminCost ? Math.round(Number(editCatAdminCost) * (1 + (percentAdminCost + percentVisitorCost) / 100)).toLocaleString('en-US') : ''}
+                  className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl outline-none text-left font-bold text-sm text-slate-500 cursor-not-allowed"
                 />
               </div>
 

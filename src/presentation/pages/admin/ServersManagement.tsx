@@ -23,6 +23,7 @@ import {
 
 export default function ServersManagement() {
   const { t } = useTranslation();
+  const userRole = localStorage.getItem('user_role');
   const [servers, setServers] = useState<ServerResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -179,7 +180,10 @@ export default function ServersManagement() {
               <table className="w-full text-sm text-center text-slate-500">
                 <thead className="text-xs font-bold text-slate-700 bg-slate-50 border-b border-slate-100">
                   <tr>
-                    <th className="px-6 py-4">{t('servers.table.name', 'نام تامین‌کننده')}</th>
+                    <th className="px-6 py-4">{t('servers.table.name', 'نام سرور')}</th>
+                    {userRole === 'ADMIN' && (
+                      <th className="px-6 py-4">ثبت کننده / صاحب سرور</th>
+                    )}
                     <th className="px-6 py-4">{t('servers.table.url', 'آدرس پنل مرزبان')}</th>
                     <th className="px-6 py-4">{t('servers.table.username', 'نام کاربری')}</th>
                     <th className="px-6 py-4">{t('servers.table.type', 'نوع پنل')}</th>
@@ -205,6 +209,11 @@ export default function ServersManagement() {
                           )}
                         </div>
                       </td>
+                      {userRole === 'ADMIN' && (
+                        <td className="px-6 py-4 font-semibold text-slate-700">
+                          {srv.owner ? srv.owner.username : 'مدیر سیستم'}
+                        </td>
+                      )}
                       <td className="px-6 py-4 font-medium text-slate-600 dir-ltr">{srv.base_url}</td>
                       <td className="px-6 py-4 font-medium text-slate-600">{srv.username}</td>
                       <td className="px-6 py-4 font-semibold text-slate-700">

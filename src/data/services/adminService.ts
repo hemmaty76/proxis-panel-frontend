@@ -12,6 +12,8 @@ export interface AdminUserItem {
   discount_percent: number;
   role: string;
   is_active: boolean;
+  visitor_id?: string;
+  test_configs_count?: number;
   created_at: string;
 }
 
@@ -35,12 +37,13 @@ export interface SystemSettings {
   dashboard_message: string;
   dashboard_message_type: 'success' | 'warning' | 'error' | 'info';
   dashboard_version: string;
+  PercentAdminCost?: number;
 }
 
 // --- API Calls ---
 
-export const getAllShops = async (page: number = 1, size: number = 10, phone?: string) => {
-  const params = new URLSearchParams({ page: String(page), page_size: String(size) });
+export const getAllShops = async (page: number = 1, size: number = 10, phone?: string, role: string = 'SHOP') => {
+  const params = new URLSearchParams({ page: String(page), page_size: String(size), role });
   if (phone) params.append('phone_number', phone);
   
   const response = await apiClient.get<AdminUsersResponse>(`/admin/users?${params.toString()}`);
@@ -111,6 +114,8 @@ export interface ConfigTypeItem {
   description?: string;
   key: string;
   server_id: string;
+  server_name?: string;
+  categories_name_str?: string;
 }
 export const getConfigTypes = async (): Promise<ConfigTypeItem[]> => {
   const response = await apiClient.get<ConfigTypeItem[]>('/admin/config-types');
@@ -148,7 +153,7 @@ export const createConfigCategory = async (data: {
   sell_type: string;
   name?: string;
   admin_cost_per_unit: number;
-  shop_price_per_unit: number;
+  shop_price_per_unit?: number;
 }): Promise<ConfigCategoryItem> => {
   const response = await apiClient.post<ConfigCategoryItem>('/admin/config-categories', data);
   return response.data;
@@ -197,14 +202,14 @@ export const adminUpdatePackage = async (id: string, data: Partial<AdminPackageI
   return response.data;
 };
 
-export const getSettlementDashboard = async (params?: { page?: number; page_size?: number; server_id?: string }): Promise<SettlementDashboardResponse> => {
+export const getSettlementDashboard = async (params?: { page?: number; page_size?: number; user_id?: string }): Promise<SettlementDashboardResponse> => {
   const response = await apiClient.get<SettlementDashboardResponse>('/admin/settlements/', { params });
   return response.data;
 };
 
-export const createSettlement = async (serverId: string, amount: number, trackingCode: string): Promise<SettlementResponse> => {
+export const createSettlement = async (userId: string, amount: number, trackingCode: string): Promise<SettlementResponse> => {
   const response = await apiClient.post('/admin/settlements/', {
-    server_id: serverId,
+    user_id: userId,
     amount,
     tracking_code: trackingCode,
   });
@@ -219,6 +224,11 @@ export interface ServerResponse {
   password?: string;
   is_active: boolean;
   type: string;
+  owner_id?: string;
+  owner?: {
+    id: string;
+    username: string;
+  } | null;
 }
 
 export interface ServerCreateInput {
@@ -260,7 +270,7 @@ export const deleteServer = async (id: string): Promise<void> => {
 
 export interface SettlementResponse {
   id: string;
-  server_id: string;
+  user_id: string;
   amount: number;
   tracking_code: string | null;
   created_at: string;
@@ -278,5 +288,41 @@ export interface SettlementDashboardResponse {
     items: SettlementResponse[];
   };
 }
+
+export interface TransactionItem {
+  id: string;
+  amount: number;
+  balance_after: number;
+  type: 'DEPOSIT' | 'PURCHASE';
+  status: 'PENDING' | 'SUCCESS' | 'FAILED';
+  gateway: 'MANUAL' | 'ZARINPAL' | 'CRYPTO';
+  description: string | null;
+  created_at: string;
+  username: string | null;
+  phone_number: string | null;
+  reference_id: string | null;
+}
+
+export interface PaginatedTransactionsResponse {
+  total_count: number;
+  total_pages: number;
+  current_page: number;
+  page_size: number;
+  items: TransactionItem[];
+}
+
+export const getTransactions = async (
+  page = 1,
+  pageSize = 10,
+  phoneNumber?: string
+): Promise<PaginatedTransactionsResponse> => {
+  const params = new URLSearchParams();
+  params.append('page', String(page));
+  params.append('page_size', String(pageSize));
+  if (phoneNumber) params.append('phone_number', phoneNumber);
+
+  const response = await apiClient.get<PaginatedTransactionsResponse>(`/admin/transactions?${params.toString()}`);
+  return response.data;
+};
 
 

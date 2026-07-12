@@ -37,7 +37,11 @@ export const en = {
             customPrices: 'Selling Price Settings',
             panelSettings: 'Panel Settings',
             manageServers: 'Manage Servers',
-            shopSettings: 'Support Settings'
+            shopSettings: 'Support Settings',
+            myShops: 'My Shops',
+            newTestConfig: 'New Test Config',
+            testConfigs: 'Test Configs',
+            transactions: 'Deposit Transactions'
         }
     },
     usersManagement: {
@@ -142,7 +146,7 @@ export const en = {
             totalCost: 'Total Cost',
             totalRevenue: 'Total Revenue',
             netProfit: 'Net Profit',
-            upstreamDebt: 'Debt to Upstream (Marzban)',
+            upstreamDebt: 'Total Debt',
             adminGrossRevenue: 'Admin Gross Revenue',
             adminNetProfit: 'Admin Net Profit'
         },
@@ -174,6 +178,8 @@ export const en = {
             notAvailable: 'Profile information is unavailable.',
             roles: {
                 admin: 'System Admin',
+                supplier: 'System Supplier',
+                visitor: 'Visitor',
                 shopkeeper: 'Shopkeeper (Reseller)'
             }
         },
@@ -246,6 +252,22 @@ export const en = {
     },
     shopsManagement: {
         currency: 'Toman',
+        tabs: {
+            suppliers: 'Suppliers',
+            visitors: 'Visitors'
+        },
+        buttons: {
+            addSupplier: 'Add New Supplier',
+            addVisitor: 'Add New Visitor'
+        },
+        roles: {
+            shop: 'Shopkeeper (SHOP)',
+            supplier: 'Supplier (SUPPLIER)',
+            visitor: 'Visitor (VISITOR)'
+        },
+        labels: {
+            userRole: 'User Role'
+        },
         messages: {
             fetchError: 'Error fetching the shop owners list',
             invalidAmount: 'Please enter a valid amount',
@@ -281,7 +303,8 @@ export const en = {
             limit: 'Limit:',
             sell: 'Sell:',
             active: 'Active',
-            discountPercent: 'Discount'
+            discountPercent: 'Discount',
+            testConfigsCount: 'Test Configs Created'
         },
         mobileCard: {
             currentBalance: 'Current Balance',
@@ -501,7 +524,14 @@ export const en = {
         "cancel": "Cancel"
     },
     settlements: {
-
+        roles: {
+            visitor: 'Visitor',
+            supplier: 'Supplier'
+        },
+        labels: {
+            userFilter: 'User:',
+            allUsers: 'All Users'
+        },
         "messages": {
             "fetchError": "Failed to fetch data.",
             "invalidAmount": "Invalid amount.",
@@ -529,7 +559,8 @@ export const en = {
             "date": "Date & Time",
             "amount": "Amount Paid",
             "trackingCode": "Tracking Code / Note",
-            "supplierName": "Supplier Name"
+            "supplierName": "Supplier Name",
+            you: 'You'
         },
         "modal": {
             "title": "Record New Settlement",
@@ -537,7 +568,9 @@ export const en = {
             "trackingCodeLabel": "Tracking Code or Note",
             "supplierLabel": "Select Supplier",
             "selectSupplierPlaceholder": "-- Select Supplier --",
-            "submitBtn": "Submit Amount"
+            "submitBtn": "Submit Amount",
+            selectUser: 'Select Supplier / Visitor *',
+            selectPlaceholder: '-- Select --'
         }
     },
     servers: {
@@ -630,6 +663,201 @@ export const en = {
         buttons: {
             saving: "Saving...",
             save: "Save Settings"
+        }
+    },
+    visitor: {
+        dashboard: {
+            title: 'Visitor Panel',
+            subtitle: 'Manage sub-shops and commission earnings',
+            searchPlaceholder: 'Search shop...',
+            addShopBtn: 'New Shopkeeper',
+            stats: {
+                totalEarnings: 'Total Earnings',
+                totalPaid: 'Total Paid',
+                remainingBalance: 'Remaining Balance',
+                totalSales: 'Total Sales',
+                testConfigsCount: 'Test Configs Created'
+            },
+            shopsList: {
+                title: 'Your Shopkeepers',
+                subtitle: 'Shops registered by you from which you earn commissions.'
+            },
+            table: {
+                userAndPhone: 'Username & Phone',
+                desc: 'Description',
+                balanceAndCredit: 'Balance & Credit Limit',
+                discountPercent: 'Discount Percent',
+                actions: 'Actions',
+                loading: 'Loading data...',
+                empty: 'No shops found.',
+                creditLimitLabel: 'Credit Limit: '
+            },
+            tooltips: {
+                edit: 'Edit Shopkeeper',
+                resetPassword: 'Reset password to 123456'
+            },
+            modals: {
+                edit: {
+                    title: 'Edit Shopkeeper',
+                    creditLimit: 'Credit Limit (Toman)',
+                    discountPercent: 'Discount Percent',
+                    isActive: 'Active Status',
+                    desc: 'Description',
+                    descPlaceholder: 'Optional description...',
+                    submit: 'Save Changes'
+                },
+                create: {
+                    title: 'Register New Shopkeeper',
+                    username: 'Username',
+                    phone: 'Mobile Number',
+                    password: 'Password',
+                    submit: 'Create Account'
+                }
+            },
+            messages: {
+                fetchError: 'Error fetching dashboard data.',
+                createSuccess: 'New shopkeeper registered successfully.',
+                createError: 'Error registering shopkeeper.',
+                updateSuccess: 'Shopkeeper details updated successfully.',
+                updateError: 'Error updating details.',
+                resetPasswordConfirm: 'Are you sure you want to reset password for {{username}} to "123456"?',
+                resetPasswordSuccess: 'Password reset to "123456".',
+                resetPasswordError: 'Error resetting password.'
+            }
+        },
+        testConfig: {
+            title: 'Create Free Test Config',
+            subtitle: 'Create temporary test configs for connection checks',
+            rules: {
+                title: 'Visitor Test Config Rules:',
+                rule1: 'Total volume limit is 1 GB.',
+                rule2: 'Active duration is maximum 10 days.',
+                rule3: 'Creating test configs is completely free of charge.',
+                rule4: 'These configs are not saved in the db but are counted on your profile.'
+            },
+            form: {
+                locationLabel: 'Select Location/Service Type',
+                loadingLocations: 'Loading locations...',
+                clientNameLabel: 'Client Custom Name (English)',
+                clientNameHelper: 'The final username will include your visitor prefix.',
+                submitting: 'Creating account on server...',
+                submitBtn: 'Create Test Config'
+            },
+            result: {
+                successTitle: 'Config created successfully on server!',
+                usernameLabel: 'Username on server:',
+                subLinkLabel: 'Subscription Link:',
+                copyBtn: 'Copy Link'
+            },
+            messages: {
+                fetchTypesError: 'Error fetching service types.',
+                selectTypeRequired: 'Please select service type.',
+                clientNameRequired: 'Please enter client name.',
+                createSuccess: 'Test config created successfully!',
+                createError: 'Error creating test config.',
+                copySuccess: 'Subscription link copied.'
+            }
+        },
+        testConfigsList: {
+            messages: {
+                updateDescSuccess: 'Description updated successfully.',
+                updateDescError: 'Failed to update description.'
+            },
+            header: {
+                title: 'Free Test Configs',
+                subtitle: 'Complete list of temporary test accounts issued by visitors and their status'
+            },
+            buttons: {
+                create: 'Create New Test Config'
+            },
+            loading: 'Loading test configs list...',
+            empty: {
+                title: 'No test configs issued yet',
+                description: 'Once test accounts are issued by visitors, their details and links will appear here.'
+            },
+            table: {
+                username: 'Username',
+                visitor: 'Visitor',
+                server: 'Server / Location',
+                volume: 'Volume (Validity)',
+                description: 'Description (Issued to)',
+                createdAt: 'Created At',
+                actions: 'Actions',
+                unknown: 'Unknown',
+                noDescription: 'No description'
+            },
+            tooltips: {
+                editDescription: 'View / Edit Description',
+                copyLink: 'Copy subscription link',
+                showQr: 'Show QR Code'
+            },
+            pagination: {
+                total: 'Total: {{count}} configs',
+                pageOf: 'Page {{current}} of {{total}}'
+            },
+            modals: {
+                qr: {
+                    title: 'Test Config QR Code',
+                    guide: 'Scan this QR code in your client app to connect.'
+                },
+                desc: {
+                    title: 'Test Config Description',
+                    label: 'Description (Issued to):',
+                    placeholder: 'Description for this test config...',
+                    cancel: 'Cancel',
+                    submit: 'Save Changes'
+                }
+            },
+            volumeFormat: {
+                zero: '0 GB',
+                gb: '{{gb}} GB'
+            }
+        }
+    },
+    transactions: {
+        messages: {
+            fetchError: 'Error loading transactions.'
+        },
+        status: {
+            success: 'Success',
+            failed: 'Failed',
+            pending: 'Pending'
+        },
+        gateway: {
+            zarinpal: 'Zarinpal',
+            crypto: 'Crypto',
+            manual: 'Manual (Admin)'
+        },
+        header: {
+            title: 'Deposit Transactions',
+            subtitle: 'View and filter all payments, manual recharges, and bank transactions',
+            searchPlaceholder: 'Filter phone number...'
+        },
+        empty: {
+            title: 'No transactions found',
+            withFilter: 'No transactions registered with this phone number.',
+            noFilter: 'No transactions have been recorded in the system yet.',
+            clearFilter: 'Clear Filter'
+        },
+        table: {
+            user: 'User',
+            phone: 'Phone Number',
+            amount: 'Amount Deposited',
+            balanceAfter: 'Balance After Transaction',
+            gateway: 'Payment Gateway',
+            reference: 'Reference ID / Authority',
+            status: 'Status',
+            description: 'Description',
+            date: 'Transaction Date',
+            unknownUser: 'Unknown',
+            noPhone: 'No phone',
+            noDescription: 'No description'
+        },
+        pagination: {
+            total: 'Total: {{count}} transactions',
+            prev: 'Previous',
+            next: 'Next',
+            pageOf: '{{current}} of {{total}}'
         }
     }
 };

@@ -37,7 +37,11 @@ export const ar = {
             customPrices: 'إعدادات سعر البيع',
             panelSettings: 'إعدادات اللوحة',
             manageServers: 'إدارة الخوادم',
-            shopSettings: 'إعدادات الدعم'
+            shopSettings: 'إعدادات الدعم',
+            myShops: 'متاجري',
+            newTestConfig: 'تكوين اختبار جديد',
+            testConfigs: 'تكوينات الاختبار',
+            transactions: 'معاملات الإيداع'
         }
     },
     usersManagement: {
@@ -142,7 +146,7 @@ export const ar = {
             totalCost: 'إجمالي التكلفة',
             totalRevenue: 'إجمالي الإيرادات',
             netProfit: 'صافي الأرباح',
-            upstreamDebt: 'الديون للمزود (مرزبان)',
+            upstreamDebt: 'إجمالي الديون',
             adminGrossRevenue: 'إجمالي إيرادات المسؤول',
             adminNetProfit: 'صافي أرباح المسؤول'
         },
@@ -174,6 +178,8 @@ export const ar = {
             notAvailable: 'معلومات الملف الشخصي غير متوفرة.',
             roles: {
                 admin: 'مدير النظام',
+                supplier: 'تامین‌کننده سیستم',
+                visitor: 'ویزیتور',
                 shopkeeper: 'صاحب المتجر (موجه مبيعات)'
             }
         },
@@ -246,6 +252,22 @@ export const ar = {
     },
     shopsManagement: {
         currency: 'تومان',
+        tabs: {
+            suppliers: 'الموردين',
+            visitors: 'الزوار'
+        },
+        buttons: {
+            addSupplier: 'إضافة مورد جديد',
+            addVisitor: 'إضافة زائر جديد'
+        },
+        roles: {
+            shop: 'صاحب المتجر (SHOP)',
+            supplier: 'مورد (SUPPLIER)',
+            visitor: 'زائر (VISITOR)'
+        },
+        labels: {
+            userRole: 'دور المستخدم'
+        },
         messages: {
             fetchError: 'خطأ في جلب قائمة أصحاب المتاجر',
             invalidAmount: 'يرجى إدخال مبلغ صحيح',
@@ -281,7 +303,8 @@ export const ar = {
             limit: 'الحد:',
             sell: 'البيع:',
             active: 'نشط',
-            discountPercent: 'الخصم'
+            discountPercent: 'الخصم',
+            testConfigsCount: 'عدد التكوينات التجريبية المنشأة'
         },
         mobileCard: {
             currentBalance: 'الرصيد الحالي',
@@ -494,7 +517,14 @@ export const ar = {
         "cancel": "إلغاء"
     },
     settlements: {
-
+        roles: {
+            visitor: 'زائر',
+            supplier: 'مورد'
+        },
+        labels: {
+            userFilter: 'المستخدم:',
+            allUsers: 'جميع المستخدمين'
+        },
         "messages": {
             "fetchError": "حدث خطأ أثناء جلب البيانات.",
             "invalidAmount": "المبلغ غير صالح.",
@@ -522,7 +552,8 @@ export const ar = {
             "date": "التاريخ والوقت",
             "amount": "المبلغ المدفوع",
             "trackingCode": "رمز التتبع / ملاحظة",
-            "supplierName": "اسم المورد"
+            "supplierName": "اسم المورد",
+            you: 'أنت'
         },
         "modal": {
             "title": "تسجيل دفعة جديدة",
@@ -530,7 +561,9 @@ export const ar = {
             "trackingCodeLabel": "رمز التتبع أو الملاحظة",
             "supplierLabel": "اختر المورد",
             "selectSupplierPlaceholder": "-- اختر المورد --",
-            "submitBtn": "تأكيد المبلغ"
+            "submitBtn": "تأكيد المبلغ",
+            selectUser: 'اختر المورد / الزائر *',
+            selectPlaceholder: '-- اختر --'
         }
     },
     servers: {
@@ -623,6 +656,201 @@ export const ar = {
         buttons: {
             saving: "جاري الحفظ...",
             save: "حفظ الإعدادات"
+        }
+    },
+    visitor: {
+        dashboard: {
+            title: 'لوحة الزائر',
+            subtitle: 'إدارة المتاجر التابعة وأرباح العمولات',
+            searchPlaceholder: 'البحث عن متجر...',
+            addShopBtn: 'صاحب متجر جديد',
+            stats: {
+                totalEarnings: 'إجمالي أرباح العمولة',
+                totalPaid: 'إجمالي التسويات',
+                remainingBalance: 'رصيدك المتبقي',
+                totalSales: 'إجمالي المبيعات',
+                testConfigsCount: 'عدد التكوينات التجريبية المنشأة'
+            },
+            shopsList: {
+                title: 'قائمة أصحاب المتاجر الخاصة بك',
+                subtitle: 'المتاجر المسجلة بواسطتك والتي تحصل منها على عمولة.'
+            },
+            table: {
+                userAndPhone: 'اسم المستخدم والهاتف',
+                desc: 'الوصف',
+                balanceAndCredit: 'الرصيد والحد الائتماني',
+                discountPercent: 'نسبة الخصم',
+                actions: 'العمليات',
+                loading: 'جاري تحميل البيانات...',
+                empty: 'لم يتم العثور على أي متجر.',
+                creditLimitLabel: 'الحد الائتماني: '
+            },
+            tooltips: {
+                edit: 'تعديل صاحب المتجر',
+                resetPassword: 'إعادة تعيين كلمة المرور إلى 123456'
+            },
+            modals: {
+                edit: {
+                    title: 'تعديل صاحب المتجر',
+                    creditLimit: 'الحد الائتماني (تومان)',
+                    discountPercent: 'نسبة خصم صاحب المتجر',
+                    isActive: 'حالة النشاط',
+                    desc: 'الوصف',
+                    descPlaceholder: 'وصف اختياري...',
+                    submit: 'حفظ التغييرات'
+                },
+                create: {
+                    title: 'تسجيل صاحب متجر جديد',
+                    username: 'اسم المستخدم',
+                    phone: 'رقم الهاتف',
+                    password: 'كلمة المرور',
+                    submit: 'إنشاء الحساب'
+                }
+            },
+            messages: {
+                fetchError: 'خطأ في جلب بيانات لوحة التحكم.',
+                createSuccess: 'تم تسجيل صاحب المتجر الجديد بنجاح.',
+                createError: 'خطأ في تسجيل صاحب المتجر الجديد.',
+                updateSuccess: 'تم تحديث بيانات صاحب المتجر بنجاح.',
+                updateError: 'خطأ في تحديث البيانات.',
+                resetPasswordConfirm: 'هل أنت متأكد من إعادة تعيين كلمة المرور للمستخدم {{username}} إلى "123456"؟',
+                resetPasswordSuccess: 'تم إعادة تعيين كلمة المرور إلى "123456".',
+                resetPasswordError: 'خطأ في إعادة تعيين كلمة المرور.'
+            }
+        },
+        testConfig: {
+            title: 'إنشاء تكوين اختبار مجاني',
+            subtitle: 'إنشاء تكوينات اختبار مؤقتة للتحقق من الاتصال والسرعة',
+            rules: {
+                title: 'قواعد تكوين اختبار الزائر:',
+                rule1: 'الحد الأقصى للحجم هو 1 جيجابايت.',
+                rule2: 'مدة الصلاحية هي 10 أيام كحد أقصى.',
+                rule3: 'إنشاء تكوينات الاختبار مجاني بالكامل ولا توجد أي رسوم.',
+                rule4: 'لا يتم حفظ هذه التكوينات في قاعدة البيانات ولكن يتم احتسابها في ملفك الشخصي.'
+            },
+            form: {
+                locationLabel: 'اختر الموقع/نوع الخدمة',
+                loadingLocations: 'جاري تحميل المواقع...',
+                clientNameLabel: 'اسم العميل (بالإنجليزية)',
+                clientNameHelper: 'سيحتوي اسم المستخدم النهائي على بادئة الزائر الخاصة بك.',
+                submitting: 'جاري إنشاء الحساب على الخادم...',
+                submitBtn: 'إنشاء تكوين اختبار'
+            },
+            result: {
+                successTitle: 'تم إنشاء التكوين بنجاح على الخادم!',
+                usernameLabel: 'اسم المستخدم على الخادم:',
+                subLinkLabel: 'رابط الاشتراك:',
+                copyBtn: 'نسخ الرابط'
+            },
+            messages: {
+                fetchTypesError: 'خطأ في جلب قائمة الخدمات.',
+                selectTypeRequired: 'يرجى اختيار نوع الخدمة.',
+                clientNameRequired: 'يرجى إدخال اسم العميل.',
+                createSuccess: 'تم إنشاء تكوين الاختبار بنجاح!',
+                createError: 'خطأ في إنشاء تكوين الاختبار.',
+                copySuccess: 'تم نسخ رابط الاشتراك.'
+            }
+        },
+        testConfigsList: {
+            messages: {
+                updateDescSuccess: 'تم تعديل الوصف بنجاح.',
+                updateDescError: 'خطأ في تعديل الوصف.'
+            },
+            header: {
+                title: 'تكوينات الاختبار المجانية',
+                subtitle: 'القائمة الكاملة لحسابات الاختبار المؤقتة الصادرة عن الزوار وحالتها'
+            },
+            buttons: {
+                create: 'إنشاء تكوين اختبار جديد'
+            },
+            loading: 'جاري تحميل قائمة تكوينات الاختبار...',
+            empty: {
+                title: 'لم يتم إصدار أي تكوينات اختبار بعد',
+                description: 'بمجرد إصدار حسابات الاختبار بواسطة الزوار، ستظهر تفاصيلها وروابطها هنا.'
+            },
+            table: {
+                username: 'اسم المستخدم',
+                visitor: 'الزائر',
+                server: 'الخادم / الموقع',
+                volume: 'الحجم (الصلاحية)',
+                description: 'الوصف (مقدم إلى)',
+                createdAt: 'تاريخ الإنشاء',
+                actions: 'العمليات',
+                unknown: 'غير معروف',
+                noDescription: 'بلا وصف'
+            },
+            tooltips: {
+                editDescription: 'عرض / تعديل الوصف',
+                copyLink: 'نسخ رابط الاشتراك',
+                showQr: 'عرض رمز الاستجابة السريعة (QR Code)'
+            },
+            pagination: {
+                total: 'الإجمالي: {{count}} تكوينات',
+                pageOf: 'صفحة {{current}} من {{total}}'
+            },
+            modals: {
+                qr: {
+                    title: 'رمز الاستجابة السريعة لتكوين الاختبار',
+                    guide: 'امسح هذا الرمز في تطبيق العميل الخاص بك للاتصال.'
+                },
+                desc: {
+                    title: 'وصف تكوين الاختبار',
+                    label: 'الوصف (مقدم إلى):',
+                    placeholder: 'وصف لتكوين الاختبار هذا...',
+                    cancel: 'إلغاء',
+                    submit: 'حفظ التغييرات'
+                }
+            },
+            volumeFormat: {
+                zero: '0 جيجابايت',
+                gb: '{{gb}} جيجابايت'
+            }
+        }
+    },
+    transactions: {
+        messages: {
+            fetchError: 'خطأ في تحميل المعاملات.'
+        },
+        status: {
+            success: 'موفق',
+            failed: 'فاشل',
+            pending: 'قيد الانتظار'
+        },
+        gateway: {
+            zarinpal: 'زرين بال',
+            crypto: 'العملات الرقمية',
+            manual: 'يدوي (المسؤول)'
+        },
+        header: {
+            title: 'معاملات الإيداع',
+            subtitle: 'عرض وتصفية جميع المدفوعات والشحن اليدوي والمعاملات المصرفية',
+            searchPlaceholder: 'تصفية رقم الهاتف...'
+        },
+        empty: {
+            title: 'لم يتم العثور على معاملات',
+            withFilter: 'لا توجد معاملات مسجلة برقم الهاتف هذا.',
+            noFilter: 'لم يتم تسجيل أي معاملات في النظام حتى الآن.',
+            clearFilter: 'مسح التصفية'
+        },
+        table: {
+            user: 'المستخدم',
+            phone: 'رقم الهاتف',
+            amount: 'المبلغ المودع',
+            balanceAfter: 'الرصيد بعد المعاملة',
+            gateway: 'بوابة الدفع',
+            reference: 'معرف المرجع / السلطة',
+            status: 'الحالة',
+            description: 'الوصف',
+            date: 'تاريخ المعاملة',
+            unknownUser: 'غير معروف',
+            noPhone: 'بلا رقم',
+            noDescription: 'بلا وصف'
+        },
+        pagination: {
+            total: 'الإجمالي: {{count}} معاملات',
+            prev: 'السابق',
+            next: 'التالي',
+            pageOf: '{{current}} من {{total}}'
         }
     }
 };

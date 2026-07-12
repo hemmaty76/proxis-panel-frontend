@@ -54,6 +54,8 @@ export interface SystemSettings {
   dashboard_message: string;
   dashboard_message_type: 'success' | 'warning' | 'error' | 'info';
   dashboard_version: string;
+  PercentAdminCost?: number;
+  PercentVisitorCost?: number;
 }
 
 export const getSettings = async (): Promise<SystemSettings> => {
