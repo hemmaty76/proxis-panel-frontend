@@ -6,29 +6,38 @@ import { apiClient } from '../../core/api/axios';
 
 
 
-// List of Configs
-export interface ConfigItem {
+// List of Purchases
+export interface PurchaseConfigItem {
   id: string;
   marzban_username: string;
   sub_link: string;
   data_limit: number;
   expire_date: string;
+  package_name?: string;
+  package_duration?: number;
+}
+
+export interface PurchaseItem {
+  id: string;
+  product_type: string;
+  admin_cost_price: number;
   shop_buy_price: number;
   shop_sell_price: number;
   created_at: string;
+  config?: PurchaseConfigItem;
 }
 
-export interface PaginatedConfigs {
+export interface PaginatedPurchases {
   total_count: number;
   total_pages: number;
   current_page: number;
   page_size: number;
-  items: ConfigItem[];
+  items: PurchaseItem[];
 }
 
 
-export const getShopConfigs = async (page: number = 1, size: number = 10): Promise<PaginatedConfigs> => {
-  const response = await apiClient.get<PaginatedConfigs>(`/shop/configs?page=${page}&size=${size}`);
+export const getShopConfigs = async (page: number = 1, size: number = 10): Promise<PaginatedPurchases> => {
+  const response = await apiClient.get<PaginatedPurchases>(`/shop/configs?page=${page}&size=${size}`);
   return response.data;
 };
 
@@ -56,6 +65,7 @@ export interface SystemSettings {
   dashboard_version: string;
   PercentAdminCost?: number;
   PercentVisitorCost?: number;
+  telegram_support_id?: string;
 }
 
 export const getSettings = async (): Promise<SystemSettings> => {
@@ -80,11 +90,15 @@ export const updateProfile = async (payload: ShopSettingsPayload): Promise<UserP
   return response.data;
 };
 
+export const sendSupportMessage = async (message: string): Promise<{ status: string; message: string }> => {
+  const response = await apiClient.post<{ status: string; message: string }>('/shop/support', { message });
+  return response.data;
+};
+
 
 
 export interface DashboardStats {
   total_sales_count: number;
-  active_services_count: number;
   total_cost: number;
   total_revenue: number;
   net_profit: number;
@@ -142,6 +156,7 @@ export interface PackageItem {
 
 export interface PurchaseResult {
   config_details: {
+    id: string;
     marzban_username: string;
     sub_link: string;
     expire_date: string;

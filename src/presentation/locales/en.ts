@@ -41,7 +41,8 @@ export const en = {
             myShops: 'My Shops',
             newTestConfig: 'New Test Config',
             testConfigs: 'Test Configs',
-            transactions: 'Deposit Transactions'
+            transactions: 'Deposit Transactions',
+            support: 'Support & Feedback'
         }
     },
     usersManagement: {
@@ -461,6 +462,8 @@ export const en = {
                 adminCost: 'Admin Cost to Upstream (per Unit - Toman)',
                 shopPrice: 'Base Shopkeeper Price (per Unit - Toman)',
                 submitCategory: 'Register Sales Category',
+                editCategoryTitle: 'Edit Sales Category',
+                saveCategory: 'Save Changes',
                 createPackageTitle: 'Create New Package',
                 selectCategory: 'Select Service Category',
                 packageName: 'Package Template Name',
@@ -468,7 +471,8 @@ export const en = {
                 durationDays: 'Duration (Days)',
                 submitPackage: 'Register Package Template',
                 editPackageTitle: 'Edit Package Template',
-                savePackage: 'Save Changes'
+                savePackage: 'Save Changes',
+                visitorTestAllow: 'Allow Visitor Test Configuration'
             },
             tables: {
                 typeName: 'Service Type Name',
@@ -480,6 +484,9 @@ export const en = {
                 categoryName: 'Display Name',
                 adminCost: 'Admin Cost',
                 shopPrice: 'Base Shop Price',
+                visitorTest: 'Visitor Test',
+                allowed: 'Allowed',
+                notAllowed: 'Not Allowed',
                 noCategories: 'No sales categories registered.',
                 noPackages: 'No package templates configured.',
                 volume: 'Volume',
@@ -672,12 +679,14 @@ export const en = {
             subtitle: 'Manage sub-shops and commission earnings',
             searchPlaceholder: 'Search shop...',
             addShopBtn: 'New Shopkeeper',
+            chargeWalletBtn: 'Charge Wallet',
             stats: {
                 totalEarnings: 'Total Earnings',
                 totalPaid: 'Total Paid',
                 remainingBalance: 'Remaining Balance',
                 totalSales: 'Total Sales',
-                testConfigsCount: 'Test Configs Created'
+                testConfigsCount: 'Test Configs Created',
+                walletBalance: 'Wallet Balance'
             },
             shopsList: {
                 title: 'Your Shopkeepers',
@@ -727,13 +736,13 @@ export const en = {
             }
         },
         testConfig: {
-            title: 'Create Free Test Config',
+            title: 'Create Test Config',
             subtitle: 'Create temporary test configs for connection checks',
             rules: {
                 title: 'Visitor Test Config Rules:',
                 rule1: 'Total volume limit is 1 GB.',
                 rule2: 'Active duration is maximum 10 days.',
-                rule3: 'Creating test configs is completely free of charge.',
+                rule3: 'The base cost of the test config (without admin or visitor markup) will be deducted from your balance.',
                 rule4: 'These configs are not saved in the db but are counted on your profile.'
             },
             form: {
@@ -860,5 +869,21 @@ export const en = {
             next: 'Next',
             pageOf: '{{current}} of {{total}}'
         }
+    },
+    support: {
+        title: 'Support & Feedback',
+        warning: 'Only message the support in case of service downtime. There is no responsibility during general/global downtimes, and services that have an expiration date will not be renewed once expired.',
+        qualityDesc: 'We always strive to deliver the highest quality and stability for your services. If you need assistance or want to send feedback/suggestions, please use the form below.',
+        placeholder: 'Write your message here...',
+        sendBtn: 'Submit Feedback / Suggestion',
+        sending: 'Sending...',
+        sendSuccess: 'Your message has been sent successfully.',
+        sendError: 'Error sending message. Please try again.',
+        telegramTitle: 'Report Service Outage on Telegram',
+        telegramBtn: 'Message on Telegram',
+        suggestionTitle: 'Submit Feedback or Suggestion',
+        suggestionDesc: 'Please use the form below to send any suggestions, feedback, or new ideas to improve the panel.',
+        support24h: '24/7 Support',
+        telegramNotConfigured: 'Telegram support is not configured.'
     }
 };

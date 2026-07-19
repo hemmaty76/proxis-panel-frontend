@@ -6,6 +6,12 @@ export const apiClient = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+export const publicApiClient = axios.create({
+  baseURL: 'https://api.agentor.ir/api/v1',
+  timeout: 10000,
+  headers: { 'Content-Type': 'application/json' },
+});
+
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');

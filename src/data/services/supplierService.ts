@@ -1,12 +1,11 @@
 import { apiClient } from '../../core/api/axios';
-import { type ConfigItem } from './shopService';
+import { type PurchaseItem } from './shopService';
 
 export interface SupplierDashboardStats {
   total_debt: number;
   total_paid: number;
   remaining_debt: number;
   total_sales_count: number;
-  active_services_count: number;
 }
 
 export interface SupplierSalesSummaryItem {
@@ -23,7 +22,7 @@ export interface SupplierConfigsResponse {
   total_pages: number;
   current_page: number;
   page_size: number;
-  items: ConfigItem[];
+  items: PurchaseItem[];
 }
 
 export const getSupplierDashboard = async (): Promise<SupplierDashboardStats> => {

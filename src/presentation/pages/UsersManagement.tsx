@@ -1,11 +1,27 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Copy, Check, ChevronRight, ChevronLeft, QrCode, X, BarChart3, RefreshCw } from 'lucide-react';
+import { Copy, Check, ChevronRight, ChevronLeft, QrCode, X, BarChart3, RefreshCw, LifeBuoy } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { getShopConfigs, getConfigUsage, type PaginatedConfigs, type ConfigUsageResponse } from '../../data/services/shopService';
+import { getShopConfigs, getConfigUsage, type PaginatedPurchases, type ConfigUsageResponse } from '../../data/services/shopService';
 import { useTranslation } from 'react-i18next';
 
 
+
+function encodeUuidToBase64(uuidStr: string): string {
+  try {
+    const hex = uuidStr.replace(/-/g, '');
+    const bytes = new Uint8Array(hex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+    let binary = '';
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    const base64 = window.btoa(binary);
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  } catch (e) {
+    return uuidStr;
+  }
+}
 
 export default function UsersManagement() {
   const { t, i18n } = useTranslation();
@@ -19,20 +35,45 @@ export default function UsersManagement() {
   };
   const formatCurrency = (value: number) => `${value.toLocaleString(getLocale())} ${t('usersManagement.currency')}`;
 
-  const formatDate = (iso: string) => {
-    if (!iso) return t('usersManagement.emptyDate');
-    return new Intl.DateTimeFormat(getLocale(), {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    }).format(new Date(iso));
+  const formatDate = (dateInput: string | number | Date | null | undefined) => {
+    if (!dateInput) return t('usersManagement.emptyDate', 'بدون تاریخ');
+    try {
+      let date: Date;
+      if (dateInput instanceof Date) {
+        date = dateInput;
+      } else if (typeof dateInput === 'number') {
+        const isSeconds = dateInput < 10000000000;
+        date = new Date(isSeconds ? dateInput * 1000 : dateInput);
+      } else {
+        const num = Number(dateInput);
+        if (!isNaN(num) && dateInput.trim() !== '') {
+          const isSeconds = num < 10000000000;
+          date = new Date(isSeconds ? num * 1000 : num);
+        } else {
+          date = new Date(dateInput);
+        }
+      }
+
+      if (isNaN(date.getTime())) {
+        return t('usersManagement.emptyDate', 'بدون تاریخ');
+      }
+
+      return new Intl.DateTimeFormat(getLocale(), {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      }).format(date);
+    } catch (e) {
+      console.error('Error formatting date:', e, dateInput);
+      return t('usersManagement.emptyDate', 'بدون تاریخ');
+    }
   };
 
   const formatDataLimit = (limit: number) => {
     if (limit === 0) return t('usersManagement.unlimited');
     return `${limit.toLocaleString(getLocale())} ${t('usersManagement.gigabyte')}`;
   };
-  const [data, setData] = useState<PaginatedConfigs | null>(null);
+  const [data, setData] = useState<PaginatedPurchases | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -60,6 +101,8 @@ export default function UsersManagement() {
     return () => { isMounted = false; };
   }, [currentPage]);
 
+  const [copiedSupportId, setCopiedSupportId] = useState<string | null>(null);
+
   const handleCopyLink = async (id: string, link: string) => {
     try {
       await navigator.clipboard.writeText(link);
@@ -70,6 +113,20 @@ export default function UsersManagement() {
       toast.error(t('usersManagement.messages.copyError'));
     }
   };
+
+  const handleCopySupportLink = async (id: string) => {
+    try {
+      const codedId = encodeUuidToBase64(id);
+      const link = `https://support.agentor.ir/${codedId}`;
+      await navigator.clipboard.writeText(link);
+      setCopiedSupportId(id);
+      toast.success('لینک صفحه پشتیبانی (کپچا) کپی شد.');
+      setTimeout(() => setCopiedSupportId(null), 2000);
+    } catch (err) {
+      toast.error('خطا در کپی لینک پشتیبانی');
+    }
+  };
+
 
   const handleShowUsage = async (username: string) => {
     setIsUsageOpen(true);
@@ -116,7 +173,6 @@ export default function UsersManagement() {
                 <th className="px-6 py-4">{t('usersManagement.table.username')}</th>
                 <th className="px-6 py-4">{t('usersManagement.table.serviceVolume')}</th>
                 <th className="px-6 py-4">{t('usersManagement.table.createdAt')}</th>
-                <th className="px-6 py-4">{t('usersManagement.table.expireDate')}</th>
                 <th className="px-6 py-4">{t('usersManagement.table.sellPrice')}</th>
                 <th className="px-6 py-4 text-center">{t('usersManagement.table.actions')}</th>
               </tr>
@@ -133,41 +189,75 @@ export default function UsersManagement() {
                   <td colSpan={6} className="px-6 py-12 text-center text-slate-500">{t('usersManagement.table.noConfigs')}</td>
                 </tr>
               ) : (
-                data?.items.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-6 py-4 font-bold text-slate-800 dir-ltr text-right">{item.marzban_username}</td>
-                    <td className="px-6 py-4 font-medium text-slate-600">{formatDataLimit(item.data_limit)}</td>
-                    <td className="px-6 py-4 text-slate-500">{formatDate(item.created_at)}</td>
-                    <td className="px-6 py-4 text-slate-500">{formatDate(item.expire_date)}</td>
-                    <td className="px-6 py-4 font-semibold text-slate-700 tabular-nums">{formatCurrency(item.shop_sell_price)}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex justify-center items-center gap-2">
-                        <button
-                          onClick={() => handleShowUsage(item.marzban_username)}
-                          className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-600 transition-all duration-200"
-                          title="مشاهده مصرف و جزئیات"
-                        >
-                          <BarChart3 size={18} strokeWidth={2.5} />
-                        </button>
-                        <button
-                          onClick={() => setQrModal({ isOpen: true, link: item.sub_link, username: item.marzban_username })}
-                          className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 transition-all duration-200"
-                          title={t('usersManagement.tooltips.showQr')}
-                        >
-                          <QrCode size={18} strokeWidth={2.5} />
-                        </button>
-                        <button
-                          onClick={() => handleCopyLink(item.id, item.sub_link)}
-                          className={`p-2 rounded-lg transition-all duration-200 ${copiedId === item.id ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-600 hover:bg-blue-100 hover:text-blue-600'
-                            }`}
-                          title={t('usersManagement.tooltips.copyLink')}
-                        >
-                          {copiedId === item.id ? <Check size={18} strokeWidth={2.5} /> : <Copy size={18} strokeWidth={2.5} />}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                data?.items.map((item) => {
+                  const isConfig = item.product_type === 'CONFIG';
+                  const displayName = (isConfig && item.config?.marzban_username) || 'محصول دیگر';
+                  const configId = item.config?.id || '';
+                  const subLink = item.config?.sub_link || '';
+                  const dataLimit = item.config?.data_limit || 0;
+                  const packageName = item.config?.package_name;
+                  const packageDuration = item.config?.package_duration;
+
+                  return (
+                    <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-6 py-4 font-bold text-slate-800 dir-ltr text-right">{displayName}</td>
+                      <td className="px-6 py-4 font-medium text-slate-600">
+                        {isConfig ? (
+                          <>
+                            <div>{formatDataLimit(dataLimit)}</div>
+                            {packageName && (
+                              <div className="text-xs text-slate-400 mt-0.5 font-normal">
+                                {packageName} {packageDuration ? `(${packageDuration.toLocaleString(getLocale())} روز)` : ''}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="text-slate-400 text-xs">جزییات خرید در دسترس نیست</div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-slate-500">{formatDate(item.created_at)}</td>
+                      <td className="px-6 py-4 font-semibold text-slate-700 tabular-nums">{formatCurrency(item.shop_sell_price)}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex justify-center items-center gap-2">
+                          {isConfig && (
+                            <>
+                              <button
+                                onClick={() => handleShowUsage(displayName)}
+                                className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-600 transition-all duration-200"
+                                title="مشاهده مصرف و جزئیات"
+                              >
+                                <BarChart3 size={18} strokeWidth={2.5} />
+                              </button>
+                              <button
+                                onClick={() => setQrModal({ isOpen: true, link: subLink, username: displayName })}
+                                className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 transition-all duration-200"
+                                title={t('usersManagement.tooltips.showQr')}
+                              >
+                                <QrCode size={18} strokeWidth={2.5} />
+                              </button>
+                              <button
+                                onClick={() => handleCopyLink(configId, subLink)}
+                                className={`p-2 rounded-lg transition-all duration-200 ${copiedId === configId ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-600 hover:bg-blue-100 hover:text-blue-600'
+                                  }`}
+                                title={t('usersManagement.tooltips.copyLink')}
+                              >
+                                {copiedId === configId ? <Check size={18} strokeWidth={2.5} /> : <Copy size={18} strokeWidth={2.5} />}
+                              </button>
+                              <button
+                                onClick={() => handleCopySupportLink(configId)}
+                                className={`p-2 rounded-lg transition-all duration-200 ${copiedSupportId === configId ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-600 hover:bg-purple-100 hover:text-purple-600'
+                                  }`}
+                                title="کپی لینک پشتیبانی (کپچا)"
+                              >
+                                {copiedSupportId === configId ? <Check size={18} strokeWidth={2.5} /> : <LifeBuoy size={18} strokeWidth={2.5} />}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -182,45 +272,82 @@ export default function UsersManagement() {
           ) : data?.items.length === 0 ? (
             <div className="p-8 text-center text-slate-500">{t('usersManagement.table.noConfigs')}</div>
           ) : (
-            data?.items.map((item) => (
-              <div key={item.id} className="p-5 flex flex-col gap-4 bg-white hover:bg-slate-50/50 transition-colors">
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-slate-800 text-lg dir-ltr text-left">{item.marzban_username}</span>
+            data?.items.map((item) => {
+              const isConfig = item.product_type === 'CONFIG';
+              const displayName = (isConfig && item.config?.marzban_username) || 'محصول دیگر';
+              const configId = item.config?.id || '';
+              const subLink = item.config?.sub_link || '';
+              const dataLimit = item.config?.data_limit || 0;
+              const packageName = item.config?.package_name;
+              const packageDuration = item.config?.package_duration;
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleShowUsage(item.marzban_username)}
-                      className="p-2.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
-                      title="مشاهده مصرف"
-                    >
-                      <BarChart3 size={18} strokeWidth={2.5} />
-                    </button>
-                    <button
-                      onClick={() => setQrModal({ isOpen: true, link: item.sub_link, username: item.marzban_username })}
-                      className="p-2.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all"
-                      title={t('usersManagement.tooltips.showQr')}
-                    >
-                      <QrCode size={18} strokeWidth={2.5} />
-                    </button>
-                    <button
-                      onClick={() => handleCopyLink(item.id, item.sub_link)}
-                      className={`p-2.5 rounded-xl transition-all duration-200 ${copiedId === item.id ? 'bg-emerald-100 text-emerald-600' : 'bg-blue-50 text-blue-600 shadow-sm'
-                        }`}
-                      title={t('usersManagement.tooltips.copyLink')}
-                    >
-                      {copiedId === item.id ? <Check size={18} strokeWidth={2.5} /> : <Copy size={18} strokeWidth={2.5} />}
-                    </button>
+              return (
+                <div key={item.id} className="p-5 flex flex-col gap-4 bg-white hover:bg-slate-50/50 transition-colors">
+                  <div className="flex justify-between items-center gap-4 min-w-0">
+                    <span className="font-bold text-slate-800 text-lg dir-ltr text-left truncate flex-1 min-w-0" title={displayName}>
+                      {displayName}
+                    </span>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {isConfig && (
+                        <>
+                          <button
+                            onClick={() => handleShowUsage(displayName)}
+                            className="p-2.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                            title="مشاهده مصرف"
+                          >
+                            <BarChart3 size={18} strokeWidth={2.5} />
+                          </button>
+                          <button
+                            onClick={() => setQrModal({ isOpen: true, link: subLink, username: displayName })}
+                            className="p-2.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all"
+                            title={t('usersManagement.tooltips.showQr')}
+                          >
+                            <QrCode size={18} strokeWidth={2.5} />
+                          </button>
+                          <button
+                            onClick={() => handleCopyLink(configId, subLink)}
+                            className={`p-2.5 rounded-xl transition-all duration-200 ${copiedId === configId ? 'bg-emerald-100 text-emerald-600' : 'bg-blue-50 text-blue-600 shadow-sm'
+                              }`}
+                            title={t('usersManagement.tooltips.copyLink')}
+                          >
+                            {copiedId === configId ? <Check size={18} strokeWidth={2.5} /> : <Copy size={18} strokeWidth={2.5} />}
+                          </button>
+                          <button
+                            onClick={() => handleCopySupportLink(configId)}
+                            className={`p-2.5 rounded-xl transition-all duration-200 ${copiedSupportId === configId ? 'bg-emerald-100 text-emerald-600' : 'bg-purple-50 text-purple-600 shadow-sm'
+                              }`}
+                            title="کپی لینک پشتیبانی (کپچا)"
+                          >
+                            {copiedSupportId === configId ? <Check size={18} strokeWidth={2.5} /> : <LifeBuoy size={18} strokeWidth={2.5} />}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-y-3 gap-x-4 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                    <div>
+                      <span className="text-slate-400 text-[11px] font-semibold block mb-0.5">{t('usersManagement.table.volumeShort')}</span>
+                      {isConfig ? (
+                        <>
+                          <span className="font-medium text-slate-700 text-sm block">{formatDataLimit(dataLimit)}</span>
+                          {packageName && (
+                            <span className="text-[11px] text-slate-400 block mt-0.5 font-normal">
+                              {packageName} {packageDuration ? `(${packageDuration.toLocaleString(getLocale())} روز)` : ''}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-slate-400 text-xs">جزییات خرید در دسترس نیست</span>
+                      )}
+                    </div>
+                    <div><span className="text-slate-400 text-[11px] font-semibold block mb-0.5">{t('usersManagement.table.sellPrice')}</span><span className="font-bold text-slate-800 text-sm tabular-nums">{formatCurrency(item.shop_sell_price)}</span></div>
+                    <div><span className="text-slate-400 text-[11px] font-semibold block mb-0.5">{t('usersManagement.table.createdShort')}</span><span className="font-medium text-slate-600 text-sm">{formatDate(item.created_at)}</span></div>
                   </div>
                 </div>
-
-                <div className="grid grid-cols-2 gap-y-3 gap-x-4 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
-                  <div><span className="text-slate-400 text-[11px] font-semibold block mb-0.5">{t('usersManagement.table.volumeShort')}</span><span className="font-medium text-slate-700 text-sm">{formatDataLimit(item.data_limit)}</span></div>
-                  <div><span className="text-slate-400 text-[11px] font-semibold block mb-0.5">{t('usersManagement.table.sellPrice')}</span><span className="font-bold text-slate-800 text-sm tabular-nums">{formatCurrency(item.shop_sell_price)}</span></div>
-                  <div><span className="text-slate-400 text-[11px] font-semibold block mb-0.5">{t('usersManagement.table.createdShort')}</span><span className="font-medium text-slate-600 text-sm">{formatDate(item.created_at)}</span></div>
-                  <div><span className="text-slate-400 text-[11px] font-semibold block mb-0.5">{t('usersManagement.table.expireShort')}</span><span className="font-medium text-slate-600 text-sm">{formatDate(item.expire_date)}</span></div>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 
@@ -418,7 +545,7 @@ export default function UsersManagement() {
                           {t('usageModal.details.expire', 'تاریخ انقضا')}
                         </span>
                         <span className="text-sm font-bold text-slate-700">
-                          {selectedUsage.expire ? formatDate(new Date(selectedUsage.expire * 1000).toISOString()) : t('usageModal.traffic.unlimited', 'نامحدود')}
+                          {selectedUsage.expire ? formatDate(selectedUsage.expire) : t('usageModal.traffic.unlimited', 'نامحدود')}
                         </span>
                       </div>
                     )}

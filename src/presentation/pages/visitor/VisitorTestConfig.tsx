@@ -83,7 +83,7 @@ export default function VisitorTestConfig() {
       <div>
         <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
           <FilePlus className="text-indigo-600" size={28} />
-          {t('visitor.testConfig.title', 'ایجاد کانفیگ تست رایگان')}
+          {t('visitor.testConfig.title', 'ایجاد کانفیگ تست')}
         </h1>
         <p className="text-sm text-slate-500 font-medium mt-1">{t('visitor.testConfig.subtitle', 'ساخت اکانت‌های تست موقت برای بررسی سرعت و اتصال')}</p>
       </div>
@@ -95,7 +95,7 @@ export default function VisitorTestConfig() {
           <ul className="list-disc list-inside space-y-1">
             <li>{t('visitor.testConfig.rules.rule1', 'حجم کل این اکانت‌ها برابر ۱ گیگابایت است.')}</li>
             <li>{t('visitor.testConfig.rules.rule2', 'مدت زمان فعال بودن اکانت‌ها حداکثر ۱۰ روز می‌باشد.')}</li>
-            <li>{t('visitor.testConfig.rules.rule3', 'ساخت کانفیگ تست کاملاً رایگان است و هیچ هزینه‌ای برای مغازه‌دار یا شما ندارد.')}</li>
+            <li>{t('visitor.testConfig.rules.rule3', 'هزینه اولیه ساخت کانفیگ تست بدون درصد ادمین و ویزیتور از موجودی شما کسر خواهد شد و برای مغازه‌دار رایگان است.')}</li>
             <li>{t('visitor.testConfig.rules.rule4', 'این اکانت‌ها در لیست اصلی فاکتورها ثبت نمی‌شوند اما تعداد آن‌ها در اطلاعات شما شمارش می‌شود.')}</li>
           </ul>
         </div>

@@ -1,5 +1,5 @@
 import { apiClient } from '../../core/api/axios';
-import { type ConfigItem } from './shopService';
+import { type PurchaseItem } from './shopService';
 import { type AdminUserItem } from './adminService';
 
 export interface VisitorDashboardStats {
@@ -7,8 +7,8 @@ export interface VisitorDashboardStats {
   total_paid: number;
   remaining_balance: number;
   total_sales_count: number;
-  active_services_count: number;
   test_configs_count: number;
+  balance?: number;
 }
 
 export interface VisitorConfigsResponse {
@@ -16,7 +16,7 @@ export interface VisitorConfigsResponse {
   total_pages: number;
   current_page: number;
   page_size: number;
-  items: ConfigItem[];
+  items: PurchaseItem[];
 }
 
 export interface TestConfigCreateInput {

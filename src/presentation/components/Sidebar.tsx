@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, BanknoteCheck, Store, Settings, FilePlus, Package, Server, FileSpreadsheet, Receipt } from 'lucide-react';
+import { LayoutDashboard, Users, BanknoteCheck, Store, Settings, FilePlus, Package, Server, FileSpreadsheet, Receipt, Headphones } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
@@ -12,7 +13,11 @@ export default function Sidebar({ isOpen, onClose, appVersion }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const userRole = localStorage.getItem('user_role');
+  const [userRole, setUserRole] = useState<string | null>(() => localStorage.getItem('user_role'));
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem('user_role'));
+  }, [location.pathname]);
 
   const menuItems = [
     { text: t('sidebar.menu.dashboard'), path: '/dashboard', icon: <LayoutDashboard size={20} strokeWidth={2.5} /> },
@@ -31,15 +36,15 @@ export default function Sidebar({ isOpen, onClose, appVersion }: SidebarProps) {
     ] : userRole === 'SUPPLIER' ? [
       { text: t('sidebar.menu.manageServices'), path: '/admin/services', icon: <Package size={20} strokeWidth={2.5} /> },
       { text: t('sidebar.menu.manageServers', 'مدیریت سرورها'), path: '/admin/servers', icon: <Server size={20} strokeWidth={2.5} /> },
-      { text: t('settlements.header.title'), path: '/admin/settlements', icon: <BanknoteCheck size={20} strokeWidth={2.5} /> },
-      { text: t('sidebar.menu.testConfigs', 'کانفیگ‌های تست'), path: '/visitor/test-configs', icon: <FileSpreadsheet size={20} strokeWidth={2.5} /> }
+      { text: t('settlements.header.title'), path: '/admin/settlements', icon: <BanknoteCheck size={20} strokeWidth={2.5} /> }
     ] : userRole === 'VISITOR' ? [
       { text: t('sidebar.menu.myShops', 'مغازه‌های من'), path: '/visitor/shops', icon: <Store size={20} strokeWidth={2.5} /> },
       { text: t('sidebar.menu.newTestConfig', 'کانفیگ تست جدید'), path: '/visitor/test-config', icon: <FilePlus size={20} strokeWidth={2.5} /> },
       { text: t('settlements.header.title'), path: '/admin/settlements', icon: <BanknoteCheck size={20} strokeWidth={2.5} /> },
       { text: t('sidebar.menu.testConfigs', 'کانفیگ‌های تست'), path: '/visitor/test-configs', icon: <FileSpreadsheet size={20} strokeWidth={2.5} /> }
     ] : [
-      { text: t('sidebar.menu.shopSettings', 'تنظیمات پشتیبانی'), path: '/settings/shop', icon: <Settings size={20} strokeWidth={2.5} /> }
+      { text: t('sidebar.menu.shopSettings', 'تنظیمات پشتیبانی'), path: '/settings/shop', icon: <Settings size={20} strokeWidth={2.5} /> },
+      { text: t('sidebar.menu.support', 'پشتیبانی'), path: '/support', icon: <Headphones size={20} strokeWidth={2.5} /> }
     ]),
   ];
 

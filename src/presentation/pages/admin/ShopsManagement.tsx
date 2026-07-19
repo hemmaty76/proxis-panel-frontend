@@ -478,13 +478,9 @@ export default function ShopsManagement() {
                 <div className="flex justify-center py-8"><Loader2 className="animate-spin text-indigo-600" size={32} /></div>
               ) : statsModal.stats ? (
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <p className="text-xs text-slate-500 font-bold mb-1">{t('shopsManagement.modals.stats.salesCount')}</p>
-                    <p className="text-xl font-black text-slate-800 tabular-nums">{statsModal.stats.total_sales_count}</p>
-                  </div>
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <p className="text-xs text-slate-500 font-bold mb-1">{t('shopsManagement.modals.stats.activeServices')}</p>
-                    <p className="text-xl font-black text-emerald-600 tabular-nums">{statsModal.stats.active_services_count}</p>
+                  <div className="col-span-2 bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <span className="text-sm text-slate-600 font-bold">{t('shopsManagement.modals.stats.salesCount')}</span>
+                    <span className="text-lg font-black text-slate-800 tabular-nums">{statsModal.stats.total_sales_count}</span>
                   </div>
                   <div className="col-span-2 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 flex justify-between items-center">
                     <span className="text-sm text-indigo-800 font-bold">{t('shopsManagement.modals.stats.netProfit')}</span>

@@ -45,12 +45,16 @@ export default function ServicesManagement() {
   const [catTypeId, setCatTypeId] = useState('');
   const [catSellType, setCatSellType] = useState('VOLUME_TIME');
   const [catAdminCost, setCatAdminCost] = useState('');
+  const [catAllowTest, setCatAllowTest] = useState(false);
   const [percentAdminCost, setPercentAdminCost] = useState<number>(0);
   const [percentVisitorCost, setPercentVisitorCost] = useState<number>(0);
 
   // Category edit modal states
   const [editingCat, setEditingCat] = useState<ConfigCategoryItem | null>(null);
   const [editCatAdminCost, setEditCatAdminCost] = useState('');
+  const [editCatTypeId, setEditCatTypeId] = useState('');
+  const [editCatSellType, setEditCatSellType] = useState('VOLUME_TIME');
+  const [editCatAllowTest, setEditCatAllowTest] = useState(false);
 
   // 3. Package inputs
   const [pkgCatId, setPkgCatId] = useState('');
@@ -163,10 +167,12 @@ export default function ServicesManagement() {
       await createConfigCategory({
         config_type_id: catTypeId,
         sell_type: catSellType,
-        admin_cost_per_unit: Number(catAdminCost.replace(/\D/g, ''))
+        admin_cost_per_unit: Number(catAdminCost.replace(/\D/g, '')),
+        allow_test: catAllowTest
       });
       toast.success(t('servicesManagement.messages.createCategorySuccess', 'دسته کانفیگ جدید با موفقیت ایجاد شد.'));
       setCatAdminCost('');
+      setCatAllowTest(false);
       fetchData();
     } catch (err: any) {
       toast.error(err.response?.data?.detail || t('servicesManagement.messages.createCategoryError', 'خطا در ثبت دسته کانفیگ.'));
@@ -189,15 +195,21 @@ export default function ServicesManagement() {
   const startEditingCategory = (c: ConfigCategoryItem) => {
     setEditingCat(c);
     setEditCatAdminCost(c.admin_cost_per_unit.toString());
+    setEditCatTypeId(c.config_type_id);
+    setEditCatSellType(c.sell_type);
+    setEditCatAllowTest(c.allow_test || false);
   };
 
   const handleUpdateCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingCat || !editCatAdminCost) return;
+    if (!editingCat || !editCatAdminCost || !editCatTypeId || !editCatSellType) return;
     setIsSubmitting(true);
     try {
       await updateConfigCategory(editingCat.id, {
-        admin_cost_per_unit: Number(editCatAdminCost.replace(/\D/g, ''))
+        admin_cost_per_unit: Number(editCatAdminCost.replace(/\D/g, '')),
+        config_type_id: editCatTypeId,
+        sell_type: editCatSellType,
+        allow_test: editCatAllowTest
       });
       toast.success(t('servicesManagement.messages.updateCategorySuccess', 'دسته کانفیگ با موفقیت ویرایش شد.'));
       setEditingCat(null);
@@ -414,6 +426,18 @@ export default function ServicesManagement() {
                     placeholder="محاسبه خودکار..."
                   />
                 </div>
+                <div className="flex items-center gap-2 py-1 select-none">
+                  <input
+                    type="checkbox"
+                    id="catAllowTest"
+                    checked={catAllowTest}
+                    onChange={e => setCatAllowTest(e.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                  />
+                  <label htmlFor="catAllowTest" className="text-xs font-bold text-slate-700 cursor-pointer">
+                    {t('servicesManagement.labels.forms.visitorTestAllow', 'امکان ایجاد کانفیگ تستی توسط ویزیتور')}
+                  </label>
+                </div>
                 <button type="submit" disabled={isSubmitting || types.length === 0} className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 flex justify-center shadow-sm transition-all disabled:opacity-50">{isSubmitting ? <Loader2 className="animate-spin" size={18} /> : t('servicesManagement.labels.forms.submitCategory', 'ثبت دسته فروش')}</button>
               </form>
             )}
@@ -526,12 +550,13 @@ export default function ServicesManagement() {
                       )}
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.adminCost', 'هزینه ادمین')}</th>
                       <th className="px-6 py-3">{t('servicesManagement.labels.tables.shopPrice', 'قیمت پایه مغازه')}</th>
+                      <th className="px-6 py-3 text-center">{t('servicesManagement.labels.tables.visitorTest', 'تست ویزیتور')}</th>
                       <th className="px-6 py-3 text-center w-28">{t('servicesManagement.labels.tables.actions', 'عملیات')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-medium">
                     {categories.length === 0 ? (
-                      <tr><td colSpan={userRole === 'ADMIN' ? 5 : 4} className="px-6 py-8 text-center text-slate-400">{t('servicesManagement.labels.tables.noCategories', 'هیچ دسته‌بندی فروشی ثبت نشده است.')}</td></tr>
+                      <tr><td colSpan={userRole === 'ADMIN' ? 6 : 5} className="px-6 py-8 text-center text-slate-400">{t('servicesManagement.labels.tables.noCategories', 'هیچ دسته‌بندی فروشی ثبت نشده است.')}</td></tr>
                     ) : (
                       categories.map(c => {
                         const typeItem = types.find(tItem => tItem.id === c.config_type_id);
@@ -546,6 +571,17 @@ export default function ServicesManagement() {
                             )}
                             <td className="px-6 py-4 text-slate-700 font-bold tabular-nums">{c.admin_cost_per_unit.toLocaleString()} {t('usersManagement.currency', 'تومان')}</td>
                             <td className="px-6 py-4 text-indigo-600 font-bold tabular-nums">{c.shop_price_per_unit.toLocaleString()} {t('usersManagement.currency', 'تومان')}</td>
+                            <td className="px-6 py-4 text-center">
+                              {c.allow_test ? (
+                                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
+                                  {t('servicesManagement.labels.tables.allowed', 'مجاز')}
+                                </span>
+                              ) : (
+                                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-50 text-slate-400 border border-slate-200">
+                                  {t('servicesManagement.labels.tables.notAllowed', 'غیرمجاز')}
+                                </span>
+                              )}
+                            </td>
                             <td className="px-6 py-4 text-center">
                               <div className="flex items-center justify-center gap-1">
                                 <button onClick={() => startEditingCategory(c)} className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-bold text-xs">ویرایش</button>
@@ -727,8 +763,26 @@ export default function ServicesManagement() {
 
             <form onSubmit={handleUpdateCategorySubmit} className="p-5 space-y-4 overflow-y-auto flex-1">
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">{t('servicesManagement.labels.forms.categoryName', 'نام دسته‌بندی')}</label>
-                <input type="text" disabled value={editingCat.name} className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-slate-500 cursor-not-allowed" />
+                <label className="block text-xs font-bold text-slate-600 mb-1">{t('servicesManagement.labels.forms.selectType', 'انتخاب نوع سرویس')}</label>
+                <select required value={editCatTypeId} onChange={e => setEditCatTypeId(e.target.value)} className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium">
+                  {types.map(typeItem => {
+                    const associatedServer = serversList.find(s => s.id === typeItem.server_id);
+                    return (
+                      <option key={typeItem.id} value={typeItem.id}>
+                        {typeItem.name} (سرور: {associatedServer ? associatedServer.name : t('common.unknown', 'نامشخص')})
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-600 mb-1">{t('servicesManagement.labels.forms.sellType', 'مدل فروش و حسابداری')}</label>
+                <select required value={editCatSellType} onChange={e => setEditCatSellType(e.target.value)} className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium">
+                  <option value="VOLUME_TIME">{t('servicesManagement.labels.sellTypes.volumeTime', 'حجمی و زمانی محدود')}</option>
+                  <option value="UNLIMITED_VOLUME">{t('servicesManagement.labels.sellTypes.unlimitedVolume', 'حجم نامحدود با زمان محدود')}</option>
+                  <option value="UNLIMITED_TIME">{t('servicesManagement.labels.sellTypes.unlimitedTime', 'زمان نامحدود با حجم محدود')}</option>
+                </select>
               </div>
 
               <div>
@@ -752,6 +806,19 @@ export default function ServicesManagement() {
                   value={editCatAdminCost ? Math.round(Number(editCatAdminCost) * (1 + (percentAdminCost + percentVisitorCost) / 100)).toLocaleString('en-US') : ''}
                   className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl outline-none text-left font-bold text-sm text-slate-500 cursor-not-allowed"
                 />
+              </div>
+
+              <div className="flex items-center gap-2 py-1 select-none">
+                <input
+                  type="checkbox"
+                  id="editCatAllowTest"
+                  checked={editCatAllowTest}
+                  onChange={e => setEditCatAllowTest(e.target.checked)}
+                  className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                />
+                <label htmlFor="editCatAllowTest" className="text-xs font-bold text-slate-700 cursor-pointer">
+                  {t('servicesManagement.labels.forms.visitorTestAllow', 'امکان ایجاد کانفیگ تستی توسط ویزیتور')}
+                </label>
               </div>
 
               <button type="submit" disabled={isSubmitting} className="w-full py-3 mt-2 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 flex justify-center shadow-sm transition-all">{isSubmitting ? <Loader2 className="animate-spin" size={20} /> : t('servicesManagement.labels.forms.saveCategory', 'ذخیره تغییرات')}</button>

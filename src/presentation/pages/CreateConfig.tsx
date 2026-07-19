@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Wallet, Package as PackageIcon, Check, Copy, QrCode, X, Clock, HardDrive, Loader2, Info } from 'lucide-react';
+import { Wallet, Package as PackageIcon, Check, Copy, QrCode, X, Clock, HardDrive, Loader2, Info, LifeBuoy } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -14,6 +14,22 @@ import {
 } from '../../data/services/shopService';
 
 
+
+function encodeUuidToBase64(uuidStr: string): string {
+  try {
+    const hex = uuidStr.replace(/-/g, '');
+    const bytes = new Uint8Array(hex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+    let binary = '';
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    const base64 = window.btoa(binary);
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  } catch (e) {
+    return uuidStr;
+  }
+}
 
 export default function CreateConfig() {
   const { t, i18n } = useTranslation();
@@ -116,6 +132,8 @@ export default function CreateConfig() {
     }
   };
 
+  const [copiedSupportUsername, setCopiedSupportUsername] = useState<string | null>(null);
+
   const handleCopyLink = async (username: string, link: string) => {
     try {
       await navigator.clipboard.writeText(link);
@@ -126,6 +144,20 @@ export default function CreateConfig() {
       toast.error(t('createConfig.messages.copyError'));
     }
   };
+
+  const handleCopySupportLink = async (id: string, username: string) => {
+    try {
+      const codedId = encodeUuidToBase64(id);
+      const link = `https://support.agentor.ir/${codedId}`;
+      await navigator.clipboard.writeText(link);
+      setCopiedSupportUsername(username);
+      toast.success('لینک صفحه پشتیبانی (کپچا) کپی شد.');
+      setTimeout(() => setCopiedSupportUsername(null), 2000);
+    } catch (err) {
+      toast.error('خطا در کپی لینک پشتیبانی');
+    }
+  };
+
 
   return (
     <div className="space-y-6 md:space-y-8 relative">
@@ -273,6 +305,13 @@ export default function CreateConfig() {
                     </button>
                     <button onClick={() => handleCopyLink(config.marzban_username, config.sub_link)} className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 flex items-center gap-2 ${copiedUsername === config.marzban_username ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' : 'bg-slate-800 text-white hover:bg-slate-700'}`}>
                       {copiedUsername === config.marzban_username ? <><Check size={16} strokeWidth={2.5} /> {t('createConfig.recentPurchases.copied')}</> : <><Copy size={16} strokeWidth={2.5} /> {t('createConfig.recentPurchases.copyLink')}</>}
+                    </button>
+                    <button
+                      onClick={() => handleCopySupportLink(config.id, config.marzban_username)}
+                      className={`p-2.5 rounded-xl transition-all duration-200 ${copiedSupportUsername === config.marzban_username ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-600 hover:bg-purple-100 hover:text-purple-600'}`}
+                      title="کپی لینک پشتیبانی (کپچا)"
+                    >
+                      {copiedSupportUsername === config.marzban_username ? <Check size={18} strokeWidth={2.5} /> : <LifeBuoy size={18} strokeWidth={2.5} />}
                     </button>
                   </div>
                 </div>

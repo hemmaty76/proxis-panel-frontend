@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Users, Search, Plus, Wallet, KeyRound, Edit3, X, Loader2, Landmark, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { Users, Search, Plus, Wallet, KeyRound, Edit3, X, Loader2, Landmark, HelpCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import {
   getVisitorDashboard, getVisitorShops, createShopUnderVisitor,
   type VisitorDashboardStats
 } from '../../../data/services/visitorService';
 import { resetShopPassword, updateShop, type AdminUserItem } from '../../../data/services/adminService';
+import { requestZarinpalCharge } from '../../../data/services/shopService';
 
 export default function VisitorDashboard() {
   const { t, i18n } = useTranslation();
@@ -40,9 +42,42 @@ export default function VisitorDashboard() {
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 10;
 
-  // Form states
   const [createCreditLimit, setCreateCreditLimit] = useState('0');
   const [createDiscountPercent, setCreateDiscountPercent] = useState('0');
+
+  // Charge wallet states
+  const [isChargeModalOpen, setIsChargeModalOpen] = useState(false);
+  const [chargeAmount, setChargeAmount] = useState('');
+  const [isCharging, setIsCharging] = useState(false);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const paymentStatus = searchParams.get('payment');
+  const [isResultModalOpen, setIsResultModalOpen] = useState(!!paymentStatus);
+
+  const handleChargeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const numericAmount = Number(chargeAmount.replace(/\D/g, ''));
+
+    if (!numericAmount || numericAmount < 10000) {
+      toast.error(t('dashboardHome.messages.minCharge', 'حداقل مبلغ شارژ ۱۰,۰۰۰ تومان است.'));
+      return;
+    }
+
+    setIsCharging(true);
+    try {
+      const data = await requestZarinpalCharge(numericAmount);
+      window.location.href = data.payment_url;
+    } catch {
+      toast.error(t('dashboardHome.messages.chargeError', 'خطا در اتصال به درگاه پرداخت.'));
+      setIsCharging(false);
+    }
+  };
+
+  const handleCloseResultModal = () => {
+    setIsResultModalOpen(false);
+    searchParams.delete('payment');
+    setSearchParams(searchParams, { replace: true });
+  };
 
   const fetchStats = async () => {
     try {
@@ -181,45 +216,72 @@ export default function VisitorDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-500">{t('visitor.dashboard.stats.totalEarnings', 'کل درآمد پورسانت')}</span>
-            <span className="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><Landmark size={20} /></span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[140px]">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-500">{t('visitor.dashboard.stats.walletBalance', 'موجودی کیف پول')}</span>
+              <span className="p-2 bg-emerald-50 text-emerald-600 rounded-xl"><Wallet size={20} /></span>
+            </div>
+            <p className="text-xl font-black text-slate-800 mt-4 tabular-nums">{formatCurrency(stats?.balance || 0)}</p>
           </div>
-          <p className="text-xl font-black text-slate-800 mt-4 tabular-nums">{formatCurrency(stats?.total_earnings || 0)}</p>
+          <button
+            onClick={() => setIsChargeModalOpen(true)}
+            className="mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white py-1.5 px-3 rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center justify-center gap-1"
+          >
+            <Plus size={14} />
+            {t('visitor.dashboard.chargeWalletBtn', 'شارژ حساب')}
+          </button>
         </div>
 
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-500">{t('visitor.dashboard.stats.totalPaid', 'مجموع تسویه‌ها')}</span>
-            <span className="p-2 bg-emerald-50 text-emerald-600 rounded-xl"><CheckCircle2 size={20} /></span>
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[140px]">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-500">{t('visitor.dashboard.stats.totalEarnings', 'کل درآمد پورسانت')}</span>
+              <span className="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><Landmark size={20} /></span>
+            </div>
+            <p className="text-xl font-black text-slate-800 mt-4 tabular-nums">{formatCurrency(stats?.total_earnings || 0)}</p>
           </div>
-          <p className="text-xl font-black text-slate-800 mt-4 tabular-nums">{formatCurrency(stats?.total_paid || 0)}</p>
         </div>
 
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-500">{t('visitor.dashboard.stats.remainingBalance', 'طلب باقیمانده شما')}</span>
-            <span className="p-2 bg-amber-50 text-amber-600 rounded-xl"><Wallet size={20} /></span>
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[140px]">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-500">{t('visitor.dashboard.stats.totalPaid', 'مجموع تسویه‌ها')}</span>
+              <span className="p-2 bg-emerald-50 text-emerald-600 rounded-xl"><CheckCircle2 size={20} /></span>
+            </div>
+            <p className="text-xl font-black text-slate-800 mt-4 tabular-nums">{formatCurrency(stats?.total_paid || 0)}</p>
           </div>
-          <p className="text-xl font-black text-slate-800 mt-4 tabular-nums">{formatCurrency(stats?.remaining_balance || 0)}</p>
         </div>
 
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-500">{t('visitor.dashboard.stats.totalSales', 'تعداد کل فروش')}</span>
-            <span className="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><Users size={20} /></span>
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[140px]">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-500">{t('visitor.dashboard.stats.remainingBalance', 'طلب باقیمانده شما')}</span>
+              <span className="p-2 bg-amber-50 text-amber-600 rounded-xl"><Wallet size={20} /></span>
+            </div>
+            <p className="text-xl font-black text-slate-800 mt-4 tabular-nums">{formatCurrency(stats?.remaining_balance || 0)}</p>
           </div>
-          <p className="text-xl font-black text-slate-800 mt-4 tabular-nums">{stats?.total_sales_count || 0}</p>
         </div>
 
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-500">{t('visitor.dashboard.stats.testConfigsCount', 'کانفیگ تست ساخته‌شده')}</span>
-            <span className="p-2 bg-slate-50 text-slate-600 rounded-xl"><HelpCircle size={20} /></span>
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[140px]">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-500">{t('visitor.dashboard.stats.totalSales', 'تعداد کل فروش')}</span>
+              <span className="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><Users size={20} /></span>
+            </div>
+            <p className="text-xl font-black text-slate-800 mt-4 tabular-nums">{stats?.total_sales_count || 0}</p>
           </div>
-          <p className="text-xl font-black text-slate-800 mt-4 tabular-nums">{stats?.test_configs_count || 0}</p>
+        </div>
+
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[140px]">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-500">{t('visitor.dashboard.stats.testConfigsCount', 'کانفیگ تست ساخته‌شده')}</span>
+              <span className="p-2 bg-slate-50 text-slate-600 rounded-xl"><HelpCircle size={20} /></span>
+            </div>
+            <p className="text-xl font-black text-slate-800 mt-4 tabular-nums">{stats?.test_configs_count || 0}</p>
+          </div>
         </div>
       </div>
 
@@ -452,6 +514,123 @@ export default function VisitorDashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Charge Wallet Modal */}
+      {isChargeModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50/50">
+              <h3 className="font-bold text-slate-800">
+                {t('dashboardHome.chargeModal.title', 'افزایش موجودی حساب')}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsChargeModalOpen(false)}
+                className="text-slate-400 hover:text-red-500 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleChargeSubmit} className="p-6 space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                  {t('dashboardHome.chargeModal.amountLabel', 'مبلغ شارژ (تومان)')}
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  required
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none dir-ltr font-bold text-slate-800"
+                  value={chargeAmount}
+                  onChange={(e) => {
+                    const rawValue = e.target.value.replace(/\D/g, '');
+                    setChargeAmount(rawValue ? Number(rawValue).toLocaleString('en-US') : '');
+                  }}
+                  placeholder="مثال: 50,000"
+                />
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl text-xs font-medium leading-relaxed space-y-2">
+                <p>
+                  {t('dashboardHome.chargeModal.notice', 'پس از پرداخت موفق، مبلغ بلافاصله به موجودی حساب شما افزوده خواهد شد.')}
+                </p>
+                <p className="font-bold text-amber-900 border-t border-amber-200/60 pt-2 flex items-start gap-1">
+                  <span>⚠️</span>
+                  <span>{t('dashboardHome.chargeModal.vpnWarning', 'توجه: لطفاً قبل از ورود به درگاه پرداخت، فیلترشکن (VPN) خود را خاموش کنید تا در فرآیند پرداخت خطایی رخ ندهد.')}</span>
+                </p>
+              </div>
+
+              <div className="pt-2 flex gap-3">
+                <button
+                  type="submit"
+                  disabled={isCharging || !chargeAmount}
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold disabled:opacity-50 transition-all flex justify-center items-center gap-2 shadow-sm"
+                >
+                  {isCharging ? <Loader2 className="animate-spin" size={20} /> : null}
+                  {t('dashboardHome.chargeModal.submitBtn', 'پرداخت با زرین‌پال')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsChargeModalOpen(false)}
+                  disabled={isCharging}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-bold transition-colors"
+                >
+                  {t('common.cancel', 'انصراف')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Zarinpal Payment Result Modal */}
+      {isResultModalOpen && paymentStatus && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200 p-6 text-center space-y-4">
+            {paymentStatus === 'success' ? (
+              <>
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-8 ring-emerald-100/50">
+                  <CheckCircle2 size={36} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-extrabold text-slate-800">
+                    {t('dashboardHome.paymentResult.successTitle', 'افزایش موجودی موفقیت‌آمیز بود')}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                    {t('dashboardHome.paymentResult.successDesc', 'تراکنش شما با موفقیت تایید شد. مبلغ پرداختی بلافاصله به موجودی حساب شما اضافه گردید.')}
+                  </p>
+                </div>
+                <button
+                  onClick={handleCloseResultModal}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold shadow-sm transition-all"
+                >
+                  {t('dashboardHome.paymentResult.closeBtn', 'متوجه شدم')}
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-600 ring-8 ring-red-100/50">
+                  <XCircle size={36} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-extrabold text-slate-800">
+                    {t('dashboardHome.paymentResult.failedTitle', 'پرداخت ناموفق یا انصراف')}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                    {t('dashboardHome.paymentResult.failedDesc', 'عملیات پرداخت با خطا مواجه شد و یا توسط شما لغو گردید.')}
+                  </p>
+                </div>
+                <button
+                  onClick={handleCloseResultModal}
+                  className="w-full bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-xl font-bold shadow-sm transition-all"
+                >
+                  {t('dashboardHome.paymentResult.closeBtn', 'متوجه شدم')}
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

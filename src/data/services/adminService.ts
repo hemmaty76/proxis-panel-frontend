@@ -27,7 +27,6 @@ export interface AdminUsersResponse {
 
 export interface AdminUserStats {
   total_sales_count: number;
-  active_services_count: number;
   total_cost: number;
   total_revenue: number;
   net_profit: number;
@@ -142,6 +141,7 @@ export interface ConfigCategoryItem {
   name?: string;
   admin_cost_per_unit: number;
   shop_price_per_unit: number;
+  allow_test: boolean;
   config_type?: ConfigTypeItem;
 }
 export const getConfigCategories = async (): Promise<ConfigCategoryItem[]> => {
@@ -154,6 +154,7 @@ export const createConfigCategory = async (data: {
   name?: string;
   admin_cost_per_unit: number;
   shop_price_per_unit?: number;
+  allow_test?: boolean;
 }): Promise<ConfigCategoryItem> => {
   const response = await apiClient.post<ConfigCategoryItem>('/admin/config-categories', data);
   return response.data;
@@ -162,6 +163,9 @@ export const updateConfigCategory = async (id: string, data: {
   name?: string;
   admin_cost_per_unit?: number;
   shop_price_per_unit?: number;
+  config_type_id?: string;
+  sell_type?: string;
+  allow_test?: boolean;
 }): Promise<ConfigCategoryItem> => {
   const response = await apiClient.patch<ConfigCategoryItem>(`/admin/config-categories/${id}`, data);
   return response.data;

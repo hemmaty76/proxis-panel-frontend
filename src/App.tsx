@@ -10,6 +10,7 @@ import ShopsManagement from './presentation/pages/admin/ShopsManagement';
 import ServicesManagement from './presentation/pages/admin/ServicesManagement';
 import AdminSettlements from './presentation/pages/admin/AdminSettlements';
 import ShopSettings from './presentation/pages/ShopSettings';
+import SupportPage from './presentation/pages/SupportPage';
 import type { JSX } from 'react/jsx-runtime';
 import SystemSettingsPage from './presentation/pages/admin/SystemSetting';
 import ServersManagement from './presentation/pages/admin/ServersManagement';
@@ -17,6 +18,7 @@ import VisitorDashboard from './presentation/pages/visitor/VisitorDashboard';
 import VisitorTestConfig from './presentation/pages/visitor/VisitorTestConfig';
 import TestConfigsList from './presentation/pages/admin/TestConfigsList';
 import TransactionsList from './presentation/pages/admin/TransactionsList';
+import PublicConfig from './presentation/pages/PublicConfig';
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const isAuthenticated = !!localStorage.getItem('access_token');
@@ -68,6 +70,15 @@ const AdminOrSupplierOrVisitorRoute = ({ children }: { children: JSX.Element }) 
   return children;
 };
 
+const AdminOrVisitorRoute = ({ children }: { children: JSX.Element }) => {
+  const isAuthenticated = !!localStorage.getItem('access_token');
+  const role = localStorage.getItem('user_role');
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (role !== 'ADMIN' && role !== 'VISITOR') return <Navigate to="/dashboard" replace />;
+
+  return children;
+};
+
 const ShopOrAdminRoute = ({ children }: { children: JSX.Element }) => {
   const isAuthenticated = !!localStorage.getItem('access_token');
   const role = localStorage.getItem('user_role');
@@ -97,6 +108,7 @@ const ForcePasswordRoute = ({ children }: { children: JSX.Element }) => {
 
 function App() {
   const isAuthenticated = !!localStorage.getItem('access_token');
+  const isSupportDomain = window.location.hostname.includes('support');
 
   return (
     <BrowserRouter>
@@ -104,7 +116,16 @@ function App() {
         <Toaster position="top-center" toastOptions={{ style: { fontFamily: 'inherit' } }} />
 
         <Routes>
-          <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
+          <Route
+            path="/"
+            element={
+              isSupportDomain ? (
+                <PublicConfig />
+              ) : (
+                <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />
+              )
+            }
+          />
 
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 
@@ -198,6 +219,16 @@ function App() {
             }
           />
           <Route
+            path="/support"
+            element={
+              <PrivateRoute>
+                <DashboardLayout>
+                  <SupportPage />
+                </DashboardLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/admin/settlements"
             element={
               <AdminOrSupplierOrVisitorRoute>
@@ -240,12 +271,16 @@ function App() {
           <Route
             path="/visitor/test-configs"
             element={
-              <AdminOrSupplierOrVisitorRoute>
+              <AdminOrVisitorRoute>
                 <DashboardLayout>
                   <TestConfigsList />
                 </DashboardLayout>
-              </AdminOrSupplierOrVisitorRoute>
+              </AdminOrVisitorRoute>
             }
+          />
+          <Route
+            path="/:code"
+            element={<PublicConfig />}
           />
         </Routes>
       </div>

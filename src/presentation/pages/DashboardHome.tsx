@@ -294,16 +294,6 @@ export default function DashboardHome() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </svg>
         ),
-      },
-      {
-        title: 'کانفیگ‌های فعال',
-        value: formatNumber(supplierStats.active_services_count),
-        accent: 'green',
-        icon: (
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        ),
       }
     );
   } else if (stats) {
@@ -315,16 +305,6 @@ export default function DashboardHome() {
         icon: (
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-          </svg>
-        ),
-      },
-      {
-        title: t('dashboardHome.stats.activeServices', 'سرویس‌های فعال'),
-        value: formatNumber(stats.active_services_count),
-        accent: 'default',
-        icon: (
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
         ),
       },
@@ -459,8 +439,8 @@ export default function DashboardHome() {
                   </div>
                 </div>
 
-                {profile.role === 'SHOP' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                {(profile.role === 'SHOP' || profile.role === 'VISITOR') && (
+                  <div className={`grid grid-cols-1 ${profile.role === 'SHOP' ? 'sm:grid-cols-2' : ''} gap-4 pt-2`}>
                     <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4 min-h-[88px] flex flex-col justify-between transition-colors duration-200 hover:bg-slate-50">
                       <div className="flex justify-between items-start">
                         <p className="text-xs font-semibold text-slate-500 mb-1">{t('dashboardHome.profile.balance', 'موجودی')}</p>
@@ -476,12 +456,14 @@ export default function DashboardHome() {
                         {formatCurrency(profile.balance)}
                       </p>
                     </div>
-                    <div className="rounded-xl border border-indigo-100 bg-indigo-50/40 p-4 min-h-[88px] flex flex-col justify-center transition-colors duration-200 hover:bg-indigo-50/60">
-                      <p className="text-xs font-semibold text-indigo-600/80 mb-1">{t('dashboardHome.profile.creditLimit', 'سقف اعتبار')}</p>
-                      <p className="text-xl font-extrabold text-indigo-700 tabular-nums">
-                        {formatCurrency(profile.credit_limit)}
-                      </p>
-                    </div>
+                    {profile.role === 'SHOP' && (
+                      <div className="rounded-xl border border-indigo-100 bg-indigo-50/40 p-4 min-h-[88px] flex flex-col justify-center transition-colors duration-200 hover:bg-indigo-50/60">
+                        <p className="text-xs font-semibold text-indigo-600/80 mb-1">{t('dashboardHome.profile.creditLimit', 'سقف اعتبار')}</p>
+                        <p className="text-xl font-extrabold text-indigo-700 tabular-nums">
+                          {formatCurrency(profile.credit_limit)}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
 
