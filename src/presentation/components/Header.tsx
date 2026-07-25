@@ -2,26 +2,28 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
-    localStorage.removeItem('user_role'); 
+    localStorage.removeItem('user_role');
     toast.success(t('forceChangePassword.messages.logoutSuccess'));
     setTimeout(() => {
       window.location.href = '/login';
     }, 500);
   };
 
+  /*
   const changeLanguage = (lang: string) => {
     i18n.changeLanguage(lang);
   };
+  */
 
   return (
     <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-4 md:px-8 shadow-sm shrink-0">
-      
+
       <div className="flex items-center gap-3">
-        <button 
+        <button
           onClick={onMenuClick}
           className="md:hidden p-2 -me-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
         >
@@ -37,32 +39,35 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
       </div>
 
       <div className="flex items-center gap-4">
-        
+
+        {/* تغییر زبان فعلاً غیرفعال شده و روی فارسی محدود است */}
+        {/* 
         <div className="flex bg-slate-100 p-1 rounded-lg">
-          <button 
+          <button
             onClick={() => changeLanguage('fa')}
             className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${i18n.language === 'fa' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
             FA
           </button>
-          <button 
+          <button
             onClick={() => changeLanguage('en')}
             className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${i18n.language === 'en' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
             EN
           </button>
-          <button 
+          <button
             onClick={() => changeLanguage('ar')}
             className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${i18n.language === 'ar' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
             AR
           </button>
         </div>
+        */}
 
         <div className="hidden sm:block text-start">
           <p className="text-sm font-semibold text-slate-700">{t('header.welcome')}</p>
         </div>
-        
+
         <button
           onClick={handleLogout}
           className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"

@@ -31,9 +31,13 @@ export const fa = {
         menu: {
             dashboard: 'داشبورد و آمار',
             createConfig: 'ساخت کانفیگ',
+            configsStore: 'فروشگاه کانفیگ',
+            accountsStore: 'فروشگاه اکانت',
             manageUsers: 'مدیریت کاربران',
             manageShop: 'مدیریت مغازه',
             manageServices: 'مدیریت خدمات و پکیج‌ها',
+            manageAccountTemplates: 'مدیریت محصولات اکانت',
+            supplierAccounts: 'ثبت و مدیریت اکانت‌ها',
             customPrices: 'تنظیمات قیمت فروش',
             panelSettings: 'تنظیمات پنل',
             manageServers: 'مدیریت سرورها',
@@ -910,5 +914,114 @@ export const fa = {
         suggestionDesc: 'برای ارسال هرگونه پیشنهاد، انتقاد یا ایده جدید جهت بهبود پنل، از فرم زیر استفاده کنید.',
         support24h: 'پشتیبانی ۲۴ ساعته',
         telegramNotConfigured: 'پشتیبان تلگرام پیکربندی نشده است.'
+    },
+    shopAccounts: {
+        currency: 'تومان',
+        header: {
+            title: 'فروشگاه اکانت',
+            subtitle: 'خرید و مدیریت اکانت‌های ثبت‌شده ({{name}})',
+            balance: 'موجودی کیف پول شما'
+        },
+        tabs: {
+            store: 'خرید اکانت',
+            purchased: 'اکانت‌های خریداری شده'
+        },
+        store: {
+            emptyTitle: 'هیچ محصولی تعریف نشده است',
+            emptyDesc: 'مدیر سیستم هنوز محصولی برای فروش ثبت نکرده است.',
+            uniqueBadge: 'محصول یکتا (منحصربفرد)',
+            bulkBadge: 'محصول عمومی (موجودی انبوه)',
+            outOfStock: 'اتمام موجودی',
+            activeStock: 'موجودی فعال: {{count}}',
+            noDescription: 'فاقد توضیحات تکمیلی',
+            buyPriceLabel: 'قیمت خرید همکار:',
+            variablePrice: 'متغیر (بر اساس امکانات)',
+            disabledPrice: 'غیرفعال',
+            checkUniqueAccounts: 'بررسی اکانت‌های موجود',
+            selectSupplier: 'انتخاب تامین‌کننده و خرید',
+            unavailable: 'ناموجود'
+        },
+        purchased: {
+            searchPlaceholder: 'جستجو با شماره تماس مشتری...',
+            emptyTitle: 'خرید سفارشی یافت نشد',
+            emptyDesc: 'هنوز هیچ اکانتی از این بخش خریداری نکرده‌اید.',
+            table: {
+                productName: 'نام محصول',
+                customerPhone: 'شماره تماس مشتری',
+                paidAmount: 'مبلغ پرداختی',
+                purchaseDate: 'تاریخ خرید',
+                actions: 'عملیات'
+            },
+            viewCredentials: 'مشاهده مشخصات اکانت',
+            supportLink: 'لینک پشتیبانی',
+            copied: 'کپی شد',
+            copySupportTooltip: 'کپی لینک پشتیبانی مشتری',
+            notRegistered: 'ثبت نشده',
+            pagination: 'صفحه {{current}} از {{total}}'
+        },
+        uniqueDrawer: {
+            titleBadge: 'اکانت‌های اختصاصی',
+            empty: 'در حال حاضر هیچ اکانتی برای این محصول موجود نیست.',
+            simpleSpecs: 'مشخصات عمومی ساده',
+            finalPrice: 'قیمت نهایی:',
+            buyButton: 'سفارش و پرداخت اکانت'
+        },
+        bulkDrawer: {
+            titleBadge: 'فهرست تامین‌کنندگان',
+            empty: 'هیچ پیشنهادی برای این محصول در حال حاضر موجود نیست.',
+            supplierName: 'نام تامین‌کننده:',
+            accountStock: 'موجودی اکانت:',
+            itemsUnit: 'عدد',
+            finalPrice: 'قیمت نهایی خرید:',
+            selectButton: 'انتخاب این تامین‌کننده'
+        },
+        confirmModal: {
+            title: 'تأییدیه و ثبت نهایی سفارش',
+            description: 'مبلغ این سفارش پس از تأیید از موجودی کیف پول کسر شده و اطلاعات ورود اکانت صادر می‌شود.',
+            phoneLabel: 'شماره موبایل مشتری',
+            phonePlaceholder: 'مثال: 09123456789',
+            phoneNote: 'توجه: پیامک اطلاعات خرید و لینک پشتیبانی مشتری با درگاه کاوه نگار به این شماره ارسال خواهد شد.',
+            sellPriceLabel: 'قیمت فروش به مشتری (تومان)',
+            systemSuggestedPrice: 'قیمت پیشنهادی سیستم: {{price}} (سود پیش‌فرض: {{percent}}٪)',
+            productName: 'نام محصول:',
+            deductionAmount: 'مبلغ کسر شونده از کیف پول:',
+            balanceAfter: 'موجودی پس از خرید:',
+            profitGuide: 'این اکانت با قیمت {{sellPrice}} به مشتری فروخته خواهد شد و سود شما از این تراکنش {{profit}} خواهد بود.',
+            submitButton: 'پرداخت و دریافت اکانت',
+            cancelButton: 'انصراف'
+        },
+        successModal: {
+            title: 'خرید با موفقیت انجام شد!',
+            description: 'مشخصات ورود به اکانت در جدول زیر آماده استفاده است.',
+            productName: 'نام محصول:',
+            customerPhone: 'شماره تماس مشتری:',
+            smsSentNotice: '📢 پیامک حاوی لینک پشتیبانی مشتری با موفقیت به شماره {{phone}} ارسال گردید.',
+            paidAmount: 'مبلغ پرداختی:',
+            sensitiveHeader: 'مشخصات حساس اکانت خریداری شده:',
+            closeButton: 'متوجه شدم / بستن',
+            copySupportLink: 'کپی لینک پشتیبانی مشتری'
+        },
+        viewModal: {
+            title: 'مشخصات اکانت خریداری شده',
+            paidAmount: 'مبلغ پرداختی:',
+            purchaseDate: 'تاریخ خرید:',
+            customerPhone: 'شماره تماس مشتری:',
+            publicFields: 'مشخصات عمومی:',
+            sensitiveInfo: 'اطلاعات حساس ورود:',
+            closeButton: 'بستن',
+            copySupportLink: 'کپی لینک پشتیبانی مشتری'
+        },
+        messages: {
+            fetchError: 'خطا در دریافت اطلاعات محصولات و پروفایل',
+            fetchPurchasedError: 'خطا در دریافت اطلاعات اکانت‌های خریداری شده',
+            fetchUniqueError: 'خطا در دریافت اکانت‌های موجود',
+            fetchOffersError: 'خطا در دریافت لیست پیشنهادهای فروشندگان',
+            phoneRequired: 'وارد کردن شماره تماس مشتری الزامی است.',
+            purchaseSuccess: 'خرید با موفقیت انجام شد!',
+            purchaseFailed: 'تراکنش با خطا مواجه شد. موجودی خود را بررسی کنید.',
+            copied: 'کپی شد!',
+            supportLinkCopied: 'لینک پشتیبانی مشتری کپی شد.',
+            supportLinkCopyError: 'خطا در کپی لینک پشتیبانی'
+        }
     }
 }

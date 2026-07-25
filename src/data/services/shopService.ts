@@ -36,10 +36,12 @@ export interface PaginatedPurchases {
 }
 
 
-export const getShopConfigs = async (page: number = 1, size: number = 10): Promise<PaginatedPurchases> => {
-  const response = await apiClient.get<PaginatedPurchases>(`/shop/configs?page=${page}&size=${size}`);
+export const getShopConfigs = async (page: number = 1, size: number = 10, search?: string): Promise<PaginatedPurchases> => {
+  const url = search ? `/shop/configs?page=${page}&size=${size}&search=${encodeURIComponent(search)}` : `/shop/configs?page=${page}&size=${size}`;
+  const response = await apiClient.get<PaginatedPurchases>(url);
   return response.data;
 };
+
 
 
 // UserProfile
@@ -204,3 +206,138 @@ export const requestZarinpalCharge = async (amount: number): Promise<{ payment_u
   const response = await apiClient.post('/payments/zarinpal/request', { amount });
   return response.data;
 };
+
+export const verifyPendingPayments = async (): Promise<{ verified_count: number }> => {
+  const response = await apiClient.post<{ verified_count: number }>('/payments/verify-pending');
+  return response.data;
+};
+
+// Renewable Config APIs
+export interface RenewInfoResponse {
+  username: string;
+  marzban_username?: string;
+  is_package_active?: boolean;
+  current_package?: any;
+  current_package_name?: string;
+  data_limit_gb?: number;
+  duration_days?: number;
+  live_info?: any;
+  server_accessible?: boolean;
+  available_packages: PackageItem[];
+}
+
+export const getConfigRenewInfo = async (username: string): Promise<RenewInfoResponse> => {
+  const response = await apiClient.get<RenewInfoResponse>(`/shop/configs/${username}/renew-info`);
+  return response.data;
+};
+
+export const renewConfig = async (username: string, packageId: string, customSellPrice?: number | null): Promise<PurchaseResult> => {
+  const response = await apiClient.post<PurchaseResult>(`/shop/configs/${username}/renew`, {
+    package_id: packageId,
+    custom_sell_price: customSellPrice
+  });
+  return response.data;
+};
+
+
+// Shop Accounts APIs
+export interface ShopAccountProduct {
+  id: string;
+  name: string;
+  description?: string;
+  price?: number;
+  is_unique: boolean;
+  is_active?: boolean;
+  image_url?: string;
+  frontend_key?: string;
+  created_at: string;
+  stock: number;
+}
+
+export interface BulkProductOffer {
+  id: string;
+  product_id: string;
+  price: number;
+  title?: string;
+  warranty_days?: number;
+  description?: string;
+  supplier_username?: string;
+  supplier_name?: string;
+}
+
+
+export interface ShopAccountPurchaseResult {
+  purchase_id: string;
+  public_url: string;
+  unique_code: string;
+  public_fields: Record<string, any>;
+  private_fields: Record<string, any>;
+}
+
+export const getShopAccountProducts = async (): Promise<ShopAccountProduct[]> => {
+  const response = await apiClient.get('/shop/accounts/products');
+  return response.data;
+};
+
+export const getShopAccountProductOffers = async (productId: string): Promise<BulkProductOffer[]> => {
+  const response = await apiClient.get(`/shop/accounts/products/${productId}/offers`);
+  return response.data;
+};
+
+export const buyShopAccount = async (payload: {
+  product_id: string;
+  offer_id?: string;
+  account_id?: string;
+  customer_phone: string;
+  custom_sell_price?: number;
+}): Promise<ShopAccountPurchaseResult> => {
+  const response = await apiClient.post('/shop/accounts/buy', payload);
+  return response.data;
+};
+
+export interface PaginatedShopPurchases {
+  items: any[];
+  total_count: number;
+  total_pages: number;
+  current_page: number;
+  page_size: number;
+}
+
+export const getShopAccountPurchases = async (
+  page: number = 1,
+  pageSize: number = 10,
+  customerPhone?: string
+): Promise<PaginatedShopPurchases> => {
+  let url = `/shop/accounts/purchases?page=${page}&page_size=${pageSize}`;
+  if (customerPhone && customerPhone.trim()) {
+    url += `&customer_phone=${encodeURIComponent(customerPhone.trim())}`;
+  }
+  const response = await apiClient.get(url);
+  if (Array.isArray(response.data)) {
+    return {
+      items: response.data,
+      total_count: response.data.length,
+      total_pages: 1,
+      current_page: 1,
+      page_size: pageSize
+    };
+  }
+  return {
+    items: response.data?.items || [],
+    total_count: response.data?.total_count || 0,
+    total_pages: response.data?.total_pages || 1,
+    current_page: response.data?.current_page || page,
+    page_size: response.data?.page_size || pageSize
+  };
+};
+
+
+
+export const reportShopAccount = async (payload: {
+  purchase_id: string;
+  reason: string;
+}): Promise<{ status: string; report_id: string }> => {
+  const response = await apiClient.post('/shop/accounts/report', payload);
+  return response.data;
+};
+

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Wallet, Package as PackageIcon, Check, Copy, QrCode, X, Clock, HardDrive, Loader2, Info, LifeBuoy } from 'lucide-react';
+import { Wallet, Package as PackageIcon, Check, Copy, QrCode, X, Clock, HardDrive, Loader2, Info, LifeBuoy, Store, ShoppingBag } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
+import UsersManagement from './UsersManagement';
 import {
   getShopPackages,
   purchasePackage,
@@ -31,8 +33,28 @@ function encodeUuidToBase64(uuidStr: string): string {
   }
 }
 
-export default function CreateConfig() {
+interface CreateConfigProps {
+  defaultTab?: 'store' | 'purchased';
+}
+
+export default function CreateConfig({ defaultTab = 'store' }: CreateConfigProps) {
   const { t, i18n } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState<'store' | 'purchased'>(
+    (tabParam as 'store' | 'purchased') || defaultTab
+  );
+
+  useEffect(() => {
+    if (tabParam === 'store' || tabParam === 'purchased') {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (tab: 'store' | 'purchased') => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
 
   const getLocale = () => {
     switch (i18n.language) {
@@ -69,6 +91,7 @@ export default function CreateConfig() {
   const [recentPurchases, setRecentPurchases] = useState<PurchaseResult['config_details'][]>([]);
   const [copiedUsername, setCopiedUsername] = useState<string | null>(null);
   const [qrModal, setQrModal] = useState<{ isOpen: boolean; link: string; username: string } | null>(null);
+  const [successModal, setSuccessModal] = useState<PurchaseResult['config_details'] | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -124,6 +147,7 @@ export default function CreateConfig() {
 
       setRecentPurchases(prev => [result.config_details, ...prev]);
       setSelectedPackage(null);
+      setSuccessModal(result.config_details);
     } catch (error: any) {
       const errorMsg = error.response?.data?.detail || t('createConfig.messages.purchaseErrorFallback');
       toast.error(errorMsg);
@@ -164,10 +188,10 @@ export default function CreateConfig() {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
-            {t('createConfig.header.title')}
+            فروشگاه کانفیگ
           </h1>
           <p className="text-sm text-slate-500 font-medium">
-            {t('createConfig.header.subtitle')}
+            خرید پکیج و مدیریت کانفیگ‌های فعال
           </p>
         </div>
 
@@ -184,7 +208,31 @@ export default function CreateConfig() {
         </div>
       </header>
 
-      <section>
+      {/* Tabs Menu */}
+      <div className="flex bg-slate-100 p-1.5 rounded-xl max-w-md mx-auto">
+        <button
+          onClick={() => handleTabChange('store')}
+          className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
+            activeTab === 'store' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Store size={18} />
+          <span>خرید کانفیگ</span>
+        </button>
+        <button
+          onClick={() => handleTabChange('purchased')}
+          className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
+            activeTab === 'purchased' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <ShoppingBag size={18} />
+          <span>کانفیگ‌های خریداری شده</span>
+        </button>
+      </div>
+
+      {activeTab === 'store' ? (
+        <>
+          <section>
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, idx) => (
@@ -199,10 +247,10 @@ export default function CreateConfig() {
         ) : (
           <div className="space-y-6">
             {/* تب فیلتر دسته‌بندی‌ها */}
-            <div className="flex gap-2 border-b border-slate-200 pb-3 overflow-x-auto shrink-0">
+            <div className="flex flex-nowrap items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto shrink-0 no-scrollbar max-w-full">
               <button
                 onClick={() => setActiveFilter('ALL')}
-                className={`px-4.5 py-2 text-xs font-bold rounded-xl border transition-all ${
+                className={`px-4.5 py-2 text-xs font-bold rounded-xl border transition-all whitespace-nowrap shrink-0 ${
                   activeFilter === 'ALL'
                     ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-600/10'
                     : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -217,7 +265,7 @@ export default function CreateConfig() {
                   <button
                     key={cat.id}
                     onClick={() => setActiveFilter(cat.id)}
-                    className={`px-4.5 py-2 text-xs font-bold rounded-xl border transition-all ${
+                    className={`px-4.5 py-2 text-xs font-bold rounded-xl border transition-all whitespace-nowrap shrink-0 ${
                       activeFilter === cat.id
                         ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-600/10'
                         : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -320,6 +368,10 @@ export default function CreateConfig() {
           </div>
         </section>
       )}
+        </>
+      ) : (
+        <UsersManagement hideHeader={true} />
+      )}
 
       {selectedPackage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
@@ -406,6 +458,80 @@ export default function CreateConfig() {
                 disabled={isPurchasing || (balance !== null && (balance + creditLimit) < getCostPrice(selectedPackage))}
                 className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                 {isPurchasing ? <Loader2 size={18} className="animate-spin" /> : t('createConfig.modal.payAndReceive')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {successModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6 text-center space-y-4">
+              <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                <Check size={28} strokeWidth={2.5} />
+              </div>
+
+              <div>
+                <h3 className="text-xl font-black text-slate-800">کانفیگ با موفقیت ساخته شد</h3>
+                <p className="text-xs font-mono font-semibold text-slate-500 mt-1 dir-ltr">
+                  {successModal.marzban_username}
+                </p>
+              </div>
+
+              {/* QR Code Canvas */}
+              <div className="flex justify-center my-2">
+                <div className="p-3 bg-white border-2 border-slate-100 rounded-2xl shadow-sm inline-block">
+                  <QRCodeCanvas value={successModal.sub_link} size={170} level="M" includeMargin={false} className="rounded-lg" />
+                </div>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-3 flex justify-between items-center text-xs font-semibold">
+                <span className="text-slate-500">مبلغ کسر شده:</span>
+                <span className="text-slate-800 font-bold tabular-nums">{formatCurrency(successModal.price_paid)}</span>
+              </div>
+
+              {/* Action buttons below QR code */}
+              <div className="space-y-2 pt-1">
+                <button
+                  onClick={() => handleCopyLink(successModal.marzban_username, successModal.sub_link)}
+                  className={`w-full py-3 px-4 rounded-xl font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2 ${
+                    copiedUsername === successModal.marzban_username
+                      ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20'
+                      : 'bg-slate-900 text-white hover:bg-slate-800'
+                  }`}
+                >
+                  {copiedUsername === successModal.marzban_username ? (
+                    <><Check size={16} strokeWidth={2.5} /> لینک کپی شد</>
+                  ) : (
+                    <><Copy size={16} strokeWidth={2.5} /> کپی لینک</>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => handleCopySupportLink(successModal.id, successModal.marzban_username)}
+                  className={`w-full py-3 px-4 rounded-xl font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2 ${
+                    copiedSupportUsername === successModal.marzban_username
+                      ? 'bg-purple-100 text-purple-700 border border-purple-200'
+                      : 'bg-indigo-50 text-indigo-650 hover:bg-indigo-100 hover:text-indigo-700'
+                  }`}
+                >
+                  {copiedSupportUsername === successModal.marzban_username ? (
+                    <><Check size={16} strokeWidth={2.5} /> لینک پشتیبان کپی شد</>
+                  ) : (
+                    <><LifeBuoy size={16} strokeWidth={2.5} /> کپی لینک پشتیبان</>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+              <button
+                onClick={() => setSuccessModal(null)}
+                className="w-full py-3 px-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all"
+              >
+                بستن و متوجه شدم
               </button>
             </div>
           </div>

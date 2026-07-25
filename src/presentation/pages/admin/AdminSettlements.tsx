@@ -10,14 +10,17 @@ import {
   CheckCircle2,
   AlertCircle,
   X,
-  History
+  History,
+  Users
 } from 'lucide-react';
 import {
   type SettlementDashboardResponse,
   type AdminUserItem,
+  type UserDebtItem,
   getSettlementDashboard,
   createSettlement,
-  getAllShops
+  getAllShops,
+  getAdminUserDebts
 } from '../../../data/services/adminService';
 
 interface StatCardProps {
@@ -74,8 +77,11 @@ export default function AdminSettlements() {
 
   const userRole = localStorage.getItem('user_role');
 
+  const [activeTab, setActiveTab] = useState<'settlements' | 'debts'>('settlements');
   const [data, setData] = useState<SettlementDashboardResponse | null>(null);
+  const [userDebts, setUserDebts] = useState<UserDebtItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDebtsLoading, setIsDebtsLoading] = useState(false);
   const [suppliers, setSuppliers] = useState<AdminUserItem[]>([]);
   
   // Pagination & Filtering States
@@ -102,6 +108,19 @@ export default function AdminSettlements() {
     }
   };
 
+  const fetchUserDebtsData = async () => {
+    if (userRole !== 'ADMIN') return;
+    setIsDebtsLoading(true);
+    try {
+      const debts = await getAdminUserDebts();
+      setUserDebts(debts);
+    } catch {
+      // Silent error
+    } finally {
+      setIsDebtsLoading(false);
+    }
+  };
+
   const fetchDashboardData = async (page = 1, userId = '') => {
     setIsLoading(true);
     try {
@@ -121,6 +140,7 @@ export default function AdminSettlements() {
   useEffect(() => {
     if (userRole === 'ADMIN') {
       fetchSuppliersList();
+      fetchUserDebtsData();
     }
   }, []);
 
@@ -128,10 +148,23 @@ export default function AdminSettlements() {
     fetchDashboardData(currentPage, filterUserId);
   }, [currentPage, filterUserId]);
 
+  useEffect(() => {
+    if (activeTab === 'debts' && userRole === 'ADMIN') {
+      fetchUserDebtsData();
+    }
+  }, [activeTab]);
+
   const handleOpenModal = () => {
     setNewAmount('');
     setNewTrackingCode('');
     setSelectedUserId('');
+    setIsModalOpen(true);
+  };
+
+  const handleSettleUser = (debtItem: UserDebtItem) => {
+    setSelectedUserId(debtItem.user_id);
+    setNewAmount(debtItem.remaining_debt > 0 ? debtItem.remaining_debt.toLocaleString('en-US') : '');
+    setNewTrackingCode('');
     setIsModalOpen(true);
   };
 
@@ -155,6 +188,7 @@ export default function AdminSettlements() {
       toast.success(t('settlements.messages.success', 'پرداختی با موفقیت ثبت شد.'));
       setIsModalOpen(false);
       fetchDashboardData(currentPage, filterUserId);
+      fetchUserDebtsData();
     } catch {
       toast.error(t('settlements.messages.submitError', 'خطا در ثبت پرداختی.'));
     } finally {
@@ -214,103 +248,211 @@ export default function AdminSettlements() {
         </div>
       </div>
 
-      {/* Main Content */}
-      {isLoading || !data ? (
-        <div className="flex justify-center py-12"><Loader2 className="animate-spin text-indigo-600" size={36} /></div>
-      ) : (
-        <>
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StatCard
-              title={userRole === 'SUPPLIER' || userRole === 'VISITOR' ? 'طلب تولید شده شما (طلب کل)' : filterUserId ? 'بدهی تولید شده تامین‌کننده' : t('settlements.stats.totalDebt', 'کل بدهی تولید شده')}
-              value={formatCurrency(data.total_debt)}
-              accent="slate"
-              icon={<TrendingDown size={22} />}
-            />
-            <StatCard
-              title={userRole === 'SUPPLIER' || userRole === 'VISITOR' ? 'دریافتی‌های تسویه شده شما' : filterUserId ? 'مبلغ تسویه شده تامین‌کننده' : t('settlements.stats.totalPaid', 'کل مبلغ تسویه شده')}
-              value={formatCurrency(data.total_paid)}
-              accent="green"
-              icon={<CheckCircle2 size={22} />}
-            />
-            <StatCard
-              title={userRole === 'SUPPLIER' || userRole === 'VISITOR' ? 'مانده طلب فعلی شما' : filterUserId ? 'مانده بدهی تامین‌کننده' : t('settlements.stats.remainingDebt', 'مانده بدهی فعلی')}
-              value={formatCurrency(data.remaining_debt)}
-              accent={data.remaining_debt > 0 ? "red" : "default"}
-              icon={<AlertCircle size={22} />}
-            />
-          </div>
+      {/* Top Tab Switcher */}
+      <div className="flex border-b border-slate-200">
+        <button
+          onClick={() => setActiveTab('settlements')}
+          className={`py-3 px-5 text-sm font-extrabold transition-all border-b-2 flex items-center gap-2 ${
+            activeTab === 'settlements'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <History size={18} />
+          <span>{t('settlements.tabs.history', 'لیست تسویه‌ها')}</span>
+        </button>
 
-          {/* History Table */}
+        {userRole === 'ADMIN' && (
+          <button
+            onClick={() => setActiveTab('debts')}
+            className={`py-3 px-5 text-sm font-extrabold transition-all border-b-2 flex items-center gap-2 ${
+              activeTab === 'debts'
+                ? 'border-indigo-600 text-indigo-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <Users size={18} />
+            <span>{t('settlements.tabs.debts', 'لیست بدهی‌ها')}</span>
+            {userDebts.filter(d => d.remaining_debt > 0).length > 0 && (
+              <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">
+                {userDebts.filter(d => d.remaining_debt > 0).length}
+              </span>
+            )}
+          </button>
+        )}
+      </div>
+
+      {activeTab === 'debts' && userRole === 'ADMIN' && (
+        <div className="space-y-6">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-2">
-              <History className="text-slate-400" size={20} />
-              <h2 className="text-lg font-bold text-slate-800">{t('settlements.history.title', 'تاریخچه پرداختی‌ها')}</h2>
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Users className="text-slate-400" size={20} />
+                <h2 className="text-lg font-bold text-slate-800">لیست بدهی تامین‌کنندگان و ویزیتورها</h2>
+              </div>
+              <span className="text-xs font-semibold text-slate-400">تعداد کل: {userDebts.length} نفر</span>
             </div>
 
-            {historyItems.length === 0 ? (
+            {isDebtsLoading ? (
+              <div className="flex justify-center py-12"><Loader2 className="animate-spin text-indigo-600" size={36} /></div>
+            ) : userDebts.length === 0 ? (
               <div className="p-12 text-center bg-slate-50/50">
                 <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-base font-bold text-slate-500">
-                  {t('settlements.history.empty', 'هیچ پرداختی تا کنون ثبت نشده است.')}
-                </h3>
+                <h3 className="text-base font-bold text-slate-500">هیچ تامین‌کننده یا ویزیتوری یافت نشد.</h3>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-center text-slate-500">
                   <thead className="text-xs font-bold text-slate-700 bg-slate-50 border-b border-slate-100">
                     <tr>
-                      <th className="px-6 py-4">{t('settlements.table.date', 'تاریخ و ساعت')}</th>
-                      <th className="px-6 py-4">{t('settlements.table.supplierName', 'نام تامین‌کننده')}</th>
-                      <th className="px-6 py-4">{t('settlements.table.amount', 'مبلغ پرداختی')}</th>
-                      <th className="px-6 py-4">{t('settlements.table.trackingCode', 'کد پیگیری / یادداشت')}</th>
+                      <th className="px-6 py-4 text-right">کاربر / نام فروشگاه</th>
+                      <th className="px-6 py-4">نقش</th>
+                      <th className="px-6 py-4">شماره همراه</th>
+                      <th className="px-6 py-4">طلب کل (تولید شده)</th>
+                      <th className="px-6 py-4">پرداختی تسویه‌شده</th>
+                      <th className="px-6 py-4">مانده بدهی فعلی</th>
+                      <th className="px-6 py-4">عملیات</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {historyItems.map((record) => {
-                      const associatedSupplier = suppliers.find(s => s.id === record.user_id);
-                      return (
-                        <tr key={record.id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
-                          <td className="px-6 py-4 font-medium text-slate-900">{formatDate(record.created_at)}</td>
-                          <td className="px-6 py-4 font-semibold text-slate-800">
-                            {associatedSupplier ? `${associatedSupplier.username} (${associatedSupplier.role === 'VISITOR' ? t('settlements.roles.visitor', 'ویزیتور') : t('settlements.roles.supplier', 'تامین‌کننده')})` : (userRole !== 'ADMIN' ? t('settlements.table.you', 'شما') : t('settlements.table.unknownServer', 'نامشخص'))}
-                          </td>
-                          <td className="px-6 py-4 font-black text-emerald-600">{formatCurrency(record.amount)}</td>
-                          <td className="px-6 py-4 font-medium text-slate-600">{record.tracking_code || '-'}</td>
-                        </tr>
-                      );
-                    })}
+                    {userDebts.map((item) => (
+                      <tr key={item.user_id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
+                        <td className="px-6 py-4 text-right font-extrabold text-slate-900">
+                          {item.shop_name}
+                          {item.username !== item.shop_name && <span className="text-xs font-medium text-slate-400 mr-1">({item.username})</span>}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2.5 py-1 rounded-lg text-xs font-extrabold ${
+                            item.role === 'VISITOR' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-blue-50 text-blue-700 border border-blue-200'
+                          }`}>
+                            {item.role === 'VISITOR' ? 'ویزیتور' : 'تامین‌کننده'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 font-mono text-slate-600 font-bold dir-ltr">{item.phone_number || '-'}</td>
+                        <td className="px-6 py-4 font-bold text-slate-700">{formatCurrency(item.total_debt)}</td>
+                        <td className="px-6 py-4 font-bold text-emerald-600">{formatCurrency(item.total_paid)}</td>
+                        <td className="px-6 py-4 font-extrabold text-base">
+                          <span className={item.remaining_debt > 0 ? 'text-rose-600' : 'text-slate-400'}>
+                            {formatCurrency(item.remaining_debt)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() => handleSettleUser(item)}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1 mx-auto"
+                          >
+                            <Wallet size={14} />
+                            <span>تسویه</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
             )}
-
-            {/* Pagination Controls */}
-            {historyResponse && historyResponse.total_pages > 1 && (
-              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4 text-xs font-bold text-slate-500">
-                <span>
-                  {t('settlements.pagination.page', 'صفحه')} {historyResponse.current_page} {t('settlements.pagination.of', 'از')} {historyResponse.total_pages}
-                </span>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    disabled={currentPage <= 1}
-                    onClick={() => setCurrentPage(prev => prev - 1)}
-                    className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white text-slate-700 transition-colors"
-                  >
-                    قبلی
-                  </button>
-                  <button
-                    disabled={currentPage >= historyResponse.total_pages}
-                    onClick={() => setCurrentPage(prev => prev + 1)}
-                    className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white text-slate-700 transition-colors"
-                  >
-                    بعدی
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
-        </>
+        </div>
+      )}
+
+      {activeTab === 'settlements' && (
+        isLoading || !data ? (
+          <div className="flex justify-center py-12"><Loader2 className="animate-spin text-indigo-600" size={36} /></div>
+        ) : (
+          <>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <StatCard
+                title={userRole === 'SUPPLIER' || userRole === 'VISITOR' ? 'طلب تولید شده شما (طلب کل)' : filterUserId ? 'بدهی تولید شده تامین‌کننده' : t('settlements.stats.totalDebt', 'کل بدهی تولید شده')}
+                value={formatCurrency(data.total_debt)}
+                accent="slate"
+                icon={<TrendingDown size={22} />}
+              />
+              <StatCard
+                title={userRole === 'SUPPLIER' || userRole === 'VISITOR' ? 'دریافتی‌های تسویه شده شما' : filterUserId ? 'مبلغ تسویه شده تامین‌کننده' : t('settlements.stats.totalPaid', 'کل مبلغ تسویه شده')}
+                value={formatCurrency(data.total_paid)}
+                accent="green"
+                icon={<CheckCircle2 size={22} />}
+              />
+              <StatCard
+                title={userRole === 'SUPPLIER' || userRole === 'VISITOR' ? 'مانده طلب فعلی شما' : filterUserId ? 'مانده بدهی تامین‌کننده' : t('settlements.stats.remainingDebt', 'مانده بدهی فعلی')}
+                value={formatCurrency(data.remaining_debt)}
+                accent={data.remaining_debt > 0 ? "red" : "default"}
+                icon={<AlertCircle size={22} />}
+              />
+            </div>
+
+            {/* History Table */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-2">
+                <History className="text-slate-400" size={20} />
+                <h2 className="text-lg font-bold text-slate-800">{t('settlements.history.title', 'تاریخچه پرداختی‌ها')}</h2>
+              </div>
+
+              {historyItems.length === 0 ? (
+                <div className="p-12 text-center bg-slate-50/50">
+                  <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                  <h3 className="text-base font-bold text-slate-500">
+                    {t('settlements.history.empty', 'هیچ پرداختی تا کنون ثبت نشده است.')}
+                  </h3>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-center text-slate-500">
+                    <thead className="text-xs font-bold text-slate-700 bg-slate-50 border-b border-slate-100">
+                      <tr>
+                        <th className="px-6 py-4">{t('settlements.table.date', 'تاریخ و ساعت')}</th>
+                        <th className="px-6 py-4">{t('settlements.table.supplierName', 'نام تامین‌کننده')}</th>
+                        <th className="px-6 py-4">{t('settlements.table.amount', 'مبلغ پرداختی')}</th>
+                        <th className="px-6 py-4">{t('settlements.table.trackingCode', 'کد پیگیری / یادداشت')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {historyItems.map((record) => {
+                        const associatedSupplier = suppliers.find(s => s.id === record.user_id);
+                        return (
+                          <tr key={record.id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
+                            <td className="px-6 py-4 font-medium text-slate-900">{formatDate(record.created_at)}</td>
+                            <td className="px-6 py-4 font-semibold text-slate-800">
+                              {associatedSupplier ? `${associatedSupplier.username} (${associatedSupplier.role === 'VISITOR' ? t('settlements.roles.visitor', 'ویزیتور') : t('settlements.roles.supplier', 'تامین‌کننده')})` : (userRole !== 'ADMIN' ? t('settlements.table.you', 'شما') : t('settlements.table.unknownServer', 'نامشخص'))}
+                            </td>
+                            <td className="px-6 py-4 font-black text-emerald-600">{formatCurrency(record.amount)}</td>
+                            <td className="px-6 py-4 font-medium text-slate-600">{record.tracking_code || '-'}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Pagination Controls */}
+              {historyResponse && historyResponse.total_pages > 1 && (
+                <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4 text-xs font-bold text-slate-500">
+                  <span>
+                    {t('settlements.pagination.page', 'صفحه')} {historyResponse.current_page} {t('settlements.pagination.of', 'از')} {historyResponse.total_pages}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      disabled={currentPage <= 1}
+                      onClick={() => setCurrentPage(prev => prev - 1)}
+                      className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white text-slate-700 transition-colors"
+                    >
+                      قبلی
+                    </button>
+                    <button
+                      disabled={currentPage >= historyResponse.total_pages}
+                      onClick={() => setCurrentPage(prev => prev + 1)}
+                      className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-white text-slate-700 transition-colors"
+                    >
+                      بعدی
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )
       )}
 
       {/* New Settlement Modal */}

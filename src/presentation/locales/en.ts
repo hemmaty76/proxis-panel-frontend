@@ -31,9 +31,13 @@ export const en = {
         menu: {
             dashboard: 'Dashboard & Stats',
             createConfig: 'Create Config',
+            configsStore: 'Config Store',
+            accountsStore: 'Account Store',
             manageUsers: 'Manage Users',
             manageShop: 'Manage Shop',
             manageServices: 'Manage Services & Packages',
+            manageAccountTemplates: 'Manage Account Products',
+            supplierAccounts: 'Register & Manage Accounts',
             customPrices: 'Selling Price Settings',
             panelSettings: 'Panel Settings',
             manageServers: 'Manage Servers',
@@ -885,5 +889,114 @@ export const en = {
         suggestionDesc: 'Please use the form below to send any suggestions, feedback, or new ideas to improve the panel.',
         support24h: '24/7 Support',
         telegramNotConfigured: 'Telegram support is not configured.'
+    },
+    shopAccounts: {
+        currency: 'Toman',
+        header: {
+            title: 'Account Store',
+            subtitle: 'Purchase and manage registered accounts ({{name}})',
+            balance: 'Your Wallet Balance'
+        },
+        tabs: {
+            store: 'Buy Account',
+            purchased: 'Purchased Accounts'
+        },
+        store: {
+            emptyTitle: 'No products defined',
+            emptyDesc: 'The system administrator has not registered any products for sale yet.',
+            uniqueBadge: 'Unique Product (Exclusive)',
+            bulkBadge: 'Public Product (Bulk Stock)',
+            outOfStock: 'Out of Stock',
+            activeStock: 'Active Stock: {{count}}',
+            noDescription: 'No additional description',
+            buyPriceLabel: 'Partner Buy Price:',
+            variablePrice: 'Variable (Based on features)',
+            disabledPrice: 'Disabled',
+            checkUniqueAccounts: 'Check Available Accounts',
+            selectSupplier: 'Select Supplier & Buy',
+            unavailable: 'Unavailable'
+        },
+        purchased: {
+            searchPlaceholder: 'Search by customer phone number...',
+            emptyTitle: 'No purchased accounts found',
+            emptyDesc: 'You have not purchased any accounts from this section yet.',
+            table: {
+                productName: 'Product Name',
+                customerPhone: 'Customer Phone',
+                paidAmount: 'Paid Amount',
+                purchaseDate: 'Purchase Date',
+                actions: 'Actions'
+            },
+            viewCredentials: 'View Account Credentials',
+            supportLink: 'Support Link',
+            copied: 'Copied',
+            copySupportTooltip: 'Copy Customer Support Link',
+            notRegistered: 'Not registered',
+            pagination: 'Page {{current}} of {{total}}'
+        },
+        uniqueDrawer: {
+            titleBadge: 'Exclusive Accounts',
+            empty: 'No accounts currently available for this product.',
+            simpleSpecs: 'Simple Public Specs',
+            finalPrice: 'Final Price:',
+            buyButton: 'Order & Pay Account'
+        },
+        bulkDrawer: {
+            titleBadge: 'Suppliers List',
+            empty: 'No offers currently available for this product.',
+            supplierName: 'Supplier Name:',
+            accountStock: 'Account Stock:',
+            itemsUnit: 'items',
+            finalPrice: 'Final Buy Price:',
+            selectButton: 'Select This Supplier'
+        },
+        confirmModal: {
+            title: 'Order Confirmation & Finalization',
+            description: 'Upon confirmation, the order amount will be deducted from your wallet balance and account login details will be issued.',
+            phoneLabel: 'Customer Mobile Number',
+            phonePlaceholder: 'e.g., 09123456789',
+            phoneNote: 'Note: SMS containing purchase info and customer support link will be sent to this number.',
+            sellPriceLabel: 'Selling Price to Customer (Toman)',
+            systemSuggestedPrice: 'System suggested price: {{price}} (Default profit: {{percent}}%)',
+            productName: 'Product Name:',
+            deductionAmount: 'Deducted Amount from Wallet:',
+            balanceAfter: 'Balance After Purchase:',
+            profitGuide: 'This account will be sold to customer for {{sellPrice}} and your profit will be {{profit}}.',
+            submitButton: 'Pay & Receive Account',
+            cancelButton: 'Cancel'
+        },
+        successModal: {
+            title: 'Purchase Successful!',
+            description: 'Account login details are ready for use in the table below.',
+            productName: 'Product Name:',
+            customerPhone: 'Customer Phone:',
+            smsSentNotice: '📢 SMS containing customer support link was successfully sent to {{phone}}.',
+            paidAmount: 'Paid Amount:',
+            sensitiveHeader: 'Sensitive Account Credentials:',
+            closeButton: 'Understood / Close',
+            copySupportLink: 'Copy Customer Support Link'
+        },
+        viewModal: {
+            title: 'Purchased Account Credentials',
+            paidAmount: 'Paid Amount:',
+            purchaseDate: 'Purchase Date:',
+            customerPhone: 'Customer Phone:',
+            publicFields: 'Public Specifications:',
+            sensitiveInfo: 'Sensitive Login Info:',
+            closeButton: 'Close',
+            copySupportLink: 'Copy Customer Support Link'
+        },
+        messages: {
+            fetchError: 'Error fetching products and profile data',
+            fetchPurchasedError: 'Error fetching purchased accounts data',
+            fetchUniqueError: 'Error fetching available accounts',
+            fetchOffersError: 'Error fetching suppliers offers list',
+            phoneRequired: 'Customer phone number is required.',
+            purchaseSuccess: 'Purchase completed successfully!',
+            purchaseFailed: 'Transaction failed. Please check your balance.',
+            copied: 'Copied!',
+            supportLinkCopied: 'Customer support link copied.',
+            supportLinkCopyError: 'Error copying support link'
+        }
     }
 };

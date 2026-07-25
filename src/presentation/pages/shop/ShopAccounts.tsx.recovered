@@ -1,0 +1,24 @@
+import json
+import sys
+
+path = r"C:\Users\mowji\.gemini\antigravity-ide\brain\f4ed20f1-44e5-4fba-9533-936772986caf\.system_generated\logs\transcript_full.jsonl"
+
+print("Searching transcript...")
+with open(path, "r", encoding="utf-8") as f:
+    for line in f:
+        try:
+            data = json.loads(line)
+            if "tool_calls" in data:
+                for call in data["tool_calls"]:
+                    args = call.get("args", {})
+                    args_str = str(args)
+                    if "ShopAccounts.tsx" in args_str:
+                        print(f"Step {data.get('step_index')}: {call.get('name')}")
+                        if "CodeContent" in args:
+                            print("--> FOUND CodeContent in write_to_file!")
+                            # Save code content
+                            with open(r"g:\frontend\proxis-billing\frontend\src\presentation\pages\shop\ShopAccounts.tsx.recovered", "w", encoding="utf-8") as out:
+                                out.write(args["CodeContent"])
+                            print("Saved to ShopAccounts.tsx.recovered")
+        except Exception as e:
+            pass

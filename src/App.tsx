@@ -4,7 +4,6 @@ import Login from './presentation/pages/Login';
 import DashboardHome from './presentation/pages/DashboardHome';
 import DashboardLayout from './presentation/components/DashboardLayout';
 import ForceChangePassword from './presentation/pages/ForceChangePassword';
-import UsersManagement from './presentation/pages/UsersManagement';
 import CreateConfig from './presentation/pages/CreateConfig';
 import ShopsManagement from './presentation/pages/admin/ShopsManagement';
 import ServicesManagement from './presentation/pages/admin/ServicesManagement';
@@ -19,6 +18,11 @@ import VisitorTestConfig from './presentation/pages/visitor/VisitorTestConfig';
 import TestConfigsList from './presentation/pages/admin/TestConfigsList';
 import TransactionsList from './presentation/pages/admin/TransactionsList';
 import PublicConfig from './presentation/pages/PublicConfig';
+import PublicAccount from './presentation/pages/PublicAccount';
+import SupplierAccounts from './presentation/pages/supplier/SupplierAccounts';
+import AccountReports from './presentation/pages/AccountReports';
+import ShopAccounts from './presentation/pages/shop/ShopAccounts';
+import AccountProductsManagement from './presentation/pages/admin/AccountProductsManagement';
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const isAuthenticated = !!localStorage.getItem('access_token');
@@ -146,26 +150,17 @@ function App() {
           />
 
           <Route
-            path="/users"
+            path="/shop/configs"
             element={
               <ShopOrAdminRoute>
                 <DashboardLayout>
-                  <UsersManagement />
+                  <CreateConfig defaultTab="store" />
                 </DashboardLayout>
               </ShopOrAdminRoute>
             }
           />
-
-          <Route
-            path="/proxies"
-            element={
-              <ShopOrAdminRoute>
-                <DashboardLayout>
-                  <CreateConfig />
-                </DashboardLayout>
-              </ShopOrAdminRoute>
-            }
-          />
+          <Route path="/proxies" element={<Navigate to="/shop/configs?tab=store" replace />} />
+          <Route path="/users" element={<Navigate to="/shop/configs?tab=purchased" replace />} />
 
           <Route
             path="/admin/shops"
@@ -175,6 +170,36 @@ function App() {
                   <ShopsManagement />
                 </DashboardLayout>
               </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/account-products"
+            element={
+              <AdminRoute>
+                <DashboardLayout>
+                  <AccountProductsManagement />
+                </DashboardLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/account-reports"
+            element={
+              <AdminRoute>
+                <DashboardLayout>
+                  <AccountReports />
+                </DashboardLayout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/supplier/reports"
+            element={
+              <AdminOrSupplierRoute>
+                <DashboardLayout>
+                  <AccountReports />
+                </DashboardLayout>
+              </AdminOrSupplierRoute>
             }
           />
           <Route
@@ -229,6 +254,26 @@ function App() {
             }
           />
           <Route
+            path="/supplier/accounts"
+            element={
+              <AdminOrSupplierRoute>
+                <DashboardLayout>
+                  <SupplierAccounts />
+                </DashboardLayout>
+              </AdminOrSupplierRoute>
+            }
+          />
+          <Route
+            path="/shop/accounts"
+            element={
+              <ShopOrAdminRoute>
+                <DashboardLayout>
+                  <ShopAccounts />
+                </DashboardLayout>
+              </ShopOrAdminRoute>
+            }
+          />
+          <Route
             path="/admin/settlements"
             element={
               <AdminOrSupplierOrVisitorRoute>
@@ -277,6 +322,10 @@ function App() {
                 </DashboardLayout>
               </AdminOrVisitorRoute>
             }
+          />
+          <Route
+            path="/account/:code"
+            element={<PublicAccount />}
           />
           <Route
             path="/:code"

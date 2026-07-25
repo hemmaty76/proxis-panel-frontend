@@ -1,13 +1,13 @@
 import axios from 'axios';
 
 export const apiClient = axios.create({
-  baseURL: 'https://api.agentor.ir/api/v1',
+  baseURL: 'http://localhost:8080/api/v1',
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
 
 export const publicApiClient = axios.create({
-  baseURL: 'https://api.agentor.ir/api/v1',
+  baseURL: 'http://localhost:8080/api/v1',
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });

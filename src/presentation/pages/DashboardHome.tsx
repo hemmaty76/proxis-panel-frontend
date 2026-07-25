@@ -11,9 +11,10 @@ import {
   updateProfile,
 } from '../../data/services/shopService';
 import { getFinancialReport, type FinancialReport } from '../../data/services/adminService';
+import { getSupplierDashboard, getSupplierSalesSummary } from '../../data/services/supplierService';
 
-import { Wallet, Loader2, X, CreditCard, CheckCircle2, XCircle, Percent } from 'lucide-react';
-import { requestZarinpalCharge } from '../../data/services/shopService';
+import { Wallet, Loader2, X, CreditCard, CheckCircle2, XCircle, Percent, RotateCw } from 'lucide-react';
+import { requestZarinpalCharge, verifyPendingPayments } from '../../data/services/shopService';
 
 
 interface StatCardProps {
@@ -172,6 +173,26 @@ export default function DashboardHome() {
   };
 
 
+  const [isSyncingPending, setIsSyncingPending] = useState(false);
+
+  const handleSyncPendingPayments = async () => {
+    setIsSyncingPending(true);
+    try {
+      const res = await verifyPendingPayments();
+      if (res.verified_count > 0) {
+        toast.success(`تعداد ${res.verified_count} تراکنش معلق با موفقیت تایید شد و موجودی حساب شارژ گردید.`);
+        const updatedProfile = await getProfile();
+        setProfile(updatedProfile);
+      } else {
+        toast('هیچ تراکنش معلقی برای تایید یافت نشد.', { icon: 'ℹ️' });
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || err.message || 'خطا در پیگیری و استعلام تراکنش‌های معلق');
+    } finally {
+      setIsSyncingPending(false);
+    }
+  };
+
   useEffect(() => {
     let cancelled = false;
 
@@ -188,7 +209,6 @@ export default function DashboardHome() {
           if (cancelled) return;
           setAdminReport(reportData);
         } else if (profileData.role === 'SUPPLIER') {
-          const { getSupplierDashboard, getSupplierSalesSummary } = await import('../../data/services/supplierService');
           const [statsData, summaryData] = await Promise.all([
             getSupplierDashboard(),
             getSupplierSalesSummary()
@@ -286,7 +306,7 @@ export default function DashboardHome() {
         ),
       },
       {
-        title: 'تعداد کل فروش سرورها',
+        title: 'تعداد کل فروش',
         value: formatNumber(supplierStats.total_sales_count),
         accent: 'indigo',
         icon: (
@@ -444,13 +464,23 @@ export default function DashboardHome() {
                     <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4 min-h-[88px] flex flex-col justify-between transition-colors duration-200 hover:bg-slate-50">
                       <div className="flex justify-between items-start">
                         <p className="text-xs font-semibold text-slate-500 mb-1">{t('dashboardHome.profile.balance', 'موجودی')}</p>
-                        <button
-                          onClick={() => setIsChargeModalOpen(true)}
-                          className="px-2.5 py-1 bg-white border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 text-emerald-600 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
-                        >
-                          <Wallet size={14} />
-                          {t('dashboardHome.profile.chargeBtn', 'شارژ حساب')}
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={handleSyncPendingPayments}
+                            disabled={isSyncingPending}
+                            title="پیگیری و استعلام خریدهای معلق"
+                            className="p-1.5 bg-white border border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-slate-500 hover:text-blue-600 rounded-lg text-xs font-bold transition-all shadow-sm disabled:opacity-50"
+                          >
+                            {isSyncingPending ? <Loader2 className="animate-spin" size={14} /> : <RotateCw size={14} />}
+                          </button>
+                          <button
+                            onClick={() => setIsChargeModalOpen(true)}
+                            className="px-2.5 py-1 bg-white border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 text-emerald-600 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                          >
+                            <Wallet size={14} />
+                            {t('dashboardHome.profile.chargeBtn', 'شارژ حساب')}
+                          </button>
+                        </div>
                       </div>
                       <p className="text-xl font-extrabold text-slate-900 tabular-nums mt-2">
                         {formatCurrency(profile.balance)}
@@ -629,22 +659,34 @@ export default function DashboardHome() {
                 </p>
               </div>
 
-              <div className="pt-2 flex gap-3">
-                <button
-                  type="submit"
-                  disabled={isCharging || !chargeAmount}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold disabled:opacity-50 transition-all flex justify-center items-center gap-2 shadow-sm"
-                >
-                  {isCharging ? <Loader2 className="animate-spin" size={20} /> : null}
-                  {t('dashboardHome.chargeModal.submitBtn', 'پرداخت با زرین‌پال')}
-                </button>
+              <div className="pt-2 flex flex-col gap-2">
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    disabled={isCharging || !chargeAmount}
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold disabled:opacity-50 transition-all flex justify-center items-center gap-2 shadow-sm"
+                  >
+                    {isCharging ? <Loader2 className="animate-spin" size={20} /> : null}
+                    {t('dashboardHome.chargeModal.submitBtn', 'پرداخت با زرین‌پال')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsChargeModalOpen(false)}
+                    disabled={isCharging}
+                    className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-bold transition-colors"
+                  >
+                    {t('common.cancel', 'انصراف')}
+                  </button>
+                </div>
+
                 <button
                   type="button"
-                  onClick={() => setIsChargeModalOpen(false)}
-                  disabled={isCharging}
-                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-bold transition-colors"
+                  onClick={handleSyncPendingPayments}
+                  disabled={isSyncingPending || isCharging}
+                  className="w-full mt-2 py-2 px-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 border border-blue-200/60 disabled:opacity-50"
                 >
-                  {t('common.cancel', 'انصراف')}
+                  {isSyncingPending ? <Loader2 className="animate-spin" size={14} /> : <RotateCw size={14} />}
+                  استعلام و پیگیری خریدهای معلق (مشکل عدم شارژ)
                 </button>
               </div>
             </form>
@@ -703,23 +745,23 @@ export default function DashboardHome() {
           </div>
         </div>
       )}
-      {/* بخش آمار فروش کانفیگ‌ها به تفکیک پکیج (فقط برای تامین‌کنندگان) */}
+      {/* بخش آمار فروش کانفیگ‌ها و اکانت‌ها به تفکیک پکیج/محصول (فقط برای تامین‌کنندگان) */}
       {profile?.role === 'SUPPLIER' && supplierSummary && supplierSummary.length > 0 && (
         <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-6">
           <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-l from-indigo-50/30 to-white flex items-center gap-2">
             <svg className="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <h2 className="text-lg font-bold text-indigo-900">آمار فروش به تفکیک پکیج و سرور</h2>
+            <h2 className="text-lg font-bold text-indigo-900">آمار فروش به تفکیک پکیج، سرور و محصول اکانت</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-center text-slate-500">
               <thead className="text-xs font-bold text-slate-700 bg-slate-50 border-b border-slate-100">
                 <tr>
-                  <th className="px-6 py-4">نام سرور</th>
+                  <th className="px-6 py-4">نام سرور / انبار</th>
                   <th className="px-6 py-4">نوع سرویس</th>
                   <th className="px-6 py-4">نوع فروش</th>
-                  <th className="px-6 py-4">بسته (پکیج)</th>
+                  <th className="px-6 py-4">بسته / محصول</th>
                   <th className="px-6 py-4">تعداد فروش</th>
                   <th className="px-6 py-4">کل طلب (تومان)</th>
                 </tr>
@@ -730,7 +772,7 @@ export default function DashboardHome() {
                     <td className="px-6 py-4 font-semibold text-slate-900">{item.server_name}</td>
                     <td className="px-6 py-4 font-medium text-slate-700">{item.config_type_name}</td>
                     <td className="px-6 py-4 font-medium text-slate-600">
-                      {item.sell_type === 'VOLUME_LIMIT' ? 'حجمی' : 'زمانی'}
+                      {item.sell_type === 'VOLUME_LIMIT' ? 'حجمی' : item.sell_type === 'TIME_LIMIT' ? 'زمانی' : item.sell_type}
                     </td>
                     <td className="px-6 py-4 font-medium text-slate-700">{item.package_name || '-'}</td>
                     <td className="px-6 py-4 font-black text-indigo-600 tabular-nums">{item.sales_count}</td>

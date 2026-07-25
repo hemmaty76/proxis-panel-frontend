@@ -333,3 +333,143 @@ export const getTransactions = async (
 };
 
 
+// Product Accounts & Reports APIs for Admin
+
+
+export interface AdminProductAccount {
+  id: string;
+  name: string;
+  description?: string;
+  price?: number;
+  is_unique: boolean;
+  is_active: boolean;
+  image_url?: string;
+  frontend_key?: string;
+  fields_schema: {
+    properties: Record<string, {
+      type: string;
+      required: boolean;
+      is_private?: boolean;
+      icon?: string;
+      hint?: string;
+      multiline?: boolean;
+    }>;
+  };
+  created_at: string;
+  stock: number;
+}
+
+export interface AdminProductAccountCreatePayload {
+  name: string;
+  description?: string;
+  price?: number | null;
+  is_unique: boolean;
+  is_active?: boolean;
+  image_url?: string;
+  frontend_key?: string;
+  fields_schema: {
+    properties: Record<string, {
+      type: string;
+      required: boolean;
+      is_private?: boolean;
+      icon?: string;
+      hint?: string;
+      multiline?: boolean;
+    }>;
+  };
+}
+
+export interface AdminAccountReport {
+  id: string;
+  purchase_id: string;
+  sold_account_id: string;
+  shopkeeper_id: string;
+  supplier_id: string;
+  reason: string;
+  status: 'PENDING' | 'APPROVED_BY_ADMIN' | 'REJECTED_BY_ADMIN' | 'RESOLVED_BY_SUPPLIER' | 'REJECTED_BY_SUPPLIER';
+  replacement_sold_account_id?: string;
+  created_at: string;
+  resolved_at?: string;
+  shopkeeper_details?: {
+    username: string;
+    phone_number?: string;
+    shop_name?: string;
+  };
+  supplier_details?: {
+    username: string;
+    phone_number?: string;
+  };
+  product_details?: {
+    id: string;
+    name: string;
+    is_unique: boolean;
+  };
+  sold_account_details?: {
+    id: string;
+    public_fields: Record<string, any>;
+    private_fields: Record<string, any>;
+  };
+}
+
+export const getAdminProductAccounts = async (): Promise<AdminProductAccount[]> => {
+  const response = await apiClient.get('/admin/accounts/products');
+  return response.data;
+};
+
+export const createAdminProductAccount = async (payload: AdminProductAccountCreatePayload): Promise<AdminProductAccount> => {
+  const response = await apiClient.post('/admin/accounts/products', payload);
+  return response.data;
+};
+
+export const updateAdminProductAccount = async (id: string, payload: Partial<AdminProductAccountCreatePayload>): Promise<AdminProductAccount> => {
+  const response = await apiClient.patch(`/admin/accounts/products/${id}`, payload);
+  return response.data;
+};
+
+export const deleteAdminProductAccount = async (id: string): Promise<void> => {
+  await apiClient.delete(`/admin/accounts/products/${id}`);
+};
+
+export const recalculateProductStock = async (id: string): Promise<{ stock: number }> => {
+  const response = await apiClient.post(`/admin/accounts/products/${id}/sync-stock`);
+  return response.data;
+};
+
+export const getAdminAccountReports = async (): Promise<AdminAccountReport[]> => {
+  const response = await apiClient.get('/admin/accounts/reports');
+  return response.data;
+};
+
+export const approveAdminReport = async (reportId: string): Promise<void> => {
+  await apiClient.post(`/admin/accounts/reports/${reportId}/approve`);
+};
+
+export const rejectAdminReport = async (reportId: string): Promise<void> => {
+  await apiClient.post(`/admin/accounts/reports/${reportId}/reject`);
+};
+
+export interface UserDebtItem {
+  user_id: string;
+  username: string;
+  role: string;
+  balance: number;
+  credit_limit: number;
+  debt_amount: number;
+  remaining_debt: number;
+  total_debt: number;
+  total_paid: number;
+  shop_name?: string;
+  phone_number?: string;
+  last_settlement_at?: string;
+}
+
+
+
+export const getAdminUserDebts = async (): Promise<UserDebtItem[]> => {
+  const response = await apiClient.get('/admin/settlements/debts');
+  return response.data;
+};
+
+
+
+

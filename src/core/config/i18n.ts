@@ -28,6 +28,7 @@ i18n
     updateHtmlAttributes(lng);
   })
   .init({
+    lng: 'fa',
     resources: {
       fa: { translation: fa },
       en: { translation: en },
@@ -40,7 +41,6 @@ i18n
     },
     detection: {
       // ۳. کلید اصلی برای پیش‌فرض بودن فارسی: فقط لوکال استوریج را چک کن. 
-      // با حذف 'navigator'، زبان مرورگر کلاً نادیده گرفته می‌شود.
       order: ['localStorage'],
       caches: ['localStorage'], 
     }

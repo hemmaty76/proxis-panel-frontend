@@ -31,9 +31,13 @@ export const ar = {
         menu: {
             dashboard: 'لوحة التحكم والإحصائيات',
             createConfig: 'إنشاء تكوین (كونفيج)',
+            configsStore: 'متجر التكوينات',
+            accountsStore: 'متجر الحسابات',
             manageUsers: 'إدارة المستخدمين',
             manageShop: 'إدارة المتجر',
             manageServices: 'إدارة الخدمات والحزم',
+            manageAccountTemplates: 'إدارة منتجات الحسابات',
+            supplierAccounts: 'تسجيل وإدارة الحسابات',
             customPrices: 'إعدادات سعر البيع',
             panelSettings: 'إعدادات اللوحة',
             manageServers: 'إدارة الخوادم',
@@ -878,5 +882,114 @@ export const ar = {
         suggestionDesc: 'يرجى استخدام النموذج أدناه لإرسال أي اقتراحات أو ملاحظات أو أفكار جديدة لتحسين اللوحة.',
         support24h: 'دعم على مدار الساعة',
         telegramNotConfigured: 'لم يتم إعداد الدعم عبر تليجرام.'
+    },
+    shopAccounts: {
+        currency: 'تومان',
+        header: {
+            title: 'متجر الحسابات',
+            subtitle: 'شراء وإدارة الحسابات المسجلة ({{name}})',
+            balance: 'رصيد محفظتك'
+        },
+        tabs: {
+            store: 'شراء حساب',
+            purchased: 'الحسابات المشتراة'
+        },
+        store: {
+            emptyTitle: 'لم يتم تعريف أي منتجات',
+            emptyDesc: 'لم يقم مسؤول النظام بتسجيل أي منتجات للبيع بعد.',
+            uniqueBadge: 'منتج فريد (خاص)',
+            bulkBadge: 'منتج عام (كميات كبيرة)',
+            outOfStock: 'نفد المخزون',
+            activeStock: 'المخزون النشط: {{count}}',
+            noDescription: 'لا يوجد وصف إضافي',
+            buyPriceLabel: 'سعر شراء الشريك:',
+            variablePrice: 'متغير (حسب الميزات)',
+            disabledPrice: 'معطل',
+            checkUniqueAccounts: 'التحقق من الحسابات المتاحة',
+            selectSupplier: 'اختيار المورد والشراء',
+            unavailable: 'غير متوفر'
+        },
+        purchased: {
+            searchPlaceholder: 'البحث برقم هاتف الزبون...',
+            emptyTitle: 'لم يتم العثور على حسابات مشتراة',
+            emptyDesc: 'لم تقم بشراء أي حسابات من هذا القسم بعد.',
+            table: {
+                productName: 'اسم المنتج',
+                customerPhone: 'رقم هاتف الزبون',
+                paidAmount: 'المبلغ المدفوع',
+                purchaseDate: 'تاريخ الشراء',
+                actions: 'العمليات'
+            },
+            viewCredentials: 'عرض بيانات الحساب',
+            supportLink: 'رابط الدعم',
+            copied: 'تم النسخ',
+            copySupportTooltip: 'نسخ رابط دعم الزبون',
+            notRegistered: 'غير مسجل',
+            pagination: 'صفحة {{current}} من {{total}}'
+        },
+        uniqueDrawer: {
+            titleBadge: 'حسابات خاصة',
+            empty: 'لا توجد حسابات متاحة حالياً لهذا المنتج.',
+            simpleSpecs: 'المواصفات العامة البسيطة',
+            finalPrice: 'السعر النهائي:',
+            buyButton: 'طلب ودفع الحساب'
+        },
+        bulkDrawer: {
+            titleBadge: 'قائمة الموردين',
+            empty: 'لا توجد عروض متاحة حالياً لهذا المنتج.',
+            supplierName: 'اسم المورد:',
+            accountStock: 'مخزون الحسابات:',
+            itemsUnit: 'عدد',
+            finalPrice: 'سعر الشراء النهائي:',
+            selectButton: 'اختيار هذا المورد'
+        },
+        confirmModal: {
+            title: 'تأكيد الطلب وإتمامه',
+            description: 'عند التأكيد، سيتم خصم مبلغ الطلب من رصيد محفظتك وإصدار بيانات تسجيل الدخول بالحساب.',
+            phoneLabel: 'رقم هاتف الزبون',
+            phonePlaceholder: 'مثال: 09123456789',
+            phoneNote: 'ملاحظة: سيتم إرسال رسالة نصية تحتوي على معلومات الشراء ورابط الدعم إلى هذا الرقم.',
+            sellPriceLabel: 'سعر البيع للزبون (تومان)',
+            systemSuggestedPrice: 'السعر المقترح من النظام: {{price}} (الربح الافتراضي: {{percent}}%)',
+            productName: 'اسم المنتج:',
+            deductionAmount: 'المبلغ المخصوم من المحفظة:',
+            balanceAfter: 'الرصيد بعد الشراء:',
+            profitGuide: 'سيتم بيع هذا الحساب للزبون بسعر {{sellPrice}} وستكون أرباحك من هذه المعاملة {{profit}}.',
+            submitButton: 'دفع واستلام الحساب',
+            cancelButton: 'إلغاء'
+        },
+        successModal: {
+            title: 'تم الشراء بنجاح!',
+            description: 'بيانات تسجيل الدخول بالحساب جاهزة للاستخدام في الجدول أدناه.',
+            productName: 'اسم المنتج:',
+            customerPhone: 'رقم هاتف الزبون:',
+            smsSentNotice: '📢 تم إرسال رسالة نصية تحتوي على رابط الدعم بنجاح إلى الرقم {{phone}}.',
+            paidAmount: 'المبلغ المدفوع:',
+            sensitiveHeader: 'البيانات الحساسة للحساب المشتري:',
+            closeButton: 'فهمت / إغلاق',
+            copySupportLink: 'نسخ رابط دعم الزبون'
+        },
+        viewModal: {
+            title: 'تفاصيل الحساب المشتري',
+            paidAmount: 'المبلغ المدفوع:',
+            purchaseDate: 'تاريخ الشراء:',
+            customerPhone: 'رقم هاتف الزبون:',
+            publicFields: 'المواصفات العامة:',
+            sensitiveInfo: 'معلومات الدخول الحساسة:',
+            closeButton: 'إغلاق',
+            copySupportLink: 'نسخ رابط دعم الزبون'
+        },
+        messages: {
+            fetchError: 'خطأ في جلب بيانات المنتجات والملف الشخصي',
+            fetchPurchasedError: 'خطأ في جلب بيانات الحسابات المشتراة',
+            fetchUniqueError: 'خطأ في جلب الحسابات المتاحة',
+            fetchOffersError: 'خطأ في جلب قائمة عروض الموردين',
+            phoneRequired: 'إدخال رقم هاتف الزبون إجباري.',
+            purchaseSuccess: 'تمت عملية الشراء بنجاح!',
+            purchaseFailed: 'فشلت المعاملة. يرجى التحقق من رصيدك.',
+            copied: 'تم النسخ!',
+            supportLinkCopied: 'تم نسخ رابط دعم الزبون.',
+            supportLinkCopyError: 'خطأ في نسخ رابط الدعم'
+        }
     }
 };
