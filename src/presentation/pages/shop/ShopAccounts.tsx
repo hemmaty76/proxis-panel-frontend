@@ -207,12 +207,12 @@ export default function ShopAccounts() {
       });
       setPurchaseResult(res);
       toast.success('خرید اکانت با موفقیت انجام شد!');
-      
+
       // Update balance
       if (balance !== null) {
         setBalance(prev => prev !== null ? prev - checkoutOffer.price : prev);
       }
-      
+
       fetchData();
     } catch (error: any) {
       toast.error(error.response?.data?.detail || 'خطا در خرید اکانت. موجودی حساب یا انبار را بررسی کنید.');
@@ -244,14 +244,12 @@ export default function ShopAccounts() {
 
 
 
-  const getImageUrl = (url?: string, key?: string) => {
+  const getImageUrl = (url?: string, _key?: string) => {
     if (url && url.trim() !== '') {
       if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) return url;
       return `/${url}`;
     }
-    if (key === 'apple_id') return '/images/apst.webp';
-    if (key === 'apple_id_icloud') return '/images/apcl.webp';
-    return '/images/apst.webp';
+    return '';
   };
 
   if (loading && products.length === 0) {
@@ -292,18 +290,16 @@ export default function ShopAccounts() {
       <div className="flex bg-slate-100 p-1.5 rounded-xl w-full sm:max-w-md mx-auto">
         <button
           onClick={() => setActiveTab('store')}
-          className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-bold text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
-            activeTab === 'store' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-          }`}
+          className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-bold text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 ${activeTab === 'store' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+            }`}
         >
           <Store size={16} className="sm:w-[18px] sm:h-[18px]" />
           <span>خرید اکانت</span>
         </button>
         <button
           onClick={() => setActiveTab('purchases')}
-          className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-bold text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
-            activeTab === 'purchases' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-          }`}
+          className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-bold text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 ${activeTab === 'purchases' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+            }`}
         >
           <ShoppingBag size={16} className="sm:w-[18px] sm:h-[18px]" />
           <span>اکانت‌های خریداری شده ({purchasesTotalCount})</span>
@@ -449,9 +445,7 @@ export default function ShopAccounts() {
                     <tr>
                       <th className="py-3 px-4">محصول</th>
                       <th className="py-3 px-4">شماره خریدار / مشتری</th>
-                      <th className="py-3 px-4">مبلغ خرید (کیف‌پول)</th>
-                      <th className="py-3 px-4">فروش به مشتری</th>
-                      <th className="py-3 px-4">سود شما</th>
+                      <th className="py-3 px-4">قیمت فروش به مشتری</th>
                       <th className="py-3 px-4">تاریخ خرید</th>
                       <th className="py-3 px-4">تاریخ مهلت گارانتی</th>
                       <th className="py-3 px-4 text-center">صفحه تحویل مشتری</th>
@@ -488,19 +482,9 @@ export default function ShopAccounts() {
                             {p.customer_phone ? p.customer_phone : 'ثبت‌نشده'}
                           </td>
 
-                          {/* Price Paid (Buy Price) */}
-                          <td className="py-3.5 px-4 font-bold text-blue-700">
-                            {(p.shop_buy_price || p.price_paid || 0).toLocaleString('fa-IR')} تومان
-                          </td>
-
                           {/* Customer Sell Price */}
                           <td className="py-3.5 px-4 font-bold text-slate-800">
                             {(p.shop_sell_price || p.shop_buy_price || p.price_paid || 0).toLocaleString('fa-IR')} تومان
-                          </td>
-
-                          {/* Profit */}
-                          <td className="py-3.5 px-4 font-black text-emerald-600">
-                            {(p.profit !== undefined ? p.profit : ((p.shop_sell_price || p.shop_buy_price || 0) - (p.shop_buy_price || 0))).toLocaleString('fa-IR')} تومان
                           </td>
 
                           {/* Purchased Date */}
@@ -593,11 +577,7 @@ export default function ShopAccounts() {
                         <div>
                           <h4 className="font-black text-slate-900 text-sm">{p.product_name || 'خرید اکانت'}</h4>
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs mt-1">
-                            <span className="font-bold text-blue-700">خرید: {(p.shop_buy_price || p.price_paid || 0).toLocaleString('fa-IR')}</span>
-                            <span className="text-slate-400">|</span>
-                            <span className="font-bold text-slate-700">فروش: {(p.shop_sell_price || p.shop_buy_price || 0).toLocaleString('fa-IR')}</span>
-                            <span className="text-slate-400">|</span>
-                            <span className="font-black text-emerald-600">سود: {(p.profit !== undefined ? p.profit : ((p.shop_sell_price || p.shop_buy_price || 0) - (p.shop_buy_price || 0))).toLocaleString('fa-IR')} تومان</span>
+                            <span className="font-bold text-slate-700">قیمت فروش به مشتری: {(p.shop_sell_price || p.shop_buy_price || p.price_paid || 0).toLocaleString('fa-IR')} تومان</span>
                           </div>
                         </div>
 
@@ -702,7 +682,7 @@ export default function ShopAccounts() {
       {drawerProduct && (
         <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs" dir="rtl">
           <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            
+
             {/* Header with Step indicator */}
             <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2 sm:gap-3">
@@ -734,7 +714,7 @@ export default function ShopAccounts() {
                     <X size={20} />
                   </button>
                 )}
-                
+
                 <div>
                   <h2 className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
                     <span>{drawerProduct.name}</span>
@@ -750,10 +730,10 @@ export default function ShopAccounts() {
                     {purchaseResult
                       ? 'خرید با موفقیت انجام شد'
                       : checkoutStep === 1
-                      ? 'انتخاب آفر و تامین‌کننده محصول'
-                      : checkoutStep === 2
-                      ? 'ثبت شماره همراه مشتری برای ارسال پیامک'
-                      : 'بررسی فاکتور، قیمت فروش و پرداخت نهایی'}
+                        ? 'انتخاب آفر و تامین‌کننده محصول'
+                        : checkoutStep === 2
+                          ? 'ثبت شماره همراه مشتری برای ارسال پیامک'
+                          : 'بررسی فاکتور، قیمت فروش و پرداخت نهایی'}
                   </p>
                 </div>
               </div>

@@ -12,11 +12,14 @@ import {
   Download
 } from 'lucide-react';
 import AppleIdLayout from './public-accounts/AppleIdLayout';
+import AppleIdICloudLayout from './public-accounts/AppleIdICloudLayout';
+import GeminiSubLayout from './public-accounts/GeminiSubLayout';
 import DefaultAccountLayout from './public-accounts/DefaultAccountLayout';
 
 interface AccountData {
   product_name: string;
   product_description: string | null;
+  frontend_key: string | null;
   public_fields: Record<string, any>;
   private_fields: Record<string, any>;
   customer_phone: string | null;
@@ -122,7 +125,26 @@ export default function PublicAccount() {
   });
 
 
-  const isAppleId = accountData?.product_name.toLowerCase().includes('apple') || false;
+  const frontendKey = (accountData?.frontend_key || '').toLowerCase().trim();
+  const productNameLower = (accountData?.product_name || '').toLowerCase().trim();
+
+  const isGeminiSub =
+    frontendKey === 'gemini_sub' ||
+    productNameLower.includes('gemini') ||
+    productNameLower.includes('google ai') ||
+    productNameLower.includes('جمینای') ||
+    productNameLower.includes('جمینی');
+
+  const isAppleIdICloud =
+    frontendKey === 'apple_id_icloud' ||
+    productNameLower.includes('icloud') ||
+    accountData?.product_name.includes('آیکلود') ||
+    accountData?.product_name.includes('ایکلاود');
+
+  const isAppleIdAppStore =
+    frontendKey === 'apple_id' ||
+    productNameLower.includes('apple') ||
+    accountData?.product_name.includes('اپل');
 
   if (loading) {
     return (
@@ -238,7 +260,27 @@ export default function PublicAccount() {
 
         {/* Dynamic content wrapper */}
         <div className="space-y-6 relative z-10">
-          {isAppleId ? (
+          {isGeminiSub ? (
+            <GeminiSubLayout
+              accountData={accountData}
+              mainFields={mainFields}
+              securityFields={securityFields}
+              otherFields={otherFields}
+              copiedKey={copiedKey}
+              handleCopy={handleCopy}
+              translateKey={translateKey}
+            />
+          ) : isAppleIdICloud ? (
+            <AppleIdICloudLayout
+              accountData={accountData}
+              mainFields={mainFields}
+              securityFields={securityFields}
+              otherFields={otherFields}
+              copiedKey={copiedKey}
+              handleCopy={handleCopy}
+              translateKey={translateKey}
+            />
+          ) : isAppleIdAppStore ? (
             <AppleIdLayout
               accountData={accountData}
               mainFields={mainFields}

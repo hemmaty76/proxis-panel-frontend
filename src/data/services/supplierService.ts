@@ -122,7 +122,7 @@ export const getSupplierTemplates = async (): Promise<ProductAccount[]> => {
 };
 
 export const getSupplierAccounts = async (): Promise<SupplierAccount[]> => {
-  const response = await apiClient.get('/supplier/accounts/');
+  const response = await apiClient.get('/supplier/accounts');
   return response.data;
 };
 
@@ -136,7 +136,7 @@ export const registerSupplierAccount = async (payload: {
   warranty_days?: number;
   description?: string;
 }): Promise<SupplierAccount> => {
-  const response = await apiClient.post('/supplier/accounts/', payload);
+  const response = await apiClient.post('/supplier/accounts', payload);
   return response.data;
 };
 
